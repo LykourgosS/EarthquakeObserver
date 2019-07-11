@@ -42,14 +42,14 @@ public class ExampleService extends Service {
         // when service started with:
         // 1. startService() -> without the following line system will kill the service after 1 min
         // 2. startForegroundService() -> if not called in 5 seconds max system will kill the service (on API v.26)
-        startForeground(1, notification);
+        startForeground(1, notification); // id must be greater than 0
 
         // todo do heavy work on a background thread
 
         // to stop service from here (it will trigger onDestroy())
         //stopSelf();
 
-        return START_NOT_STICKY;
+        return START_NOT_STICKY; // START_NOT_STICKY = when the system kills the service it won't be recreated again
     }
 
     @Override
@@ -58,7 +58,7 @@ public class ExampleService extends Service {
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
+    public IBinder onBind(Intent intent) { // we have to implement this, though it's not needed here
         return null;
     }
 }

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.R;
+import com.unipi.lykourgoss.earthquakeobserver.codinginflow.servicesandbackground.c_IntentService.IntentServiceActivity;
 
 public class ForegroundServiceActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -24,6 +25,8 @@ public class ForegroundServiceActivity extends AppCompatActivity implements View
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_foreground_service);
+
+        startActivity(new Intent(this, IntentServiceActivity.class));
 
         editTextInput = findViewById(R.id.edit_text_input);
 

@@ -5,6 +5,7 @@
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name=".codinginflow.servicesandbackground.b_ForegroundService.App"
@@ -15,6 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".codinginflow.servicesandbackground.c_IntentService.IntentServiceActivity"></activity>
         <activity android:name=".codinginflow.servicesandbackground.b_ForegroundService.ForegroundServiceActivity" />
         <activity android:name=".codinginflow.notificationexample.NotificationChannelActivity" />
         <activity android:name=".MainActivity" />
@@ -30,6 +32,7 @@
             android:name=".codinginflow.servicesandbackground.a_JobScheduler.ExampleJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service android:name=".codinginflow.servicesandbackground.b_ForegroundService.ExampleService" />
+        <service android:name=".codinginflow.servicesandbackground.c_IntentService.ExampleIntentService" />
     </application>
 
 </manifest>

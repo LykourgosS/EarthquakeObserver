@@ -22,7 +22,7 @@ public class App extends Application {
     }
 
     private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){ // notification channels are available for API v.26 and up
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){ // notification channels are available for API v.26 and higher
             NotificationChannel serviceChannel = new NotificationChannel(
                     CHANNEL_ID,
                     "Channel name",
