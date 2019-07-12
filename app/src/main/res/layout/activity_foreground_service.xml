@@ -8,6 +8,11 @@
     android:gravity="center"
     tools:context=".codinginflow.servicesandbackground.b_ForegroundService.ForegroundServiceActivity">
 
+    <TextView
+        android:text="(Foreground)Service Activity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <EditText
         android:id="@+id/edit_text_input"
         android:layout_width="match_parent"

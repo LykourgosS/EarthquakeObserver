@@ -5,14 +5,14 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 
+import com.unipi.lykourgoss.earthquakeobserver.Constant;
+
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
  * on 10,July,2019.
  */
 
 public class App extends Application {
-
-    public static final String CHANNEL_ID = "exampleServiceChannel";
 
     @Override
     public void onCreate() {
@@ -24,7 +24,7 @@ public class App extends Application {
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){ // notification channels are available for API v.26 and higher
             NotificationChannel serviceChannel = new NotificationChannel(
-                    CHANNEL_ID,
+                    Constant.CHANNEL_ID,
                     "Channel name",
                     NotificationManager.IMPORTANCE_DEFAULT
             );

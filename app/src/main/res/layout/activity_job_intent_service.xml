@@ -5,30 +5,24 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16sp"
-    tools:context=".codinginflow.notificationexample.NotificationChannelActivity">
+    android:gravity="center"
+    tools:context=".codinginflow.servicesandbackground.d_JobIntentService.JobIntentServiceActivity">
 
     <TextView
-        android:text="NotificationChannel Activity"
+        android:text="JobIntentService Activity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <EditText
-        android:id="@+id/edit_text_title"
+        android:id="@+id/edit_text_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Title" />
-
-    <EditText
-        android:id="@+id/edit_text_message"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Message" />
+        android:hint="Input" />
 
     <Button
-        android:id="@+id/button_send_on_channel"
-        android:layout_width="wrap_content"
+        android:id="@+id/button_enqueue_work"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Send on Channel" />
+        android:text="Enqueue work" />
 
 </LinearLayout>

@@ -9,13 +9,11 @@ import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.codinginflow.servicesandbackground.c_IntentService.IntentServiceActivity;
 
 public class ForegroundServiceActivity extends AppCompatActivity implements View.OnClickListener {
-
-    public static final String EXTRA_INPUT =
-            "com.unipi.lykourgoss.earthquakeobserver.codinginflow.servicesandbackground.b_ForegroundService.EXTRA_INPUT";
 
     private EditText editTextInput;
     private Button buttonStartService;
@@ -53,7 +51,7 @@ public class ForegroundServiceActivity extends AppCompatActivity implements View
         String input = editTextInput.getText().toString().trim();
 
         Intent intentService = new Intent(this, ExampleService.class);
-        intentService.putExtra(EXTRA_INPUT, input);
+        intentService.putExtra(Constant.EXTRA_INPUT, input);
 
         // to start the service while app is on the background call
         // startForegroundService(intentService), but after 5 seconds max should call

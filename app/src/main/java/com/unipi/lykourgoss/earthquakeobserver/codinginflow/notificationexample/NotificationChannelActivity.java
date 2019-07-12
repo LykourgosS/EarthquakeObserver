@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.codinginflow.servicesandbackground.b_ForegroundService.App;
 
@@ -40,7 +41,7 @@ public class NotificationChannelActivity extends AppCompatActivity implements Vi
             String title = editTextTitle.getText().toString().trim();
             String message = editTextMessage.getText().toString().trim();
 
-            Notification notification = new NotificationCompat.Builder(NotificationChannelActivity.this, App.CHANNEL_ID)
+            Notification notification = new NotificationCompat.Builder(NotificationChannelActivity.this, Constant.CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_track_changes_white_24dp)
                     .setContentTitle(title)
                     .setContentText(message)

@@ -9,12 +9,11 @@ import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.R;
+import com.unipi.lykourgoss.earthquakeobserver.codinginflow.servicesandbackground.d_JobIntentService.JobIntentServiceActivity;
 
 public class IntentServiceActivity extends AppCompatActivity implements View.OnClickListener {
-
-    public static final String EXTRA_INPUT =
-            "com.unipi.lykourgoss.earthquakeobserver.codinginflow.servicesandbackground.c_IntentService.IntentServiceActivity.EXTRA_INPUT";
 
     private EditText editTextInput;
 
@@ -24,6 +23,8 @@ public class IntentServiceActivity extends AppCompatActivity implements View.OnC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intent_service);
+
+        startActivity(new Intent(this, JobIntentServiceActivity.class));
 
         editTextInput = findViewById(R.id.edit_text_input);
 
@@ -37,7 +38,7 @@ public class IntentServiceActivity extends AppCompatActivity implements View.OnC
             String input = editTextInput.getText().toString().trim();
 
             Intent intentService = new Intent(this, ExampleIntentService.class);
-            intentService.putExtra(EXTRA_INPUT, input);
+            intentService.putExtra(Constant.EXTRA_INPUT, input);
 
             // ContextCompat.startForegroundService(...):
             // - API v.26 (Oreo) and higher: startForegroundService(...)

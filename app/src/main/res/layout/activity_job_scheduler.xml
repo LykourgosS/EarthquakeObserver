@@ -8,6 +8,11 @@
     tools:context=".MainActivity"
     android:padding="16sp">
 
+    <TextView
+        android:text="JobScheduler Activity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <Button
         android:id="@+id/button_schedule_job"
         android:layout_width="match_parent"

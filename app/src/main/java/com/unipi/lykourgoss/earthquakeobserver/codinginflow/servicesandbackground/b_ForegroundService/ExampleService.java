@@ -8,10 +8,8 @@ import android.os.IBinder;
 
 import androidx.core.app.NotificationCompat;
 
+import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.R;
-
-import static com.unipi.lykourgoss.earthquakeobserver.codinginflow.servicesandbackground.b_ForegroundService.App.CHANNEL_ID;
-import static com.unipi.lykourgoss.earthquakeobserver.codinginflow.servicesandbackground.b_ForegroundService.ForegroundServiceActivity.EXTRA_INPUT;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
@@ -27,12 +25,12 @@ public class ExampleService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) { // triggered every time we call startService()
-        String input = intent.getStringExtra(EXTRA_INPUT);
+        String input = intent.getStringExtra(Constant.EXTRA_INPUT);
 
         Intent intentNotification = new Intent(this, ForegroundServiceActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intentNotification, 0);
 
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+        Notification notification = new NotificationCompat.Builder(this, Constant.CHANNEL_ID)
                 .setContentTitle("Example Service")
                 .setContentText(input)
                 .setSmallIcon(R.drawable.ic_track_changes_white_24dp)

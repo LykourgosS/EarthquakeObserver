@@ -10,10 +10,8 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
+import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.R;
-
-import static com.unipi.lykourgoss.earthquakeobserver.codinginflow.servicesandbackground.b_ForegroundService.App.CHANNEL_ID;
-import static com.unipi.lykourgoss.earthquakeobserver.codinginflow.servicesandbackground.c_IntentService.IntentServiceActivity.EXTRA_INPUT;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
@@ -47,7 +45,7 @@ public class ExampleIntentService extends IntentService { // runs in the backgro
         Log.d(TAG, "WakeLock acquired");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { // if API is v.26 and higher start a foreground service
-            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+            Notification notification = new NotificationCompat.Builder(this, Constant.CHANNEL_ID)
                     .setContentTitle("ExampleIntentService")
                     .setContentText("Running...")
                     .setSmallIcon(R.drawable.ic_track_changes_white_24dp)
@@ -63,7 +61,7 @@ public class ExampleIntentService extends IntentService { // runs in the backgro
         // incoming intents are executed sequentially one after another in one single thread
         Log.d(TAG, "onHandleIntent");
 
-        String input = intent.getStringExtra(EXTRA_INPUT);
+        String input = intent.getStringExtra(Constant.EXTRA_INPUT);
 
         for (int i = 0; i < 10; i++) {
             Log.d(TAG, input + " - " + i);
