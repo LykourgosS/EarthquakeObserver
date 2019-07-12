@@ -3,8 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.unipi.lykourgoss.earthquakeobserver">
 
+    <!--JobScheduler, StaticReceiver-->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!--IntentService-->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!--IntentService-->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
@@ -16,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".codinginflow.servicesandbackground.d_JobIntentService.JobIntentServiceActivity"></activity>
+        <activity android:name=".codinginflow.servicesandbackground.d_JobIntentService.JobIntentServiceActivity" />
         <activity android:name=".codinginflow.servicesandbackground.c_IntentService.IntentServiceActivity" />
         <activity android:name=".codinginflow.servicesandbackground.b_ForegroundService.ForegroundServiceActivity" />
         <activity android:name=".codinginflow.notificationexample.NotificationChannelActivity" />
@@ -29,6 +32,7 @@
             </intent-filter>
         </activity>
 
+        <!--Services-->
         <service
             android:name=".codinginflow.servicesandbackground.a_JobScheduler.ExampleJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
@@ -37,6 +41,16 @@
         <service
             android:name=".codinginflow.servicesandbackground.d_JobIntentService.ExampleJobIntentService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <!--BroadcastReceivers-->
+        <receiver android:name=".codinginflow.broadcastreceiver.a_StaticReceivers.ExampleBroadcastReceiver">
+            <!--implicit broadcast because it just subscribes to these events,
+            static because is declared in the manifest-->
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

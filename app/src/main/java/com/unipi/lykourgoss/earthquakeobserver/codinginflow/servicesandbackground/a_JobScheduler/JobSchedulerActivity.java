@@ -55,7 +55,7 @@ public class JobSchedulerActivity extends AppCompatActivity implements View.OnCl
         JobInfo info = new JobInfo.Builder(JOB_ID, componentName)
                 .setRequiresCharging(true)
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
-                .setPersisted(true)
+                .setPersisted(true) // keep job alive even device is rebooted, needs permission
                 .setPeriodic(15 * 60 * 1000) // can't be less than 15 minutes, otherwise it will be changed internally
                 .build();
 
