@@ -11,7 +11,7 @@ import android.util.Log;
 
 public class ExampleJobService extends JobService { // JobService runs in the UI thread by default!!!
 
-    private static final String TAG = "ExampleJobService";
+    private static final String TAG = "StartObserverJobService";
     private boolean jobCancelled = false;
 
     @Override

@@ -3,15 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.unipi.lykourgoss.earthquakeobserver">
 
-    <!--JobScheduler, StaticReceiver-->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <!--IntentService-->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <!--IntentService-->
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
-        android:name=".codinginflow.servicesandbackground.b_ForegroundService.App"
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -19,12 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".codinginflow.servicesandbackground.d_JobIntentService.JobIntentServiceActivity" />
-        <activity android:name=".codinginflow.servicesandbackground.c_IntentService.IntentServiceActivity" />
-        <activity android:name=".codinginflow.servicesandbackground.b_ForegroundService.ForegroundServiceActivity" />
-        <activity android:name=".codinginflow.notificationexample.NotificationChannelActivity" />
-        <activity android:name=".MainActivity" />
-        <activity android:name=".codinginflow.servicesandbackground.a_JobScheduler.JobSchedulerActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,25 +22,20 @@
             </intent-filter>
         </activity>
 
-        <!--Services-->
-        <service
-            android:name=".codinginflow.servicesandbackground.a_JobScheduler.ExampleJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service android:name=".codinginflow.servicesandbackground.b_ForegroundService.ExampleService" />
-        <service android:name=".codinginflow.servicesandbackground.c_IntentService.ExampleIntentService" />
-        <service
-            android:name=".codinginflow.servicesandbackground.d_JobIntentService.ExampleJobIntentService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-
-        <!--BroadcastReceivers-->
-        <receiver android:name=".codinginflow.broadcastreceiver.a_StaticReceivers.ExampleBroadcastReceiver">
-            <!--implicit broadcast because it just subscribes to these events,
-            static because is declared in the manifest-->
+        <receiver android:name=".BootCompletedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
+
+        <service
+            android:name=".StartObserverJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name=".StopObserverJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <service android:name=".ExampleService" />
     </application>
 
 </manifest>

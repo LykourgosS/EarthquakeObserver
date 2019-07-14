@@ -12,4 +12,7 @@ public class Constant {
 
     // Notification channel id
     public static final String CHANNEL_ID = "ServiceChannel";
+
+    // used for scheduling jobs
+    public static final int JOB_ID = 1;
 }

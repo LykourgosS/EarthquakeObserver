@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver.codinginflow.servicesandbackground.b_ForegroundService;
+package com.unipi.lykourgoss.earthquakeobserver;
 
 import android.app.Application;
 import android.app.NotificationChannel;
@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 
-import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.codinginflow.broadcastreceiver.b_DynamicReceivers.ChargingReceiver;
 
 /**
@@ -25,11 +24,11 @@ public class App extends Application {
 
         createNotificationChannel();
 
-        // register receiver to receive charge mode changes while app is running
+        /*// register receiver to receive charge mode changes while app is running
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_POWER_CONNECTED);
         filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
-        registerReceiver(receiver, filter);
+        registerReceiver(receiver, filter);*/
     }
 
     private void createNotificationChannel() {
