@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver;
+package com.unipi.lykourgoss.earthquakeobserver.filestoremove;
 
 import android.app.job.JobParameters;
 import android.app.job.JobService;
@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.util.Log;
 
 import androidx.core.content.ContextCompat;
+
+import com.unipi.lykourgoss.earthquakeobserver.services.ObserverService;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
@@ -32,7 +34,7 @@ public class StopObserverJobService extends JobService { // JobService runs in t
     }
 
     private void startService() {
-        Intent intentService = new Intent(this, ExampleService.class);
+        Intent intentService = new Intent(this, ObserverService.class);
 
         // to start the service while app is on the background call
         // startForegroundService(intentService), but after 5 seconds max should call
@@ -41,7 +43,7 @@ public class StopObserverJobService extends JobService { // JobService runs in t
     }
 
     private void stopService() {
-        Intent intentService = new Intent(this, ExampleService.class);
+        Intent intentService = new Intent(this, ObserverService.class);
         stopService(intentService);
     }
 }

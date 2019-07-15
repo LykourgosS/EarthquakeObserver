@@ -4,10 +4,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
     <TextView
         android:text="Hello World"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:onClick="fakeBoot"
+        android:text="Boot"
+        android:id="@+id/button_boot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:onClick="fakePowerDisconnected"
+        android:text="Disconnect power"
+        android:id="@+id/button_disconnect_power"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

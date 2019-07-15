@@ -4,6 +4,7 @@
     package="com.unipi.lykourgoss.earthquakeobserver">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".App"
@@ -22,20 +23,18 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".BootCompletedReceiver">
+        <receiver android:name=".receivers.BootCompletedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="com.unipi.lykourgoss.earthquakeobserver.FAKE_BOOT" />
             </intent-filter>
         </receiver>
 
         <service
-            android:name=".StartObserverJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
-            android:name=".StopObserverJobService"
+            android:name=".services.StartObserverJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
-        <service android:name=".ExampleService" />
+        <service android:name=".services.ObserverService" />
     </application>
 
 </manifest>

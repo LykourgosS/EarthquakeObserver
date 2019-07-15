@@ -16,7 +16,7 @@ import com.unipi.lykourgoss.earthquakeobserver.codinginflow.broadcastreceiver.b_
 
 public class App extends Application {
 
-    private ChargingReceiver receiver = new ChargingReceiver();
+//    private ChargingReceiver receiver = new ChargingReceiver();
 
     @Override
     public void onCreate() {
