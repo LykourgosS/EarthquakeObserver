@@ -9,6 +9,8 @@ import android.widget.Toast;
 
 import com.unipi.lykourgoss.earthquakeobserver.services.StartObserverJobService;
 
+import java.util.List;
+
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
  * on 14,July,2019.
@@ -28,7 +30,9 @@ public class Util {
                 .build();
 
         JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+
         int resultCode = jobScheduler.schedule(jobInfo);
+
         if (resultCode == JobScheduler.RESULT_SUCCESS) {
             Log.d(TAG, "Job scheduled");
             Toast.makeText(context, "Job scheduled", Toast.LENGTH_SHORT).show();
