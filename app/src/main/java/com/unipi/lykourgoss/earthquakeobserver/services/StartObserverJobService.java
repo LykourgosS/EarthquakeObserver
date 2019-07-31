@@ -37,12 +37,12 @@ public class StartObserverJobService extends JobService { // JobService runs in 
     }
 
     private void startService() {
-        Intent intentService = new Intent(this, ObserverService.class);
+        Intent service = new Intent(this, ObserverService.class);
 
         // to start the service while app is on the background call
         // startForegroundService(intentService), but after 5 seconds max should call
         // startForeground(...) within Service onStartCommand()!!!
-        ContextCompat.startForegroundService(this, intentService);
+        ContextCompat.startForegroundService(this, service);
 
         //startService(): If this service is not already running, it will be instantiated and
         // started (creating a process for it if needed); if it is running then it remains running

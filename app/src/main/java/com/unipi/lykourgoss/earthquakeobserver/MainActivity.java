@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
+import com.unipi.lykourgoss.earthquakeobserver.services.ObserverService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -13,7 +16,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        startActivity(new Intent(this, GraphActivity.class));
+        Intent service = new Intent(this, ObserverService.class);
+        ContextCompat.startForegroundService(this, service);
+
+//        startActivity(new Intent(this, GraphActivityPrototype.class));
     }
 
     public void graph(View v) {

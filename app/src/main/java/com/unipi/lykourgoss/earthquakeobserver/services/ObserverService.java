@@ -12,15 +12,20 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.EarthquakeEvent;
+import com.unipi.lykourgoss.earthquakeobserver.GraphActivityPrototype;
 import com.unipi.lykourgoss.earthquakeobserver.MainActivity;
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.receivers.PowerDisconnectedReceiver;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
@@ -72,6 +77,8 @@ public class ObserverService extends Service implements SensorEventListener {
             startForeground(Constant.OBSERVER_SERVICE_ID, notification); // id must be greater than 0
         }
 
+        startActivity(new Intent(this, GraphActivityPrototype.class));
+
         // todo do heavy work on a background thread
 
         // to stop service from here (it will trigger onDestroy())
@@ -97,7 +104,7 @@ public class ObserverService extends Service implements SensorEventListener {
         return binder;
     }
 
-    private SensorEvent lastEvent;
+    private SensorEvent lastEvent = null;
 
     public SensorEvent getLastEvent() {
         return lastEvent;
@@ -105,6 +112,16 @@ public class ObserverService extends Service implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+
+        /////////// todo use following for saving in firebase
+        // time in milliseconds since January 1, 1970 UTC (1970-01-01-00:00:00)
+        long timeInMillis = (new Date()).getTime() - SystemClock.elapsedRealtime() + event.timestamp / 1000000L;
+
+        Date date = new Date(timeInMillis);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS z");
+        String dateTime = dateFormat.format(date);
+        ///////////
+
         lastEvent = event;
     }
 
