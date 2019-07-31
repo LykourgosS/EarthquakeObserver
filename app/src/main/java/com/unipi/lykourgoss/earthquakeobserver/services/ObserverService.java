@@ -3,18 +3,23 @@ package com.unipi.lykourgoss.earthquakeobserver.services;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Build;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
+import com.unipi.lykourgoss.earthquakeobserver.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.MainActivity;
 import com.unipi.lykourgoss.earthquakeobserver.R;
-import com.unipi.lykourgoss.earthquakeobserver.Util;
 import com.unipi.lykourgoss.earthquakeobserver.receivers.PowerDisconnectedReceiver;
 
 /**
@@ -22,9 +27,13 @@ import com.unipi.lykourgoss.earthquakeobserver.receivers.PowerDisconnectedReceiv
  * on 10,July,2019.
  */
 
-public class ObserverService extends Service {
+public class ObserverService extends Service implements SensorEventListener {
 
     public static final String TAG = "ObserverService";
+
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+    private final IBinder binder = new MyBinder();
 
     private PowerDisconnectedReceiver receiver = new PowerDisconnectedReceiver();
 
@@ -35,6 +44,11 @@ public class ObserverService extends Service {
         IntentFilter filter = new IntentFilter(Intent.ACTION_POWER_DISCONNECTED);
         filter.addAction(Constant.FAKE_POWER_DISCONNECTED);
         registerReceiver(receiver, filter);
+
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     @Override
@@ -66,7 +80,7 @@ public class ObserverService extends Service {
         // START_NOT_STICKY = when the system kills the service it won't be recreated again
         // START_STICKY = when the system kills the service it will be recreated with a null intent
         // START_REDELIVER_INTENT = when the system kills the service it will be recreated with the last intent
-        return START_REDELIVER_INTENT;
+        return START_REDELIVER_INTENT; // TODO probably use START_STICKY
     }
 
     @Override
@@ -75,10 +89,33 @@ public class ObserverService extends Service {
         unregisterReceiver(receiver);
         //Util.scheduleStartJob(this); // todo (is it needed) if user stop our service schedule to re-start it
         Log.d(TAG, "onDestroy: receiver unregistered");
+        sensorManager.unregisterListener(this);
     }
 
     @Override
     public IBinder onBind(Intent intent) { // we have to implement this, though it's not needed here
-        return null;
+        return binder;
+    }
+
+    private SensorEvent lastEvent;
+
+    public SensorEvent getLastEvent() {
+        return lastEvent;
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        lastEvent = event;
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    public class MyBinder extends Binder {
+        public ObserverService getService() {
+            return ObserverService.this;
+        }
     }
 }

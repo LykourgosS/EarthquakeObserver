@@ -3,11 +3,7 @@ package com.unipi.lykourgoss.earthquakeobserver;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Build;
-
-import com.unipi.lykourgoss.earthquakeobserver.codinginflow.broadcastreceiver.b_DynamicReceivers.ChargingReceiver;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
@@ -16,19 +12,11 @@ import com.unipi.lykourgoss.earthquakeobserver.codinginflow.broadcastreceiver.b_
 
 public class App extends Application {
 
-//    private ChargingReceiver receiver = new ChargingReceiver();
-
     @Override
     public void onCreate() {
         super.onCreate();
 
         createNotificationChannel();
-
-        /*// register receiver to receive charge mode changes while app is running
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_POWER_CONNECTED);
-        filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
-        registerReceiver(receiver, filter);*/
     }
 
     private void createNotificationChannel() {

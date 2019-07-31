@@ -22,4 +22,7 @@ public class Constant {
     // for Debugging purposes: custom action broadcasts
     public static final String FAKE_BOOT = "com.unipi.lykourgoss.earthquakeobserver.FAKE_BOOT";
     public static final String FAKE_POWER_DISCONNECTED = "com.unipi.lykourgoss.earthquakeobserver.FAKE_POWER_DISCONNECTED";
+
+    // used for identifying the user and the installation
+    public static final String PREF_UNIQUE_ID = "PREF_UNIQUE_ID";
 }

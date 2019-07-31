@@ -22,7 +22,9 @@ public class Util {
 
     public static void scheduleStartJob(Context context) {
         ComponentName serviceComponent = new ComponentName(context, StartObserverJobService.class);
-        JobInfo jobInfo = new JobInfo.Builder(Constant.START_SERVICE_JOB_ID, serviceComponent) // JobId must be unique
+        // JobId must be unique, otherwise it will replace the previous scheduled job, by our
+        // application, with the same jobId
+        JobInfo jobInfo = new JobInfo.Builder(Constant.START_SERVICE_JOB_ID, serviceComponent)
                 .setRequiresCharging(true)
                 //.setRequiresDeviceIdle(true)
                 //.setOverrideDeadline(1000) // The job will be run by this deadline even if other requirements are not met
