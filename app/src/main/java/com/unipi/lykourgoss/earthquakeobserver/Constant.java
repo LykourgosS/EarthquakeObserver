@@ -25,4 +25,7 @@ public class Constant {
 
     // used for identifying the user and the installation
     public static final String PREF_UNIQUE_ID = "PREF_UNIQUE_ID";
+
+    // 10 samples/s => 1 sample in 0.1 s = 100 ms = 100000 μs
+    public static final int SAMPLING_PERIOD = 10000;
 }

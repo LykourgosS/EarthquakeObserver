@@ -12,9 +12,9 @@ import com.unipi.lykourgoss.earthquakeobserver.filestoremove.XYValue;
 
 import java.util.ArrayList;
 
-public class GraphActivity extends AppCompatActivity {
+public class GraphViewActivity extends AppCompatActivity {
 
-    private static final String TAG = "GraphActivity";
+    private static final String TAG = "GraphViewActivity";
 
     private PointsGraphSeries<DataPoint> xySeries;
 

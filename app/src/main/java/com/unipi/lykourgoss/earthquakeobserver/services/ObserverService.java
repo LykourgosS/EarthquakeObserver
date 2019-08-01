@@ -18,9 +18,7 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
-import com.unipi.lykourgoss.earthquakeobserver.EarthquakeEvent;
-import com.unipi.lykourgoss.earthquakeobserver.GraphActivityPrototype;
-import com.unipi.lykourgoss.earthquakeobserver.MainActivity;
+import com.unipi.lykourgoss.earthquakeobserver.GraphActivity;
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.receivers.PowerDisconnectedReceiver;
 
@@ -36,11 +34,25 @@ public class ObserverService extends Service implements SensorEventListener {
 
     public static final String TAG = "ObserverService";
 
+    // Binder given to clients
+    private final IBinder binder = new ObserverBinder();
+
     private SensorManager sensorManager;
     private Sensor accelerometer;
-    private final IBinder binder = new MyBinder();
+    private SensorEvent lastEvent = null;
 
     private PowerDisconnectedReceiver receiver = new PowerDisconnectedReceiver();
+
+    /**
+     * Class used for the client Binder.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with IPC.
+     */
+    public class ObserverBinder extends Binder {
+        public ObserverService getService() {
+            // Return this instance of ObserverService so clients can call public methods
+            return ObserverService.this;
+        }
+    }
 
     @Override
     public void onCreate() { // triggered only once in the lifetime of the service
@@ -51,15 +63,26 @@ public class ObserverService extends Service implements SensorEventListener {
         registerReceiver(receiver, filter);
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        accelerometer.getMinDelay();
+        accelerometer.getMaximumRange();
 
-        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+        // (slower to faster)
+        // - SensorManager.SENSOR_DELAY_NORMAL, delay of 200,000 microseconds = 0.2 seconds
+        //      (Measured: events every ~200ms => fs = 5 Hz)
+        // - SensorManager.SENSOR_DELAY_UI, delay of 60,000 microseconds = 0.2 seconds
+        //      (Measured: events every ~80ms => fs = 12.5 Hz)
+        // - SensorManager.SENSOR_DELAY_GAME, delay of 20,000 microseconds = 0.2 seconds
+        //      (Measured: events every ~20ms => fs = 50 Hz)
+        // - SensorManager.SENSOR_DELAY_FASTEST, 0 microsecond delay
+        //      (Measured: events every ~20ms => fs = 50 Hz)
+        sensorManager.registerListener(this, accelerometer, Constant.SAMPLING_PERIOD);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) { // triggered every time we call startService()
 
-        Intent intentNotification = new Intent(this, MainActivity.class);
+        Intent intentNotification = new Intent(this, GraphActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intentNotification, 0);
 
         // todo only use foreground service on Oreo an higher -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
@@ -76,8 +99,6 @@ public class ObserverService extends Service implements SensorEventListener {
             // 2. startForegroundService() -> if not called in 5 seconds max system will kill the service (on API v.26)
             startForeground(Constant.OBSERVER_SERVICE_ID, notification); // id must be greater than 0
         }
-
-        startActivity(new Intent(this, GraphActivityPrototype.class));
 
         // todo do heavy work on a background thread
 
@@ -100,39 +121,26 @@ public class ObserverService extends Service implements SensorEventListener {
     }
 
     @Override
-    public IBinder onBind(Intent intent) { // we have to implement this, though it's not needed here
+    public IBinder onBind(Intent intent) {
         return binder;
     }
-
-    private SensorEvent lastEvent = null;
 
     public SensorEvent getLastEvent() {
         return lastEvent;
     }
 
+    private long millis = SystemClock.elapsedRealtime();
+
     @Override
     public void onSensorChanged(SensorEvent event) {
-
-        /////////// todo use following for saving in firebase
-        // time in milliseconds since January 1, 1970 UTC (1970-01-01-00:00:00)
-        long timeInMillis = (new Date()).getTime() - SystemClock.elapsedRealtime() + event.timestamp / 1000000L;
-
-        Date date = new Date(timeInMillis);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS z");
-        String dateTime = dateFormat.format(date);
-        ///////////
-
+        long nowMillis = SystemClock.elapsedRealtime();
+        Log.d(TAG, "onSensorChanged: diff between sensorEvents in millis: " + (nowMillis - millis));
+        millis = nowMillis;
+        // SystemClock.elapsedRealtime() (i.e. time in millis that onSensorChanged() triggered) - event.timestamp =~ 0.3 millis
         lastEvent = event;
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
-
-    public class MyBinder extends Binder {
-        public ObserverService getService() {
-            return ObserverService.this;
-        }
     }
 }

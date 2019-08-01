@@ -4,12 +4,16 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.unipi.lykourgoss.earthquakeobserver.services.StartObserverJobService;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
@@ -42,5 +46,12 @@ public class Util {
             Log.d(TAG, "Job scheduling failed");
             Toast.makeText(context, "Job scheduling failed", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public static String toDateTime(long timestampInNanos) {
+        long timeInMillis = (new Date()).getTime() - SystemClock.elapsedRealtime() + timestampInNanos / 1000000L;
+        Date date = new Date(timeInMillis);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS z");
+        return dateFormat.format(date);
     }
 }

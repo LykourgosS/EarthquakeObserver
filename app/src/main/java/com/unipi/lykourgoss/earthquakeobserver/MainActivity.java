@@ -18,8 +18,6 @@ public class MainActivity extends AppCompatActivity {
 
         Intent service = new Intent(this, ObserverService.class);
         ContextCompat.startForegroundService(this, service);
-
-//        startActivity(new Intent(this, GraphActivityPrototype.class));
     }
 
     public void graph(View v) {
