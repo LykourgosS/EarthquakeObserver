@@ -10,14 +10,21 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
+import com.unipi.lykourgoss.earthquakeobserver.EarthquakeEvent;
+import com.unipi.lykourgoss.earthquakeobserver.FirebaseHandler;
 import com.unipi.lykourgoss.earthquakeobserver.GraphActivity;
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.receivers.PowerDisconnectedReceiver;
@@ -41,6 +48,10 @@ public class ObserverService extends Service implements SensorEventListener {
     private Sensor accelerometer;
     private SensorEvent lastEvent = null;
 
+    private LocationManager locationManager;
+
+    private FirebaseHandler firebaseHandler;
+
     private PowerDisconnectedReceiver receiver = new PowerDisconnectedReceiver();
 
     /**
@@ -62,10 +73,10 @@ public class ObserverService extends Service implements SensorEventListener {
         filter.addAction(Constant.FAKE_POWER_DISCONNECTED);
         registerReceiver(receiver, filter);
 
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        accelerometer.getMinDelay();
-        accelerometer.getMaximumRange();
 
         // (slower to faster)
         // - SensorManager.SENSOR_DELAY_NORMAL, delay of 200,000 microseconds = 0.2 seconds
@@ -77,6 +88,8 @@ public class ObserverService extends Service implements SensorEventListener {
         // - SensorManager.SENSOR_DELAY_FASTEST, 0 microsecond delay
         //      (Measured: events every ~20ms => fs = 50 Hz)
         sensorManager.registerListener(this, accelerometer, Constant.SAMPLING_PERIOD);
+
+        firebaseHandler = new FirebaseHandler();
     }
 
     @Override
@@ -125,18 +138,33 @@ public class ObserverService extends Service implements SensorEventListener {
         return binder;
     }
 
+//    private float[] gravity = new float[3];
+
     public SensorEvent getLastEvent() {
+        /*final float alpha = 0.8f;
+
+        gravity[0] = alpha * gravity[0] + (1 - alpha) * lastEvent.values[0];
+        gravity[1] = alpha * gravity[1] + (1 - alpha) * lastEvent.values[1];
+        gravity[2] = alpha * gravity[2] + (1 - alpha) * lastEvent.values[2];
+
+        lastEvent.values[0] = lastEvent.values[0] - gravity[0];
+        lastEvent.values[1] = lastEvent.values[1] - gravity[1];
+        lastEvent.values[2] = lastEvent.values[2] - gravity[2];*/
         return lastEvent;
     }
 
-    private long millis = SystemClock.elapsedRealtime();
+//    private long millis = SystemClock.elapsedRealtime();
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        long nowMillis = SystemClock.elapsedRealtime();
-        Log.d(TAG, "onSensorChanged: diff between sensorEvents in millis: " + (nowMillis - millis));
-        millis = nowMillis;
+//        long nowMillis = SystemClock.elapsedRealtime();
+//        Log.d(TAG, "onSensorChanged: diff between sensorEvents in millis: " + (nowMillis - millis));
+//        millis = nowMillis;
         // SystemClock.elapsedRealtime() (i.e. time in millis that onSensorChanged() triggered) - event.timestamp =~ 0.3 millis
+        EarthquakeEvent earthquakeEvent = new EarthquakeEvent(event.values, event.timestamp);
+        if (Math.abs(earthquakeEvent.getMeasurement() - 9.87)  > 1) {
+            firebaseHandler.addEvent(earthquakeEvent);
+        }
         lastEvent = event;
     }
 

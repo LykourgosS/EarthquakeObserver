@@ -5,6 +5,11 @@
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!--<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!--<uses-feature android:name="android.hardware.location.network" />
+    <uses-feature android:name="android.hardware.location.gps" />-->
 
     <application
         android:name=".App"
@@ -15,6 +20,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".services.Main2Activity" />
+        <activity android:name=".services.LocationActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,6 +42,7 @@
             android:name=".services.StartObserverJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service android:name=".services.ObserverService" />
+        <service android:name=".services.LocationService" />
     </application>
 
 </manifest>

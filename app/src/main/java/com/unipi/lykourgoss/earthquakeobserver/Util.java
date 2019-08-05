@@ -4,6 +4,7 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
+import android.net.NetworkRequest;
 import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 import com.unipi.lykourgoss.earthquakeobserver.services.StartObserverJobService;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -45,6 +47,12 @@ public class Util {
         } else {
             Log.d(TAG, "Job scheduling failed");
             Toast.makeText(context, "Job scheduling failed", Toast.LENGTH_SHORT).show();
+        }
+
+        // log all pending and started jobs
+        List<JobInfo> jobs = jobScheduler.getAllPendingJobs();
+        for (JobInfo job : jobs) {
+            Log.d(TAG, "scheduleStartJob: " + job.toString());
         }
     }
 

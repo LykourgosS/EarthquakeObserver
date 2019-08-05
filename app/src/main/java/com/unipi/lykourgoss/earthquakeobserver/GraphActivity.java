@@ -128,6 +128,9 @@ public class GraphActivity extends AppCompatActivity implements ServiceConnectio
         return set;
     }
 
+//    float sum = 0;
+//    float counter = 0;
+
     private void addEntry(float x, float y, float z) {
         LineData data = lineChart.getData();
 
@@ -142,7 +145,7 @@ public class GraphActivity extends AppCompatActivity implements ServiceConnectio
 
         // √(x²+y²+z²) : to normalize the value, like the magnitude of a vector (now always it
         // will be greater than zero, x, y and z, it only measures the distance from zero)
-        float normXYZ = (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2)) - 9.81f;
+        float normXYZ = EarthquakeEvent.normalizeMeasurement(x, y, z);
 
         ILineDataSet XYZDataSet = data.getDataSetByIndex(3);
         data.addEntry(new Entry(XYZDataSet.getEntryCount(), normXYZ), 3);
@@ -161,6 +164,10 @@ public class GraphActivity extends AppCompatActivity implements ServiceConnectio
 
         // move to the latest entry
         lineChart.moveViewToX(data.getEntryCount());
+
+        /*sum += normXYZ;
+        counter++;
+        Log.d(TAG, "addEntry: " + sum/counter);*/
     }
 
     private void startGraphing() {

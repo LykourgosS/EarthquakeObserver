@@ -27,5 +27,11 @@ public class Constant {
     public static final String PREF_UNIQUE_ID = "PREF_UNIQUE_ID";
 
     // 10 samples/s => 1 sample in 0.1 s = 100 ms = 100000 μs
-    public static final int SAMPLING_PERIOD = 10000;
+    public static final int SAMPLING_PERIOD = 100000;
+
+    public static final String EVENT_FIREBASE_REF = "events";
+
+    // used for setting up location Requests
+    public static final int LOCATION_REQUEST_INTERVAL = 1000 * 30; // 30 seconds
+    public static final int LOCATION_REQUEST_FAST_INTERVAL = 1000 * 10; // 10 seconds
 }
