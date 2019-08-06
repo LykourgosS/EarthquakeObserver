@@ -19,6 +19,7 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationCompat;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -26,11 +27,14 @@ import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.FirebaseHandler;
 import com.unipi.lykourgoss.earthquakeobserver.GraphActivity;
+import com.unipi.lykourgoss.earthquakeobserver.MainActivity;
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.receivers.PowerDisconnectedReceiver;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
@@ -49,6 +53,8 @@ public class ObserverService extends Service implements SensorEventListener {
     private SensorEvent lastEvent = null;
 
     private Locator locator;
+    private Location currentLocation;
+    private String locationLog;
 
     private FirebaseHandler firebaseHandler;
 
@@ -90,12 +96,35 @@ public class ObserverService extends Service implements SensorEventListener {
         sensorManager.registerListener(this, accelerometer, Constant.SAMPLING_PERIOD);
 
         firebaseHandler = new FirebaseHandler();
+
+        locator = new Locator(this);
+        currentLocation = locator.getLastLocation();
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Location tempLocation = locator.getLastLocation();
+                if (currentLocation.getTime() != tempLocation.getTime()) {
+                    currentLocation = tempLocation;
+                    String location = "Lat: " + currentLocation.getLatitude() + ", Long: " + currentLocation.getLongitude();
+                    String speed = currentLocation.getSpeed() + "m/s" + " - " + currentLocation.getSpeed() * 3.6 + " km/h";
+                    if (currentLocation.getSpeed() > 0) {
+                        locationLog.concat(location + speed);
+                        new AlertDialog.Builder(ObserverService.this)
+                                .setTitle("Speed update")
+                                .setMessage(speed)
+                                .setCancelable(true)
+                                .create().show();
+                    }
+                }
+            }
+        }, 0, 1000);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) { // triggered every time we call startService()
 
-        Intent intentNotification = new Intent(this, GraphActivity.class);
+        Intent intentNotification = new Intent(this, LocationActivity.class);
+        intentNotification.putExtra("location_log", locationLog);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intentNotification, 0);
 
         // todo only use foreground service on Oreo an higher -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.O

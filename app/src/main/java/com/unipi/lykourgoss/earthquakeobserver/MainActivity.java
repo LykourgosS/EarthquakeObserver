@@ -17,6 +17,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.services.Locator;
+import com.unipi.lykourgoss.earthquakeobserver.services.ObserverService;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -40,49 +41,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        textViewLocation = findViewById(R.id.text_view_location);
-        textViewSpeed = findViewById(R.id.text_view_speed);
-        textViewSpeedLog = findViewById(R.id.text_view_speed_log);
-
         if (checkLocationPermission()) {
-            locator = new Locator(this);
-            currentLocation = locator.getLastLocation();
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    Location tempLocation = locator.getLastLocation();
-                    if (currentLocation.getTime() != tempLocation.getTime()) {
-                        currentLocation = tempLocation;
-                        final String location = "Lat: " + currentLocation.getLatitude() + ", Long: " + currentLocation.getLongitude();
-                        final String speed = currentLocation.getSpeed() + "m/s" + " - " + currentLocation.getSpeed() * 3.6 + " km/h";
-                        if (currentLocation.getSpeed() > 0) {
-                            textViewSpeedLog.append("\n -> " + speed + " (" + currentLocation.getProvider() + ")");
-                            new AlertDialog.Builder(MainActivity.this)
-                                    .setTitle("Speed update")
-                                    .setMessage(speed)
-                                    .setCancelable(true)
-                                    .create().show();
-                        }
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                textViewLocation.setText(location);
-                                textViewSpeed.setText(speed);
-                                /*textViewSpeedLog.append("\n -> " + speed + " (" + currentLocation.getProvider() + ")");*/
-                                textViewSpeedLog.append("\n\n - " + currentLocation + "\nspeed: " + speed);
-                            }
-                        });
-                    }/* else {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                textViewLocation.setText("Location is null");
-                            }
-                        });
-                        //Toast.makeText(MainActivity.this, "Location is null", Toast.LENGTH_SHORT).show();
-                    }*/
-                }
-            }, 0, 1000);
+            Intent service = new Intent(this, ObserverService.class);
+            startService(service);
         }
     }
 
