@@ -1,16 +1,13 @@
 package com.unipi.lykourgoss.earthquakeobserver;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,33 +16,73 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.unipi.lykourgoss.earthquakeobserver.services.LocationActivity;
-import com.unipi.lykourgoss.earthquakeobserver.services.LocationService;
-import com.unipi.lykourgoss.earthquakeobserver.services.Main2Activity;
-import com.unipi.lykourgoss.earthquakeobserver.services.ObserverService;
+import com.unipi.lykourgoss.earthquakeobserver.services.Locator;
 
-public class MainActivity extends AppCompatActivity implements LocationListener {
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
     private static final int LOCATION_PERMISSION_CODE = 1;
 
-    private LocationManager locationManager;
+    private Locator locator;
+
+    private TextView textViewLocation;
+    private TextView textViewSpeed;
+    private TextView textViewSpeedLog;
+
+    private Location currentLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        startActivity(new Intent(this, Main2Activity.class));
+        textViewLocation = findViewById(R.id.text_view_location);
+        textViewSpeed = findViewById(R.id.text_view_speed);
+        textViewSpeedLog = findViewById(R.id.text_view_speed_log);
 
         if (checkLocationPermission()) {
-            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,this);
-            Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            Log.d(TAG, "onCreate: " + location.toString());
-            Intent service = new Intent(this, LocationService.class);
-            startService(service);
+            locator = new Locator(this);
+            currentLocation = locator.getLastLocation();
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    Location tempLocation = locator.getLastLocation();
+                    if (currentLocation.getTime() != tempLocation.getTime()) {
+                        currentLocation = tempLocation;
+                        final String location = "Lat: " + currentLocation.getLatitude() + ", Long: " + currentLocation.getLongitude();
+                        final String speed = currentLocation.getSpeed() + "m/s" + " - " + currentLocation.getSpeed() * 3.6 + " km/h";
+                        if (currentLocation.getSpeed() > 0) {
+                            textViewSpeedLog.append("\n -> " + speed + " (" + currentLocation.getProvider() + ")");
+                            new AlertDialog.Builder(MainActivity.this)
+                                    .setTitle("Speed update")
+                                    .setMessage(speed)
+                                    .setCancelable(true)
+                                    .create().show();
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                textViewLocation.setText(location);
+                                textViewSpeed.setText(speed);
+                                /*textViewSpeedLog.append("\n -> " + speed + " (" + currentLocation.getProvider() + ")");*/
+                                textViewSpeedLog.append("\n\n - " + currentLocation + "\nspeed: " + speed);
+                            }
+                        });
+                    }/* else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                textViewLocation.setText("Location is null");
+                            }
+                        });
+                        //Toast.makeText(MainActivity.this, "Location is null", Toast.LENGTH_SHORT).show();
+                    }*/
+                }
+            }, 0, 1000);
         }
     }
 
@@ -102,27 +139,5 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        location.getSpeed();
-        Log.d(TAG, "onLocationChanged: " + location.toString());
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        Log.d(TAG, "onStatusChanged");
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-        Log.d(TAG, "onProviderEnabled");
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        Log.d(TAG, "onProviderDisabled");
-        Log.d(TAG, "onProviderDisabled: " + locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER));
     }
 }

@@ -48,7 +48,7 @@ public class ObserverService extends Service implements SensorEventListener {
     private Sensor accelerometer;
     private SensorEvent lastEvent = null;
 
-    private LocationManager locationManager;
+    private Locator locator;
 
     private FirebaseHandler firebaseHandler;
 
@@ -73,7 +73,7 @@ public class ObserverService extends Service implements SensorEventListener {
         filter.addAction(Constant.FAKE_POWER_DISCONNECTED);
         registerReceiver(receiver, filter);
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locator =new Locator(this);
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);

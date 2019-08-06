@@ -1,3 +1,4 @@
+/*
 package com.unipi.lykourgoss.earthquakeobserver.services;
 
 import android.annotation.SuppressLint;
@@ -93,17 +94,20 @@ public class Main2Activity extends AppCompatActivity {
                     if (task.getException() instanceof ResolvableApiException) {
                         // Location settings are not satisfied, but this can be fixed
                         // by showing the user a dialog.
-                        /*try {
+                        */
+/*try {
                             // Show the dialog by calling startResolutionForResult(),
                             // and check the result in onActivityResult().
                             ResolvableApiException resolvable = (ResolvableApiException) exception;
                             resolvable.startResolutionForResult(Main2Activity.this, REQUEST_CHECK_SETTINGS);
                         } catch (IntentSender.SendIntentException sendEx) {
                             // Ignore the error.
-                        }*/
+                        }*//*
+
                     }
                 }
             }
         });
     }
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package com.unipi.lykourgoss.earthquakeobserver.filestoremove;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,3 +39,4 @@ public class GraphViewActivity extends AppCompatActivity {
         xySeries = new PointsGraphSeries<>();
     }
 }
+*/
