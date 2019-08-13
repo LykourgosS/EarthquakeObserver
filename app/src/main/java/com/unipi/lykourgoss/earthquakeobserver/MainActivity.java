@@ -3,6 +3,7 @@ package com.unipi.lykourgoss.earthquakeobserver;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -16,11 +17,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.unipi.lykourgoss.earthquakeobserver.receivers.BootCompletedReceiver;
 import com.unipi.lykourgoss.earthquakeobserver.services.Locator;
 import com.unipi.lykourgoss.earthquakeobserver.services.ObserverService;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,23 +27,25 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int LOCATION_PERMISSION_CODE = 1;
 
-    private Locator locator;
-
-    private TextView textViewLocation;
-    private TextView textViewSpeed;
-    private TextView textViewSpeedLog;
-
-    private Location currentLocation;
+    // private BootCompletedReceiver receiver = new BootCompletedReceiver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // register receiver for
+        // IntentFilter filter = new IntentFilter(Constant.FAKE_BOOT);
+        // registerReceiver(receiver, filter);
+
         if (checkLocationPermission()) {
-            Intent service = new Intent(this, ObserverService.class);
-            startService(service);
+//            Intent service = new Intent(this, ObserverService.class);
+//            startService(service);
         }
+    }
+
+    public void logLocation(View v) {
+        startActivity(new Intent(this, LogLocationActivity.class));
     }
 
     public void graph(View v) {

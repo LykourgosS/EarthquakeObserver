@@ -11,28 +11,21 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Binder;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationCompat;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.FirebaseHandler;
-import com.unipi.lykourgoss.earthquakeobserver.GraphActivity;
-import com.unipi.lykourgoss.earthquakeobserver.MainActivity;
+import com.unipi.lykourgoss.earthquakeobserver.LogLocationActivity;
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.receivers.PowerDisconnectedReceiver;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -48,12 +41,19 @@ public class ObserverService extends Service implements SensorEventListener {
     // Binder given to clients
     private final IBinder binder = new ObserverBinder();
 
+    // static service status variables
+    private static boolean isCreated = false;
+    private static boolean isBind = false;
+    private static boolean isStarted = false;
+    private static boolean isSensorInitialized = false;
+    private static boolean isLocatorInitialized = false;
+
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private SensorEvent lastEvent = null;
 
     private Locator locator;
-    private Location currentLocation;
+    private Location lastLocation;
     private String locationLog;
 
     private FirebaseHandler firebaseHandler;
@@ -74,57 +74,80 @@ public class ObserverService extends Service implements SensorEventListener {
     @Override
     public void onCreate() { // triggered only once in the lifetime of the service
         super.onCreate();
+        Log.d(TAG, "onCreate");
 
+        isCreated = true;
+
+        // register receiver for
         IntentFilter filter = new IntentFilter(Intent.ACTION_POWER_DISCONNECTED);
         filter.addAction(Constant.FAKE_POWER_DISCONNECTED);
+        filter.addAction(Constant.DEVICE_IS_MOVING);
         registerReceiver(receiver, filter);
 
-        locator =new Locator(this);
-
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
-        // (slower to faster)
-        // - SensorManager.SENSOR_DELAY_NORMAL, delay of 200,000 microseconds = 0.2 seconds
-        //      (Measured: events every ~200ms => fs = 5 Hz)
-        // - SensorManager.SENSOR_DELAY_UI, delay of 60,000 microseconds = 0.2 seconds
-        //      (Measured: events every ~80ms => fs = 12.5 Hz)
-        // - SensorManager.SENSOR_DELAY_GAME, delay of 20,000 microseconds = 0.2 seconds
-        //      (Measured: events every ~20ms => fs = 50 Hz)
-        // - SensorManager.SENSOR_DELAY_FASTEST, 0 microsecond delay
-        //      (Measured: events every ~20ms => fs = 50 Hz)
-        sensorManager.registerListener(this, accelerometer, Constant.SAMPLING_PERIOD);
-
+        initSensor();
+        initLocator();
         firebaseHandler = new FirebaseHandler();
+    }
 
-        locator = new Locator(this);
-        currentLocation = locator.getLastLocation();
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Location tempLocation = locator.getLastLocation();
-                if (currentLocation.getTime() != tempLocation.getTime()) {
-                    currentLocation = tempLocation;
-                    String location = "Lat: " + currentLocation.getLatitude() + ", Long: " + currentLocation.getLongitude();
-                    String speed = currentLocation.getSpeed() + "m/s" + " - " + currentLocation.getSpeed() * 3.6 + " km/h";
-                    if (currentLocation.getSpeed() > 0) {
-                        locationLog.concat(location + speed);
-                        new AlertDialog.Builder(ObserverService.this)
-                                .setTitle("Speed update")
-                                .setMessage(speed)
-                                .setCancelable(true)
-                                .create().show();
+    public void initLocator() {
+        if (!isLocatorInitialized) {
+            locator = new Locator(this);
+            lastLocation = locator.getLastLocation();
+            /*new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (lastLocation != null) {
+                        *//*Location tempLocation = locator.getLastLocation();
+                        if (lastLocation.getTime() != tempLocation.getTime()) {
+                            lastLocation = tempLocation;
+                            String location = "Lat: " + lastLocation.getLatitude() + ", Long: " + lastLocation.getLongitude();
+                            String speed = lastLocation.getSpeed() + "m/s" + " - " + lastLocation.getSpeed() * 3.6 + " km/h";
+                            locationLog = location + "\n" + speed;
+                            if (lastLocation.getSpeed() > 0) {
+                                new AlertDialog.Builder(ObserverService.this)
+                                        .setTitle("Speed update")
+                                        .setMessage(speed)
+                                        .setCancelable(true)
+                                        .create().show();
+                            }
+                        }*//*
+                        lastLocation = locator.getLastLocation();
                     }
                 }
-            }
-        }, 0, 1000);
+            }, 0, 1000);*/
+            // todo important line (the following!!!)
+            isLocatorInitialized = true;
+        }
+    }
+
+    public void initSensor() {
+        if (!isSensorInitialized) {
+            sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+            // (slower to faster)
+            // - SensorManager.SENSOR_DELAY_NORMAL, delay of 200,000 microseconds = 0.2 seconds (Documentation)
+            //      (Measured: events every ~200ms => fs = 5 Hz)
+            // - Constant.SAMPLING_PERIOD, delay of 100,000 microseconds = 0.1 seconds (Custom)
+            //      (Measured: events every ~100ms => fs = 10 Hz)
+            // - SensorManager.SENSOR_DELAY_UI, delay of 60,000 microseconds = 0.06 seconds (Documentation)
+            //      (Measured: events every ~80ms => fs = 12.5 Hz)
+            // - SensorManager.SENSOR_DELAY_GAME, delay of 20,000 microseconds = 0.02 seconds (Documentation)
+            //      (Measured: events every ~20ms => fs = 50 Hz)
+            // - SensorManager.SENSOR_DELAY_FASTEST, 0 microsecond delay (Documentation)
+            //      (Measured: events every ~20ms => fs = 50 Hz)
+            sensorManager.registerListener(this, accelerometer, Constant.SAMPLING_PERIOD);
+            // todo important line (the following!!!)
+            isSensorInitialized = true;
+        }
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) { // triggered every time we call startService()
-
-        Intent intentNotification = new Intent(this, LocationActivity.class);
-        intentNotification.putExtra("location_log", locationLog);
+        Log.d(TAG, "onStartCommand");
+        isStarted = true;
+        Intent intentNotification = new Intent(this, LogLocationActivity.class);
+//        intentNotification.putExtra(Constant.EXTRA_LOCATION_LOG, locationLog);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intentNotification, 0);
 
         // todo only use foreground service on Oreo an higher -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
@@ -143,6 +166,7 @@ public class ObserverService extends Service implements SensorEventListener {
         }
 
         // todo do heavy work on a background thread
+        //firebaseHandler = new FirebaseHandler();
 
         // to stop service from here (it will trigger onDestroy())
         //stopSelf();
@@ -158,12 +182,13 @@ public class ObserverService extends Service implements SensorEventListener {
         super.onDestroy();
         unregisterReceiver(receiver);
         //Util.scheduleStartJob(this); // todo (is it needed) if user stop our service schedule to re-start it
-        Log.d(TAG, "onDestroy: receiver unregistered");
+        Log.d(TAG, "onDestroy");
         sensorManager.unregisterListener(this);
     }
 
     @Override
     public IBinder onBind(Intent intent) {
+        Log.d(TAG, "onBind");
         return binder;
     }
 
@@ -180,6 +205,10 @@ public class ObserverService extends Service implements SensorEventListener {
         lastEvent.values[1] = lastEvent.values[1] - gravity[1];
         lastEvent.values[2] = lastEvent.values[2] - gravity[2];*/
         return lastEvent;
+    }
+
+    public Location getLastLocation() {
+        return lastLocation;
     }
 
 //    private long millis = SystemClock.elapsedRealtime();

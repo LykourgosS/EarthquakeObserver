@@ -2,11 +2,13 @@ package com.unipi.lykourgoss.earthquakeobserver.services;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.util.Log;
 
 /**
@@ -22,14 +24,20 @@ public class Locator implements LocationListener {
 
     private Location lastLocation;
 
+    private boolean isMoving = false;
+
     private LocationManager locationManager;
+    private String provider = LocationManager.NETWORK_PROVIDER;
 
     private long lastUpdateTime;
 
+    private Context context;
+
     @SuppressLint("MissingPermission")
     public Locator(Context context) {
+        this.context = context;
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-//        locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, UPDATES_PERIOD, 5, this);
+//        locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, UPDATES_PERIOD, 10, this);
         /**
          * updates every ~20 seconds
          * locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, UPDATES_PERIOD, 0, this);
@@ -38,8 +46,10 @@ public class Locator implements LocationListener {
          * locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, UPDATES_PERIOD, 0, this);
          * */
 //        LocationProvider provider = locationManager.getProvider(locationManager.getBestProvider(createCriteria(), true));
-        locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 0, 0, this);
-        lastLocation = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+        locationManager.requestLocationUpdates(provider, 0, 10, this);
+        lastLocation = locationManager.getLastKnownLocation(provider);
+        lastUpdateTime = SystemClock.elapsedRealtime();
+        Log.d(TAG, "Locator: " + lastLocation);
     }
 
     /*private static Criteria createCriteria() {
@@ -54,17 +64,34 @@ public class Locator implements LocationListener {
         return lastLocation;
     }
 
+    public boolean isLocationEnabled() {
+        return locationManager.isProviderEnabled(provider);
+    }
+
     public boolean isMoving() {
-        float speed = lastLocation.getSpeed();
-        return speed == 0;
+//        float speed = lastLocation.getSpeed();
+//        return speed == 0;
+        return isMoving;
+    }
+
+    private boolean isFixed = false;
+
+    private boolean isFixed() {
+        return isFixed;
     }
 
     @Override
     public void onLocationChanged(Location location) {
+        // when the onLocationChanged triggered the first time means provider is fixed and only the
+        // first time isFixed will become true
+        if (!isFixed) isFixed = true;
         long timeNow = SystemClock.elapsedRealtime();
         Log.d(TAG, "onLocationChangedPeriod: " + ((timeNow - lastUpdateTime) / 1000.0));
         lastUpdateTime = timeNow;
         Log.d(TAG, "onLocationChanged: " + location);
+        if (lastLocation.getLatitude() != location.getLatitude() || lastLocation.getLongitude() != location.getLongitude()) {
+            isMoving = true;
+        }
         lastLocation = location;
     }
 
@@ -80,6 +107,9 @@ public class Locator implements LocationListener {
 
     @Override
     public void onProviderDisabled(String provider) {
+//        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        context.startActivity(intent);
         Log.d(TAG, "onProviderDisabled");
         Log.d(TAG, "onProviderDisabled: " + locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER));
     }

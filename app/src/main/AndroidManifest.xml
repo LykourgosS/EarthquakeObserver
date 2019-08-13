@@ -8,9 +8,6 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-    <!--<uses-feature android:name="android.hardware.location.network" />
-    <uses-feature android:name="android.hardware.location.gps" />-->
-
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -20,7 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".services.Main2Activity" />
+        <activity
+            android:name=".LogLocationActivity"
+            android:launchMode="singleTop" />
         <activity android:name=".services.LocationActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -29,7 +28,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".GraphActivity" />
+        <activity
+            android:name=".GraphActivity"
+            android:launchMode="singleTop" />
 
         <receiver android:name=".receivers.BootCompletedReceiver">
             <intent-filter>

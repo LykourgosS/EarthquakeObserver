@@ -22,6 +22,7 @@ public class Constant {
     // for Debugging purposes: custom action broadcasts
     public static final String FAKE_BOOT = "com.unipi.lykourgoss.earthquakeobserver.FAKE_BOOT";
     public static final String FAKE_POWER_DISCONNECTED = "com.unipi.lykourgoss.earthquakeobserver.FAKE_POWER_DISCONNECTED";
+    public static final String DEVICE_IS_MOVING = "com.unipi.lykourgoss.earthquakeobserver.DEVICE_IS_MOVING";
 
     // used for identifying the user and the installation
     public static final String PREF_UNIQUE_ID = "PREF_UNIQUE_ID";
@@ -34,4 +35,7 @@ public class Constant {
     // used for setting up location Requests
     public static final int LOCATION_REQUEST_INTERVAL = 1000 * 30; // 30 seconds
     public static final int LOCATION_REQUEST_FAST_INTERVAL = 1000 * 10; // 10 seconds
+
+    // used for logging locations in LogLocationActivity and ObserverService
+    public static final String EXTRA_LOCATION_LOG = "com.unipi.lykourgoss.earthquakeobserver.Constant.EXTRA_LOCATION_LOG";
 }

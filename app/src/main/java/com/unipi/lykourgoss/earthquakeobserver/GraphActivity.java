@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,6 +44,10 @@ public class GraphActivity extends AppCompatActivity implements ServiceConnectio
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graph);
 
+        initializeChart();
+    }
+
+    private void initializeChart() {
         lineChart = findViewById(R.id.line_chart);
 
         // enable description text
@@ -96,25 +101,6 @@ public class GraphActivity extends AppCompatActivity implements ServiceConnectio
 
         YAxis rightAxis = lineChart.getAxisRight();
         rightAxis.setEnabled(false);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        // used for taking accelerometer data from service
-        Intent intent = new Intent(this, ObserverService.class);
-        bindService(intent, this, Context.BIND_AUTO_CREATE);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(TAG, "onStop");
-        timer.cancel();
-
-        // used for taking accelerometer data from service
-        unbindService(this);
     }
 
     private LineDataSet createSet(String label, float lineWidth, int color) {
@@ -172,7 +158,7 @@ public class GraphActivity extends AppCompatActivity implements ServiceConnectio
 
     private void startGraphing() {
         timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
+        timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 final SensorEvent event = observerService.getLastEvent();
@@ -185,19 +171,56 @@ public class GraphActivity extends AppCompatActivity implements ServiceConnectio
                     });
                 }
             }
-        }, 0, 50);
+        }, 0, 110/*todo replace with Constant.SAMPLING_PERIOD*/); // period = 110, because accelerometer sampling period is 100 millis
     }
 
-    public void playPauseGraph(View v) {
+    public void stopStartGraph(View v) {
+        Button button = (Button) v;
         if (graphIsStopped) {
             startGraphing();
             Toast.makeText(this, "Start", Toast.LENGTH_SHORT).show();
             graphIsStopped = false;
+            button.setText("Stop");
         } else {
             timer.cancel();
             Toast.makeText(this, "Stop", Toast.LENGTH_SHORT).show();
             graphIsStopped = true;
+            button.setText("Start");
         }
+    }
+
+
+    /**
+     * @link: https://developer.android.com/guide/components/bound-services#Additional_Notes
+     *
+     * Note: You don't usually bind and unbind during your activity's onResume() and onPause(),
+     * because these callbacks occur at every lifecycle transition and you should keep the
+     * processing that occurs at these transitions to a minimum. Also, if multiple activities in
+     * your application bind to the same service and there is a transition between two of those
+     * activities, the service may be destroyed and recreated as the current activity unbinds
+     * (during pause) before the next one binds (during resume). This activity transition for how
+     * activities coordinate their lifecycles is described in the Activities document.
+     * */
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // used for taking accelerometer data from service
+        Intent intent = new Intent(this, ObserverService.class);
+        // The third parameter is a flag indicating options for the binding. It should usually be
+        // BIND_AUTO_CREATE in order to create the service if it's not already alive. Other possible
+        // values are BIND_DEBUG_UNBIND and BIND_NOT_FOREGROUND, or 0 for none
+        bindService(intent, this, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop");
+        timer.cancel();
+
+        // used for taking accelerometer data from service
+        unbindService(this);
     }
 
     @Override
