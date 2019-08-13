@@ -13,10 +13,8 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.util.Log;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
@@ -25,9 +23,6 @@ import com.unipi.lykourgoss.earthquakeobserver.FirebaseHandler;
 import com.unipi.lykourgoss.earthquakeobserver.LogLocationActivity;
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.receivers.PowerDisconnectedReceiver;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
@@ -74,7 +69,8 @@ public class ObserverService extends Service implements SensorEventListener {
     @Override
     public void onCreate() { // triggered only once in the lifetime of the service
         super.onCreate();
-        Log.d(TAG, "onCreate");
+        Log.d(TAG, "onCreate isLocatorInitialized = " + isLocatorInitialized);
+        Log.d(TAG, "onCreate isSensorInitialized = " + isSensorInitialized);
 
         isCreated = true;
 
@@ -90,38 +86,22 @@ public class ObserverService extends Service implements SensorEventListener {
     }
 
     public void initLocator() {
-        if (!isLocatorInitialized) {
-            locator = new Locator(this);
-            lastLocation = locator.getLastLocation();
-            /*new Timer().schedule(new TimerTask() {
+        if (true/*!isLocatorInitialized*/) {
+            locator = new Locator(this) {
                 @Override
-                public void run() {
-                    if (lastLocation != null) {
-                        *//*Location tempLocation = locator.getLastLocation();
-                        if (lastLocation.getTime() != tempLocation.getTime()) {
-                            lastLocation = tempLocation;
-                            String location = "Lat: " + lastLocation.getLatitude() + ", Long: " + lastLocation.getLongitude();
-                            String speed = lastLocation.getSpeed() + "m/s" + " - " + lastLocation.getSpeed() * 3.6 + " km/h";
-                            locationLog = location + "\n" + speed;
-                            if (lastLocation.getSpeed() > 0) {
-                                new AlertDialog.Builder(ObserverService.this)
-                                        .setTitle("Speed update")
-                                        .setMessage(speed)
-                                        .setCancelable(true)
-                                        .create().show();
-                            }
-                        }*//*
-                        lastLocation = locator.getLastLocation();
-                    }
+                public void onLocationChanged(Location location) {
+                    super.onLocationChanged(location);
+                    lastLocation = location;
                 }
-            }, 0, 1000);*/
+            };
+            lastLocation = locator.getLastLocation();
             // todo important line (the following!!!)
             isLocatorInitialized = true;
         }
     }
 
     public void initSensor() {
-        if (!isSensorInitialized) {
+        if (true/*!isSensorInitialized*/) {
             sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
@@ -180,15 +160,18 @@ public class ObserverService extends Service implements SensorEventListener {
     @Override
     public void onDestroy() { // triggered when service is stopped
         super.onDestroy();
-        unregisterReceiver(receiver);
+        Log.d(TAG, "onDestroy isLocatorInitialized = " + isLocatorInitialized);
+        Log.d(TAG, "onDestroy isSensorInitialized = " + isSensorInitialized);
         //Util.scheduleStartJob(this); // todo (is it needed) if user stop our service schedule to re-start it
-        Log.d(TAG, "onDestroy");
+        unregisterReceiver(receiver);
         sensorManager.unregisterListener(this);
+        locator.removeUpdates();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.d(TAG, "onBind");
+        Log.d(TAG, "onBind isLocatorInitialized = " + isLocatorInitialized);
+        Log.d(TAG, "onBind isSensorInitialized = " + isSensorInitialized);
         return binder;
     }
 
@@ -220,7 +203,7 @@ public class ObserverService extends Service implements SensorEventListener {
 //        millis = nowMillis;
         // SystemClock.elapsedRealtime() (i.e. time in millis that onSensorChanged() triggered) - event.timestamp =~ 0.3 millis
         EarthquakeEvent earthquakeEvent = new EarthquakeEvent(event.values, event.timestamp);
-        if (Math.abs(earthquakeEvent.getMeasurement() - 9.87)  > 1) {
+        if (Math.abs(earthquakeEvent.getMeasurement() - 9.87) > 1) {
             firebaseHandler.addEvent(earthquakeEvent);
         }
         lastEvent = event;

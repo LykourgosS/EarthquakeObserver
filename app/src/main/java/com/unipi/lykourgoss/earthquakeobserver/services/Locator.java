@@ -46,10 +46,14 @@ public class Locator implements LocationListener {
          * locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, UPDATES_PERIOD, 0, this);
          * */
 //        LocationProvider provider = locationManager.getProvider(locationManager.getBestProvider(createCriteria(), true));
-        locationManager.requestLocationUpdates(provider, 0, 10, this);
+        locationManager.requestLocationUpdates(provider, 0, 0, this);
         lastLocation = locationManager.getLastKnownLocation(provider);
         lastUpdateTime = SystemClock.elapsedRealtime();
         Log.d(TAG, "Locator: " + lastLocation);
+    }
+
+    public void removeUpdates() {
+        locationManager.removeUpdates(this);
     }
 
     /*private static Criteria createCriteria() {
@@ -74,6 +78,7 @@ public class Locator implements LocationListener {
         return isMoving;
     }
 
+    // todo remove isFixed
     private boolean isFixed = false;
 
     private boolean isFixed() {
@@ -85,11 +90,15 @@ public class Locator implements LocationListener {
         // when the onLocationChanged triggered the first time means provider is fixed and only the
         // first time isFixed will become true
         if (!isFixed) isFixed = true;
+
         long timeNow = SystemClock.elapsedRealtime();
         Log.d(TAG, "onLocationChangedPeriod: " + ((timeNow - lastUpdateTime) / 1000.0));
         lastUpdateTime = timeNow;
         Log.d(TAG, "onLocationChanged: " + location);
-        if (lastLocation.getLatitude() != location.getLatitude() || lastLocation.getLongitude() != location.getLongitude()) {
+        /*if (lastLocation.getLatitude() != location.getLatitude() || lastLocation.getLongitude() != location.getLongitude()) {
+            isMoving = true;
+        }*/
+        if (lastLocation != null && location.distanceTo(lastLocation) > 10) {
             isMoving = true;
         }
         lastLocation = location;
@@ -100,17 +109,20 @@ public class Locator implements LocationListener {
         Log.d(TAG, "onStatusChanged");
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onProviderEnabled(String provider) {
         Log.d(TAG, "onProviderEnabled");
+        Log.d(TAG, "onProviderEnabled: " + locationManager.getLastKnownLocation(provider));
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onProviderDisabled(String provider) {
 //        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 //        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //        context.startActivity(intent);
         Log.d(TAG, "onProviderDisabled");
-        Log.d(TAG, "onProviderDisabled: " + locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER));
+        Log.d(TAG, "onProviderDisabled: " + locationManager.getLastKnownLocation(provider));
     }
 }

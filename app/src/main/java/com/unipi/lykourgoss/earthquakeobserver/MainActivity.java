@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -27,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int LOCATION_PERMISSION_CODE = 1;
 
-    // private BootCompletedReceiver receiver = new BootCompletedReceiver();
+     private BootCompletedReceiver receiver = new BootCompletedReceiver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,13 +36,31 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // register receiver for
-        // IntentFilter filter = new IntentFilter(Constant.FAKE_BOOT);
-        // registerReceiver(receiver, filter);
+         IntentFilter filter = new IntentFilter(Constant.FAKE_BOOT);
+         registerReceiver(receiver, filter);
 
         if (checkLocationPermission()) {
 //            Intent service = new Intent(this, ObserverService.class);
 //            startService(service);
         }
+
+        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        Intent batteryStatus = registerReceiver(null, intentFilter);
+
+        // Are we charging / charged?
+        int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+        boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL;
+
+        // How are we charging?
+        int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+        boolean usbCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_USB;
+        boolean acCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_AC;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(receiver);
     }
 
     public void logLocation(View v) {

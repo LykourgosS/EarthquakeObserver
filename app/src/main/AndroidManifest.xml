@@ -35,7 +35,6 @@
         <receiver android:name=".receivers.BootCompletedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="com.unipi.lykourgoss.earthquakeobserver.FAKE_BOOT" />
             </intent-filter>
         </receiver>
 

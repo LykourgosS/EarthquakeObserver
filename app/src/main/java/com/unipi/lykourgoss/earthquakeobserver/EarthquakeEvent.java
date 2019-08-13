@@ -40,7 +40,7 @@ public class EarthquakeEvent {
     public EarthquakeEvent(float[] eventValues, long timeInMillis/*, double latitude, double longitude*/) {
         this.measurement = normalizeMeasurement(eventValues[0], eventValues[1], eventValues[2]);
         this.timeInMillis = timeInMillis;
-        this.dateTime = Util.toDateTime(timeInMillis);
+        this.dateTime = Util.nanosFromBootToDateTime(timeInMillis);
         /*this.latitude = latitude;
         this.longitude = longitude;*/
     }
