@@ -6,10 +6,40 @@
     android:orientation="vertical"
     tools:context=".LogLocationActivity">
 
-    <RelativeLayout
-        android:background="@android:color/holo_blue_bright"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/edit_text_latitude"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Latitude"
+            android:inputType="numberDecimal|numberSigned" />
+
+        <EditText
+            android:id="@+id/edit_text_longitude"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Longitude"
+            android:inputType="numberDecimal|numberSigned" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/button_send_mock_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="sendMockLocation"
+        android:text="Send mock location" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_blue_bright"
         android:orientation="horizontal">
 
         <TextView
@@ -26,6 +56,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_toEndOf="@+id/text_view_label"
+            android:background="@android:color/holo_blue_bright"
             android:textAlignment="viewEnd"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             tools:text="0" />
@@ -35,7 +66,7 @@
     <ScrollView
         android:id="@+id/scroll_view_log"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/text_view_location_log"

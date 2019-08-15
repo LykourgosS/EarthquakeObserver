@@ -5,11 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -32,6 +34,9 @@ public class LogLocationActivity extends AppCompatActivity implements ServiceCon
     private TextView textViewLogCount;
     private int logCount = 1;
 
+    private EditText editTextLatitude;
+    private EditText editTextLongitude;
+
     private Location lastLocation;
 
     private Timer timer;
@@ -44,6 +49,9 @@ public class LogLocationActivity extends AppCompatActivity implements ServiceCon
         scrollViewLog = findViewById(R.id.scroll_view_log);
         textViewLogLocation = findViewById(R.id.text_view_location_log);
         textViewLogCount = findViewById(R.id.text_view_log_count);
+
+        editTextLatitude = findViewById(R.id.edit_text_latitude);
+        editTextLongitude = findViewById(R.id.edit_text_longitude);
 
         Intent intent = new Intent(this, ObserverService.class);
         bindService(intent, this, Context.BIND_AUTO_CREATE);
@@ -72,7 +80,6 @@ public class LogLocationActivity extends AppCompatActivity implements ServiceCon
                     if (lastLocation != null) { // means provider in locator wasn't fixed, but now it is!
                         if (lastLocation.getTime() != tempLocation.getTime()) { // if tempLocation isn't the old (last) one
                             updateLogTextViews(tempLocation);
-                            lastLocation = tempLocation;
                         }
                     } else {
                         lastLocation = tempLocation;
@@ -93,6 +100,7 @@ public class LogLocationActivity extends AppCompatActivity implements ServiceCon
                 textViewLogCount.setText(String.valueOf(logCount));
                 logCount++;
                 scrollViewLog.fullScroll(View.FOCUS_DOWN);
+                lastLocation = location;
             }
         });
     }
@@ -109,9 +117,36 @@ public class LogLocationActivity extends AppCompatActivity implements ServiceCon
         Log.d(TAG, "getLocationLog: location.getTime() " + Util.millisToDateTime());
         long timeInMillis = new Date().getTime() - SystemClock.elapsedRealtime() + location.getTime();*/
         String dateTime = logCount +". (" + Util.millisToDateTime(location.getTime()) + ")";
+
+        Location tempLocation = new Location("");
+        tempLocation.setLatitude(location.getLatitude());
+        tempLocation.setLongitude(location.getLongitude());
+
         String distance = "\nDistance: " + lastLocation.distanceTo(location) + " m";
+        Log.d(TAG, "getLocationLog: " + distance);
         String speed = "\nSpeed: " + location.getSpeed() + "m/s" + " - " + location.getSpeed() * 3.6 + " km/h";
         String locationLog = dateTime + "\n" + location + distance + speed + "\n\n";
         return locationLog;
+    }
+
+    public void sendMockLocation(View v) {
+        double latitude = Double.valueOf(editTextLatitude.getText().toString());
+        double longitude = Double.valueOf(editTextLongitude.getText().toString());
+        if (latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180){
+            LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            locationManager.addTestProvider(LocationManager.NETWORK_PROVIDER, false,
+                    false, false, false, false,
+                    false, false, 0, 5);
+            locationManager.setTestProviderEnabled(LocationManager.NETWORK_PROVIDER, true);
+
+            Location mockLocation = new Location(LocationManager.NETWORK_PROVIDER);
+            mockLocation.setLatitude(latitude);
+            mockLocation.setLongitude(longitude);
+            mockLocation.setAccuracy(5 );
+            mockLocation.setTime(new Date().getTime());
+            mockLocation.setElapsedRealtimeNanos(SystemClock.elapsedRealtimeNanos());
+            locationManager.setTestProviderLocation(LocationManager.NETWORK_PROVIDER, mockLocation);
+            Log.d(TAG, "sendMockLocation: " + mockLocation);
+        }
     }
 }

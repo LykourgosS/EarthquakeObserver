@@ -5,34 +5,41 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:layout_margin="8sp">
 
     <Button
         android:id="@+id/button_log_location"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="logLocation"
         android:text="Log Location" />
 
     <Button
         android:id="@+id/button_graph"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="graph"
         android:text="Graph" />
 
     <Button
         android:id="@+id/button_boot"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="fakeBoot"
         android:text="Boot" />
 
     <Button
         android:id="@+id/button_disconnect_power"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="fakePowerDisconnected"
         android:text="Disconnect power" />
+
+    <TextView
+        android:id="@+id/text_view_battery_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
 </LinearLayout>

@@ -45,7 +45,7 @@ public class ObserverService extends Service implements SensorEventListener {
 
     private SensorManager sensorManager;
     private Sensor accelerometer;
-    private SensorEvent lastEvent = null;
+    private SensorEvent lastEvent;
 
     private Locator locator;
     private Location lastLocation;
@@ -64,6 +64,10 @@ public class ObserverService extends Service implements SensorEventListener {
             // Return this instance of ObserverService so clients can call public methods
             return ObserverService.this;
         }
+    }
+
+    public ObserverService() {
+        Log.d(TAG, "ObserverService: Constructor");
     }
 
     @Override

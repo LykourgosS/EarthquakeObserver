@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.view.View;
@@ -19,8 +18,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.receivers.BootCompletedReceiver;
-import com.unipi.lykourgoss.earthquakeobserver.services.Locator;
-import com.unipi.lykourgoss.earthquakeobserver.services.ObserverService;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,7 +28,9 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int LOCATION_PERMISSION_CODE = 1;
 
-     private BootCompletedReceiver receiver = new BootCompletedReceiver();
+    private TextView textViewBatteryStatus;
+
+    private BootCompletedReceiver receiver = new BootCompletedReceiver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,25 +38,40 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // register receiver for
-         IntentFilter filter = new IntentFilter(Constant.FAKE_BOOT);
-         registerReceiver(receiver, filter);
+        IntentFilter filter = new IntentFilter(Constant.FAKE_BOOT);
+        registerReceiver(receiver, filter);
 
         if (checkLocationPermission()) {
 //            Intent service = new Intent(this, ObserverService.class);
 //            startService(service);
         }
 
-        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        Intent batteryStatus = registerReceiver(null, intentFilter);
+        textViewBatteryStatus = findViewById(R.id.text_view_battery_status);
 
-        // Are we charging / charged?
-        int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-        boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL;
+        final IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 
-        // How are we charging?
-        int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-        boolean usbCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_USB;
-        boolean acCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_AC;
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Intent batteryStatus = registerReceiver(null, intentFilter);
+                // Are we charging / charged?
+                int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+                boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL;
+
+                // How are we charging?
+                int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+                boolean usbCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_USB;
+                boolean acCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_AC;
+
+                final String batteryStatusString = String.format("isCharging = %s\nusbCharge = %s\nacCharge = %s", isCharging, usbCharge, acCharge);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        textViewBatteryStatus.setText(batteryStatusString);
+                    }
+                });
+            }
+        }, 0, 500);
     }
 
     @Override
@@ -97,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PERMISSION_CODE);
+                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PERMISSION_CODE);
                         }
                     })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -107,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }).create().show();
         } else {
-            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PERMISSION_CODE);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PERMISSION_CODE);
         }
     }
 
