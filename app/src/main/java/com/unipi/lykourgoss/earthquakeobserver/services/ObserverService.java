@@ -207,8 +207,9 @@ public class ObserverService extends Service implements SensorEventListener {
 //        millis = nowMillis;
         // SystemClock.elapsedRealtime() (i.e. time in millis that onSensorChanged() triggered) - event.timestamp =~ 0.3 millis
         EarthquakeEvent earthquakeEvent = new EarthquakeEvent(event.values, event.timestamp);
-        if (Math.abs(earthquakeEvent.getMeasurement() - 9.87) > 1) {
+        if (false/*Math.abs(earthquakeEvent.getMeasurement() - 9.87) > 1*/) {
             firebaseHandler.addEvent(earthquakeEvent);
+            Log.d(TAG, "onSensorChanged: event added to Firebase");
         }
         lastEvent = event;
     }
