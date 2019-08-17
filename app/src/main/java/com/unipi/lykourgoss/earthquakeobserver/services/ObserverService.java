@@ -20,7 +20,7 @@ import androidx.core.app.NotificationCompat;
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.FirebaseHandler;
-import com.unipi.lykourgoss.earthquakeobserver.LogLocationActivity;
+import com.unipi.lykourgoss.earthquakeobserver.activities.LogLocationActivity;
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.receivers.PowerDisconnectedReceiver;
 
@@ -207,7 +207,7 @@ public class ObserverService extends Service implements SensorEventListener {
 //        millis = nowMillis;
         // SystemClock.elapsedRealtime() (i.e. time in millis that onSensorChanged() triggered) - event.timestamp =~ 0.3 millis
         EarthquakeEvent earthquakeEvent = new EarthquakeEvent(event.values, event.timestamp);
-        if (false/*Math.abs(earthquakeEvent.getMeasurement() - 9.87) > 1*/) {
+        if (false/*Math.abs(earthquakeEvent.getSensorValue() - 9.87) > 1*/) {
             firebaseHandler.addEvent(earthquakeEvent);
             Log.d(TAG, "onSensorChanged: event added to Firebase");
         }

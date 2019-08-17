@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver;
+package com.unipi.lykourgoss.earthquakeobserver.activities;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -23,6 +23,8 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.unipi.lykourgoss.earthquakeobserver.EarthquakeEvent;
+import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.services.ObserverService;
 
 import java.util.Timer;
@@ -131,7 +133,7 @@ public class GraphActivity extends AppCompatActivity implements ServiceConnectio
 
         // √(x²+y²+z²) : to normalize the value, like the magnitude of a vector (now always it
         // will be greater than zero, x, y and z, it only measures the distance from zero)
-        float normXYZ = EarthquakeEvent.normalizeMeasurement(x, y, z);
+        float normXYZ = EarthquakeEvent.normalizeSensorValue(x, y, z);
 
         ILineDataSet XYZDataSet = data.getDataSetByIndex(3);
         data.addEntry(new Entry(XYZDataSet.getEntryCount(), normXYZ), 3);

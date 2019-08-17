@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver;
+package com.unipi.lykourgoss.earthquakeobserver.activities;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -17,6 +17,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.unipi.lykourgoss.earthquakeobserver.R;
+import com.unipi.lykourgoss.earthquakeobserver.Util;
 import com.unipi.lykourgoss.earthquakeobserver.services.ObserverService;
 
 import java.util.Date;

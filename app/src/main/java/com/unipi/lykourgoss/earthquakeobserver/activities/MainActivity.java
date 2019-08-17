@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver;
+package com.unipi.lykourgoss.earthquakeobserver.activities;
 
 import android.Manifest;
 import android.content.DialogInterface;
@@ -17,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.unipi.lykourgoss.earthquakeobserver.Constant;
+import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.receivers.BootCompletedReceiver;
 
 import java.util.Timer;
@@ -78,6 +80,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(receiver);
+    }
+
+    public void sensorConfiguration(View v) {
+        startActivity(new Intent(this, SensorConfigurationActivity.class));
     }
 
     public void logLocation(View v) {

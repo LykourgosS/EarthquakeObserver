@@ -15,9 +15,9 @@ public class EarthquakeEvent {
     // todo see if we need x, y, z for extra information !!!
 
     /**
-    * normalized measurement √(x²+y²+z²) (using accelerometer output: x, y, z)
+    * normalized sensorValue √(x²+y²+z²) (using accelerometer output: x, y, z)
     * */
-    private float measurement;
+    private float sensorValue;
 
     /**
      * time in milliseconds, since January 1, 1970 UTC (1970-01-01-00:00:00), in which the event
@@ -38,7 +38,7 @@ public class EarthquakeEvent {
 
 
     public EarthquakeEvent(float[] eventValues, long timeInMillis/*, double latitude, double longitude*/) {
-        this.measurement = normalizeMeasurement(eventValues[0], eventValues[1], eventValues[2]);
+        this.sensorValue = normalizeSensorValue(eventValues[0], eventValues[1], eventValues[2]);
         this.timeInMillis = timeInMillis;
         this.dateTime = Util.nanosFromBootToDateTime(timeInMillis);
         /*this.latitude = latitude;
@@ -53,8 +53,8 @@ public class EarthquakeEvent {
         this.id = id;
     }
 
-    public float getMeasurement() {
-        return measurement;
+    public float getSensorValue() {
+        return sensorValue;
     }
 
     public long getTimeInMillis() {
@@ -73,7 +73,7 @@ public class EarthquakeEvent {
         return longitude;
     }
 
-    public static float normalizeMeasurement(float x, float y, float z) {
+    public static float normalizeSensorValue(float x, float y, float z) {
         float normXYZ = (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
         return normXYZ;
     }
