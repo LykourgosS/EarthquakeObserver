@@ -36,7 +36,7 @@ public class SensorConfigurationActivity extends AppCompatActivity implements Se
         Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(this, accelerometer, Constant.SAMPLING_PERIOD);
 
-        setTimer();
+        //setTimer();
     }
 
     @Override
@@ -45,6 +45,14 @@ public class SensorConfigurationActivity extends AppCompatActivity implements Se
         if (normValue >= DEFAULT_MEAN_SENSOR_VALUE - 0.5 && normValue <= DEFAULT_MEAN_SENSOR_VALUE + 0.5) {
             valueSum += normValue;
             valueCount++;
+            Log.d(TAG, "onSensorChanged: mean = " + valueSum / valueCount + ", count = " + valueCount);
+            //Log.d(TAG, "onSensorChanged: count = " + valueCount);
+            if (valueCount == 1000) {
+                sensorManager.unregisterListener(SensorConfigurationActivity.this);
+                float meanValue = valueSum / valueCount;
+                Log.d(TAG, "onSensorChanged: finish mean = " + meanValue);
+                finish();
+            }
         } else {
             Log.d(TAG, "onSensorChanged: big value = " + normValue);
         }
@@ -65,7 +73,7 @@ public class SensorConfigurationActivity extends AppCompatActivity implements Se
             public void onFinish() {
                 sensorManager.unregisterListener(SensorConfigurationActivity.this);
                 float meanValue = valueSum / valueCount;
-                Log.d(TAG, "onFinish: mean = " + meanValue);
+                Log.d(TAG, "onFinish: mean = " + meanValue + ", count = " + valueCount);
                 finish();
             }
         }.start();
