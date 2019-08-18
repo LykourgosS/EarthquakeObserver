@@ -10,8 +10,6 @@ import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
-import com.unipi.lykourgoss.earthquakeobserver.Util;
-
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
  * on 09,July,2019.

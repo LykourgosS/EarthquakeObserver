@@ -18,6 +18,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
+import com.unipi.lykourgoss.earthquakeobserver.tools.FirebaseHandler;
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.receivers.BootCompletedReceiver;
 
@@ -100,6 +101,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void fakePowerDisconnected(View v) {
         sendBroadcast(new Intent(Constant.FAKE_POWER_DISCONNECTED));
+    }
+
+    public void clearEvents(View v) {
+        FirebaseHandler handler = new FirebaseHandler();
+        handler.deleteAllEvents();
     }
 
     private boolean checkLocationPermission() {

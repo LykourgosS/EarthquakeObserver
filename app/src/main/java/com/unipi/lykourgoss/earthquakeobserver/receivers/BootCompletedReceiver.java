@@ -10,7 +10,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
-import com.unipi.lykourgoss.earthquakeobserver.Util;
+import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>

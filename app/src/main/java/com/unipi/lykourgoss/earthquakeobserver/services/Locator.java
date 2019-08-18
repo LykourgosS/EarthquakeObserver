@@ -20,7 +20,7 @@ public class Locator implements LocationListener {
 
     private static final String TAG = "Locator";
 
-    public static final int UPDATES_PERIOD = 0/*1000 * 10*/; // get updates every 10 seconds
+    public static final int UPDATES_PERIOD = 0/*1000 * 30*/; // get updates every 30 seconds
 
     private Location lastLocation;
 
@@ -46,7 +46,7 @@ public class Locator implements LocationListener {
          * locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, UPDATES_PERIOD, 0, this);
          * */
 //        LocationProvider provider = locationManager.getProvider(locationManager.getBestProvider(createCriteria(), true));
-        locationManager.requestLocationUpdates(provider, 0, 0, this);
+        locationManager.requestLocationUpdates(provider, 30000, 0, this);
         lastLocation = locationManager.getLastKnownLocation(provider);
         lastUpdateTime = SystemClock.elapsedRealtime();
         Log.d(TAG, "Locator: " + lastLocation);

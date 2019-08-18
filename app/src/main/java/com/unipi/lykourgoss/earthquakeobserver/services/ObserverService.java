@@ -19,10 +19,11 @@ import androidx.core.app.NotificationCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.EarthquakeEvent;
-import com.unipi.lykourgoss.earthquakeobserver.FirebaseHandler;
+import com.unipi.lykourgoss.earthquakeobserver.tools.FirebaseHandler;
 import com.unipi.lykourgoss.earthquakeobserver.activities.LogLocationActivity;
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.receivers.PowerDisconnectedReceiver;
+import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
@@ -36,20 +37,13 @@ public class ObserverService extends Service implements SensorEventListener {
     // Binder given to clients
     private final IBinder binder = new ObserverBinder();
 
-    // static service status variables
-    private static boolean isCreated = false;
-    private static boolean isBind = false;
-    private static boolean isStarted = false;
-    private static boolean isSensorInitialized = false;
-    private static boolean isLocatorInitialized = false;
-
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private SensorEvent lastEvent;
+    private float meanBalanceSensorValue;
 
     private Locator locator;
     private Location lastLocation;
-    private String locationLog;
 
     private FirebaseHandler firebaseHandler;
 
@@ -73,10 +67,6 @@ public class ObserverService extends Service implements SensorEventListener {
     @Override
     public void onCreate() { // triggered only once in the lifetime of the service
         super.onCreate();
-        Log.d(TAG, "onCreate isLocatorInitialized = " + isLocatorInitialized);
-        Log.d(TAG, "onCreate isSensorInitialized = " + isSensorInitialized);
-
-        isCreated = true;
 
         // register receiver for
         IntentFilter filter = new IntentFilter(Intent.ACTION_POWER_DISCONNECTED);
@@ -86,7 +76,6 @@ public class ObserverService extends Service implements SensorEventListener {
 
         initSensor();
         initLocator();
-        firebaseHandler = new FirebaseHandler();
     }
 
     public void initLocator() {
@@ -100,7 +89,7 @@ public class ObserverService extends Service implements SensorEventListener {
             };
             lastLocation = locator.getLastLocation();
             // todo important line (the following!!!)
-            isLocatorInitialized = true;
+            //isLocatorInitialized = true;
         }
     }
 
@@ -122,14 +111,13 @@ public class ObserverService extends Service implements SensorEventListener {
             //      (Measured: events every ~20ms => fs = 50 Hz)
             sensorManager.registerListener(this, accelerometer, Constant.SAMPLING_PERIOD);
             // todo important line (the following!!!)
-            isSensorInitialized = true;
+            //isSensorInitialized = true;
         }
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) { // triggered every time we call startService()
         Log.d(TAG, "onStartCommand");
-        isStarted = true;
         Intent intentNotification = new Intent(this, LogLocationActivity.class);
 //        intentNotification.putExtra(Constant.EXTRA_LOCATION_LOG, locationLog);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intentNotification, 0);
@@ -150,7 +138,8 @@ public class ObserverService extends Service implements SensorEventListener {
         }
 
         // todo do heavy work on a background thread
-        //firebaseHandler = new FirebaseHandler();
+        firebaseHandler = new FirebaseHandler();
+        meanBalanceSensorValue = SharedPrefManager.getInstance(this).read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_SENSOR_BALANCE_VALUE);
 
         // to stop service from here (it will trigger onDestroy())
         //stopSelf();
@@ -164,8 +153,6 @@ public class ObserverService extends Service implements SensorEventListener {
     @Override
     public void onDestroy() { // triggered when service is stopped
         super.onDestroy();
-        Log.d(TAG, "onDestroy isLocatorInitialized = " + isLocatorInitialized);
-        Log.d(TAG, "onDestroy isSensorInitialized = " + isSensorInitialized);
         //Util.scheduleStartJob(this); // todo (is it needed) if user stop our service schedule to re-start it
         unregisterReceiver(receiver);
         sensorManager.unregisterListener(this);
@@ -174,8 +161,7 @@ public class ObserverService extends Service implements SensorEventListener {
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.d(TAG, "onBind isLocatorInitialized = " + isLocatorInitialized);
-        Log.d(TAG, "onBind isSensorInitialized = " + isSensorInitialized);
+        Log.d(TAG, "onBind");
         return binder;
     }
 
@@ -207,7 +193,7 @@ public class ObserverService extends Service implements SensorEventListener {
 //        millis = nowMillis;
         // SystemClock.elapsedRealtime() (i.e. time in millis that onSensorChanged() triggered) - event.timestamp =~ 0.3 millis
         EarthquakeEvent earthquakeEvent = new EarthquakeEvent(event.values, event.timestamp);
-        if (false/*Math.abs(earthquakeEvent.getSensorValue() - 9.87) > 1*/) {
+        if (firebaseHandler != null && Math.abs(earthquakeEvent.getSensorValue() - 9.87) > 1) {
             firebaseHandler.addEvent(earthquakeEvent);
             Log.d(TAG, "onSensorChanged: event added to Firebase");
         }

@@ -81,8 +81,12 @@ public class GraphActivity extends AppCompatActivity implements ServiceConnectio
         data.addDataSet(ZDataSet);
 
         // √(x²+y²+z²) DataSet
-        LineDataSet XYZDataSet = createSet("√(x²+y²+z²)", 1f, Color.MAGENTA);
-        data.addDataSet(XYZDataSet);
+        LineDataSet normXYZDataSet = createSet("√(x²+y²+z²)", 3f, Color.BLACK);
+        data.addDataSet(normXYZDataSet);
+
+        // x+y+z DataSet
+        LineDataSet sumXYZDataSet = createSet("x+y+z", 1f, Color.YELLOW);
+        data.addDataSet(sumXYZDataSet);
 
         lineChart.setData(data);
 
@@ -134,9 +138,13 @@ public class GraphActivity extends AppCompatActivity implements ServiceConnectio
         // √(x²+y²+z²) : to normalize the value, like the magnitude of a vector (now always it
         // will be greater than zero, x, y and z, it only measures the distance from zero)
         float normXYZ = EarthquakeEvent.normalizeSensorValue(x, y, z);
+        ILineDataSet normXYZDataSet = data.getDataSetByIndex(3);
+        data.addEntry(new Entry(normXYZDataSet.getEntryCount(), normXYZ), 3);
 
-        ILineDataSet XYZDataSet = data.getDataSetByIndex(3);
-        data.addEntry(new Entry(XYZDataSet.getEntryCount(), normXYZ), 3);
+        // x+y+z
+        float sumXYZ = EarthquakeEvent.normalizeSensorValue(x, y, z);
+        ILineDataSet sumXYZDataSet = data.getDataSetByIndex(4);
+        data.addEntry(new Entry(sumXYZDataSet.getEntryCount(), sumXYZ), 4);
 
         data.notifyDataChanged();
 
@@ -194,7 +202,7 @@ public class GraphActivity extends AppCompatActivity implements ServiceConnectio
 
     /**
      * @link: https://developer.android.com/guide/components/bound-services#Additional_Notes
-     *
+     * <p>
      * Note: You don't usually bind and unbind during your activity's onResume() and onPause(),
      * because these callbacks occur at every lifecycle transition and you should keep the
      * processing that occurs at these transitions to a minimum. Also, if multiple activities in
@@ -202,7 +210,7 @@ public class GraphActivity extends AppCompatActivity implements ServiceConnectio
      * activities, the service may be destroyed and recreated as the current activity unbinds
      * (during pause) before the next one binds (during resume). This activity transition for how
      * activities coordinate their lifecycles is described in the Activities document.
-     * */
+     */
     @Override
     protected void onStart() {
         super.onStart();

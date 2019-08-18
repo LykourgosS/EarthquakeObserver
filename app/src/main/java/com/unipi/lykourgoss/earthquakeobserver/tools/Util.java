@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver;
+package com.unipi.lykourgoss.earthquakeobserver.tools;
 
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
@@ -9,6 +9,7 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.services.StartObserverJobService;
 
 import java.text.SimpleDateFormat;

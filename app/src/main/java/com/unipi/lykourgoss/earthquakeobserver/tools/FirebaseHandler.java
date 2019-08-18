@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver;
+package com.unipi.lykourgoss.earthquakeobserver.tools;
 
 import android.hardware.SensorEvent;
 
@@ -10,6 +10,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.unipi.lykourgoss.earthquakeobserver.Constant;
+import com.unipi.lykourgoss.earthquakeobserver.EarthquakeEvent;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
@@ -39,6 +41,10 @@ public class FirebaseHandler {
         String id = databaseReference.push().getKey();
         event.setId(id);
         databaseReference.child(id).setValue(event);
+    }
+
+    public void deleteAllEvents() {
+        databaseReference.setValue(null);
     }
 
     private class MyValueEventListener implements ValueEventListener {

@@ -1,7 +1,9 @@
-package com.unipi.lykourgoss.earthquakeobserver;
+package com.unipi.lykourgoss.earthquakeobserver.tools;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import com.unipi.lykourgoss.earthquakeobserver.Constant;
 
 import java.util.UUID;
 

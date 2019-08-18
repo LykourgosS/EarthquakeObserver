@@ -1,5 +1,7 @@
 package com.unipi.lykourgoss.earthquakeobserver;
 
+import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
+
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
  * on 31,July,2019.
@@ -73,6 +75,9 @@ public class EarthquakeEvent {
         return longitude;
     }
 
+    /**
+     * returns a normalized sensorValue √(x²+y²+z²) (using accelerometer output: x, y, z)
+     * */
     public static float normalizeSensorValue(float x, float y, float z) {
         float normXYZ = (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
         return normXYZ;
