@@ -30,8 +30,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.GraphActivity"
+            android:name=".activities.GraphAllActivity"
             android:launchMode="singleTop" />
+        <activity android:name=".activities.GraphOnlyNormActivity" />
 
         <receiver android:name=".receivers.BootCompletedReceiver">
             <intent-filter>

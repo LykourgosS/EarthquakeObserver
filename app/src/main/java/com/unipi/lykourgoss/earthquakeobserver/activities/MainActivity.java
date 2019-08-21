@@ -91,8 +91,12 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(this, LogLocationActivity.class));
     }
 
-    public void graph(View v) {
-        startActivity(new Intent(this, GraphActivity.class));
+    public void graphOnlyNorm(View v) {
+        startActivity(new Intent(this, GraphOnlyNormActivity.class));
+    }
+
+    public void graphAll(View v) {
+        startActivity(new Intent(this, GraphAllActivity.class));
     }
 
     public void fakeBoot(View v) {

@@ -20,6 +20,7 @@ public class Locator implements LocationListener {
 
     private static final String TAG = "Locator";
 
+    // todo use following instead of hardcoded!!!
     public static final int UPDATES_PERIOD = 0/*1000 * 30*/; // get updates every 30 seconds
 
     private Location lastLocation;

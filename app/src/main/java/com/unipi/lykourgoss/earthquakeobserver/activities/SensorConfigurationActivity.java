@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
-import com.unipi.lykourgoss.earthquakeobserver.EarthquakeEvent;
+import com.unipi.lykourgoss.earthquakeobserver.Entities.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 

@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:padding="16sp"
     android:gravity="center"
-    tools:context=".codinginflow.servicesandbackground.c_IntentService.IntentServiceActivity">
+    tools:context=".filestoremove.codinginflow.servicesandbackground.c_IntentService.IntentServiceActivity">
 
     <TextView
         android:text="IntentService Activity"

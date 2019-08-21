@@ -23,11 +23,18 @@
         android:text="Log Location" />
 
     <Button
-        android:id="@+id/button_graph"
+        android:id="@+id/button_graph_only_norm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="graph"
-        android:text="Graph" />
+        android:onClick="graphOnlyNorm"
+        android:text="Graph only norm" />
+
+    <Button
+        android:id="@+id/button_graph_all"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="graphAll"
+        android:text="Graph all" />
 
     <Button
         android:id="@+id/button_boot"

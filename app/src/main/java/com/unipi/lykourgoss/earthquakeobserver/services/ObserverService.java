@@ -18,12 +18,15 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
-import com.unipi.lykourgoss.earthquakeobserver.EarthquakeEvent;
+import com.unipi.lykourgoss.earthquakeobserver.Entities.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.tools.FirebaseHandler;
 import com.unipi.lykourgoss.earthquakeobserver.activities.LogLocationActivity;
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.receivers.PowerDisconnectedReceiver;
 import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
@@ -34,13 +37,16 @@ public class ObserverService extends Service implements SensorEventListener {
 
     public static final String TAG = "ObserverService";
 
+    private boolean isStarted = false;
+
     // Binder given to clients
     private final IBinder binder = new ObserverBinder();
 
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private SensorEvent lastEvent;
-    private float meanBalanceSensorValue;
+    private float balanceValue;
+    private List<EarthquakeEvent> eventList;
 
     private Locator locator;
     private Location lastLocation;
@@ -118,6 +124,8 @@ public class ObserverService extends Service implements SensorEventListener {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) { // triggered every time we call startService()
         Log.d(TAG, "onStartCommand");
+        isStarted = true;
+
         Intent intentNotification = new Intent(this, LogLocationActivity.class);
 //        intentNotification.putExtra(Constant.EXTRA_LOCATION_LOG, locationLog);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intentNotification, 0);
@@ -138,8 +146,10 @@ public class ObserverService extends Service implements SensorEventListener {
         }
 
         // todo do heavy work on a background thread
+        // following are used for observing events and if needed save them to Firebase Database
         firebaseHandler = new FirebaseHandler();
-        meanBalanceSensorValue = SharedPrefManager.getInstance(this).read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_SENSOR_BALANCE_VALUE);
+        balanceValue = SharedPrefManager.getInstance(this).read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_SENSOR_BALANCE_VALUE);
+        eventList = new ArrayList<>();
 
         // to stop service from here (it will trigger onDestroy())
         //stopSelf();
@@ -185,22 +195,32 @@ public class ObserverService extends Service implements SensorEventListener {
     }
 
 //    private long millis = SystemClock.elapsedRealtime();
-
     @Override
     public void onSensorChanged(SensorEvent event) {
 //        long nowMillis = SystemClock.elapsedRealtime();
 //        Log.d(TAG, "onSensorChanged: diff between sensorEvents in millis: " + (nowMillis - millis));
 //        millis = nowMillis;
         // SystemClock.elapsedRealtime() (i.e. time in millis that onSensorChanged() triggered) - event.timestamp =~ 0.3 millis
-        EarthquakeEvent earthquakeEvent = new EarthquakeEvent(event.values, event.timestamp);
-        if (firebaseHandler != null && Math.abs(earthquakeEvent.getSensorValue() - 9.87) > 1) {
-            firebaseHandler.addEvent(earthquakeEvent);
-            Log.d(TAG, "onSensorChanged: event added to Firebase");
+        if (isStarted) {
+            EarthquakeEvent earthquakeEvent = new EarthquakeEvent(event.values, event.timestamp);
+            eventList.add(earthquakeEvent);
+            if (eventList.size() == 10 && getMeanValue(eventList) > 1){
+                firebaseHandler.addEvent(earthquakeEvent);
+                Log.d(TAG, "onSensorChanged: event added to Firebase");
+            }
         }
         lastEvent = event;
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    }
+
+    private float getMeanValue(List<EarthquakeEvent> list) {
+        float sum = 0;
+        for (EarthquakeEvent event : list) {
+            sum += event.getSensorValue();
+        }
+        return sum / list.size();
     }
 }

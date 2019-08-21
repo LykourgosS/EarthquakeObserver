@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16sp"
-    tools:context=".codinginflow.notificationexample.NotificationChannelActivity">
+    tools:context=".filestoremove.codinginflow.notificationexample.NotificationChannelActivity">
 
     <TextView
         android:text="NotificationChannel Activity"

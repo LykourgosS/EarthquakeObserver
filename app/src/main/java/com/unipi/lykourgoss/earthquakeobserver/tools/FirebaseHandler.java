@@ -1,7 +1,5 @@
 package com.unipi.lykourgoss.earthquakeobserver.tools;
 
-import android.hardware.SensorEvent;
-
 import androidx.annotation.NonNull;
 
 import com.google.firebase.database.DataSnapshot;
@@ -11,7 +9,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
-import com.unipi.lykourgoss.earthquakeobserver.EarthquakeEvent;
+import com.unipi.lykourgoss.earthquakeobserver.Entities.EarthquakeEvent;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
