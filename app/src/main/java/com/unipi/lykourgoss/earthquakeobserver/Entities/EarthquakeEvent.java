@@ -39,8 +39,8 @@ public class EarthquakeEvent {
     //private String uuid; // todo or use firebase uid
 
 
-    public EarthquakeEvent(float[] eventValues, long timeInMillis/*, double latitude, double longitude*/) {
-        this.sensorValue = normalizeSensorValue(eventValues[0], eventValues[1], eventValues[2]);
+    public EarthquakeEvent(float[] eventValues, float balanceValue, long timeInMillis/*, double latitude, double longitude*/) {
+        this.sensorValue = normalizeSensorValue(eventValues[0], eventValues[1], eventValues[2]) - balanceValue;
         this.timeInMillis = timeInMillis;
         this.dateTime = Util.nanosFromBootToDateTime(timeInMillis);
         /*this.latitude = latitude;

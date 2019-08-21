@@ -7,6 +7,11 @@ package com.unipi.lykourgoss.earthquakeobserver.Entities;
 
 public class UserDevice {
 
+    enum Status {
+        RUNNING,
+        STOPPED,
+    }
+
     private String id;
 
     private float balanceSensorValue;
@@ -17,5 +22,9 @@ public class UserDevice {
 
     private String lastObservingDateTime;
 
+    private long lastObservingTimeInMillis;
+
     private boolean isOnline;
+
+    private Status serviceStatus;
 }

@@ -73,7 +73,7 @@ public class ObserverService extends Service implements SensorEventListener {
     @Override
     public void onCreate() { // triggered only once in the lifetime of the service
         super.onCreate();
-
+        Log.d(TAG, "onCreate");
         // register receiver for
         IntentFilter filter = new IntentFilter(Intent.ACTION_POWER_DISCONNECTED);
         filter.addAction(Constant.FAKE_POWER_DISCONNECTED);
@@ -163,6 +163,7 @@ public class ObserverService extends Service implements SensorEventListener {
     @Override
     public void onDestroy() { // triggered when service is stopped
         super.onDestroy();
+        Log.d(TAG, "onDestroy");
         //Util.scheduleStartJob(this); // todo (is it needed) if user stop our service schedule to re-start it
         unregisterReceiver(receiver);
         sensorManager.unregisterListener(this);
@@ -202,11 +203,14 @@ public class ObserverService extends Service implements SensorEventListener {
 //        millis = nowMillis;
         // SystemClock.elapsedRealtime() (i.e. time in millis that onSensorChanged() triggered) - event.timestamp =~ 0.3 millis
         if (isStarted) {
-            EarthquakeEvent earthquakeEvent = new EarthquakeEvent(event.values, event.timestamp);
+            EarthquakeEvent earthquakeEvent = new EarthquakeEvent(event.values, balanceValue, event.timestamp);
             eventList.add(earthquakeEvent);
-            if (eventList.size() == 10 && getMeanValue(eventList) > 1){
-                firebaseHandler.addEvent(earthquakeEvent);
-                Log.d(TAG, "onSensorChanged: event added to Firebase");
+            if (eventList.size() == 10){
+                if (getMeanValue(eventList) > 1) {
+                    firebaseHandler.addEvent(earthquakeEvent);
+                    Log.d(TAG, "onSensorChanged: event added to Firebase");
+                }
+                eventList.clear();
             }
         }
         lastEvent = event;
