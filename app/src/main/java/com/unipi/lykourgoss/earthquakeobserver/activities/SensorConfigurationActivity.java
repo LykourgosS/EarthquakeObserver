@@ -10,8 +10,8 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
-import com.unipi.lykourgoss.earthquakeobserver.Entities.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.R;
+import com.unipi.lykourgoss.earthquakeobserver.entities.MinimalEarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 
 public class SensorConfigurationActivity extends AppCompatActivity implements SensorEventListener {
@@ -51,7 +51,7 @@ public class SensorConfigurationActivity extends AppCompatActivity implements Se
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        float normValue = EarthquakeEvent.normalizeSensorValue(event.values[0], event.values[1], event.values[2]);
+        float normValue = MinimalEarthquakeEvent.normalizeValue(event.values);
         //float normValue = event.values[0] + event.values[1] + event.values[2];
         if (normValue >= Constant.DEFAULT_SENSOR_BALANCE_VALUE - 0.5 && normValue <= Constant.DEFAULT_SENSOR_BALANCE_VALUE + 0.5) {
             valueSum += normValue;

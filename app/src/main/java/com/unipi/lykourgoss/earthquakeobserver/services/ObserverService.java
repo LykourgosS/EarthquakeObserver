@@ -18,11 +18,12 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
-import com.unipi.lykourgoss.earthquakeobserver.Entities.EarthquakeEvent;
-import com.unipi.lykourgoss.earthquakeobserver.tools.FirebaseHandler;
-import com.unipi.lykourgoss.earthquakeobserver.activities.LogLocationActivity;
 import com.unipi.lykourgoss.earthquakeobserver.R;
+import com.unipi.lykourgoss.earthquakeobserver.activities.LogLocationActivity;
+import com.unipi.lykourgoss.earthquakeobserver.entities.EarthquakeEvent;
+import com.unipi.lykourgoss.earthquakeobserver.entities.MinimalEarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.receivers.PowerDisconnectedReceiver;
+import com.unipi.lykourgoss.earthquakeobserver.tools.FirebaseHandler;
 import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 
 import java.util.ArrayList;
@@ -45,13 +46,16 @@ public class ObserverService extends Service implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private SensorEvent lastEvent;
-    private float balanceValue;
-    private List<EarthquakeEvent> eventList;
+    private List<MinimalEarthquakeEvent> eventList;
 
     private Locator locator;
     private Location lastLocation;
 
     private FirebaseHandler firebaseHandler;
+
+    private SharedPrefManager sharedPrefManager;
+    private float balanceValue;
+    private String deviceId;
 
     private PowerDisconnectedReceiver receiver = new PowerDisconnectedReceiver();
 
@@ -147,8 +151,11 @@ public class ObserverService extends Service implements SensorEventListener {
 
         // todo do heavy work on a background thread
         // following are used for observing events and if needed save them to Firebase Database
-        firebaseHandler = new FirebaseHandler();
-        balanceValue = SharedPrefManager.getInstance(this).read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_SENSOR_BALANCE_VALUE);
+        sharedPrefManager = SharedPrefManager.getInstance(this);
+        deviceId = sharedPrefManager.read(Constant.DEVICE_ID, "not-registered-device");
+
+        firebaseHandler = new FirebaseHandler(deviceId);
+        balanceValue = sharedPrefManager.read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_SENSOR_BALANCE_VALUE);
         eventList = new ArrayList<>();
 
         // to stop service from here (it will trigger onDestroy())
@@ -164,6 +171,8 @@ public class ObserverService extends Service implements SensorEventListener {
     public void onDestroy() { // triggered when service is stopped
         super.onDestroy();
         Log.d(TAG, "onDestroy");
+        // todo not sure if needed!
+        isStarted = false;
         //Util.scheduleStartJob(this); // todo (is it needed) if user stop our service schedule to re-start it
         unregisterReceiver(receiver);
         sensorManager.unregisterListener(this);
@@ -176,18 +185,7 @@ public class ObserverService extends Service implements SensorEventListener {
         return binder;
     }
 
-//    private float[] gravity = new float[3];
-
     public SensorEvent getLastEvent() {
-        /*final float alpha = 0.8f;
-
-        gravity[0] = alpha * gravity[0] + (1 - alpha) * lastEvent.values[0];
-        gravity[1] = alpha * gravity[1] + (1 - alpha) * lastEvent.values[1];
-        gravity[2] = alpha * gravity[2] + (1 - alpha) * lastEvent.values[2];
-
-        lastEvent.values[0] = lastEvent.values[0] - gravity[0];
-        lastEvent.values[1] = lastEvent.values[1] - gravity[1];
-        lastEvent.values[2] = lastEvent.values[2] - gravity[2];*/
         return lastEvent;
     }
 
@@ -195,36 +193,53 @@ public class ObserverService extends Service implements SensorEventListener {
         return lastLocation;
     }
 
-//    private long millis = SystemClock.elapsedRealtime();
+    private boolean isQuaking = false;
+
+    //    private long millis = SystemClock.elapsedRealtime();
     @Override
-    public void onSensorChanged(SensorEvent event) {
+    public void onSensorChanged(SensorEvent sensorEvent) {
 //        long nowMillis = SystemClock.elapsedRealtime();
 //        Log.d(TAG, "onSensorChanged: diff between sensorEvents in millis: " + (nowMillis - millis));
 //        millis = nowMillis;
         // SystemClock.elapsedRealtime() (i.e. time in millis that onSensorChanged() triggered) - event.timestamp =~ 0.3 millis
-        if (isStarted) {
-            EarthquakeEvent earthquakeEvent = new EarthquakeEvent(event.values, balanceValue, event.timestamp);
-            eventList.add(earthquakeEvent);
-            if (eventList.size() == 10){
-                if (getMeanValue(eventList) > 1) {
-                    firebaseHandler.addEvent(earthquakeEvent);
-                    Log.d(TAG, "onSensorChanged: event added to Firebase");
+        if (isStarted /*&& lastLocation != null*/) {
+            MinimalEarthquakeEvent minimalEarthquakeEvent = new MinimalEarthquakeEvent(sensorEvent, balanceValue);
+            eventList.add(minimalEarthquakeEvent);
+            if (eventList.size() == 10) {
+                float meanValue = MinimalEarthquakeEvent.getMeanValue(eventList);
+                if (meanValue > 1) {
+                    if (!isQuaking) {
+                        //todo add
+                        Log.d(TAG, "onSensorChanged: Add new event");
+                        EarthquakeEvent earthquakeEvent = new EarthquakeEvent.Builder(eventList)
+                                .setDeviceId(deviceId)
+                                .addSensorValue(meanValue)
+                                .setLatitude(0/*lastLocation.getLatitude()*/)
+                                .setLongitude(0/*lastLocation.getLongitude()*/)
+                                .build();
+                        firebaseHandler.addEvent(earthquakeEvent);
+                        isQuaking = true;
+                    } else {
+                        //todo update
+                        Log.d(TAG, "onSensorChanged: Update existing event");
+                        long endTime = eventList.get(eventList.size() - 1).getTimeInMillis();
+                        firebaseHandler.updateEvent(meanValue, endTime);
+                    }
+                } else {
+                    if (isQuaking) {
+                        //todo terminate
+                        Log.d(TAG, "onSensorChanged: Terminate last event");
+                        firebaseHandler.terminateEvent();
+                        isQuaking = false;
+                    }
                 }
                 eventList.clear();
             }
         }
-        lastEvent = event;
+        lastEvent = sensorEvent;
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-    }
-
-    private float getMeanValue(List<EarthquakeEvent> list) {
-        float sum = 0;
-        for (EarthquakeEvent event : list) {
-            sum += event.getSensorValue();
-        }
-        return sum / list.size();
     }
 }

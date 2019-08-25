@@ -49,6 +49,9 @@ public class Constant {
     // key of device SENSOR_BALANCE_VALUE in balance to be stored in SharedPreferences
     public static final String SENSOR_BALANCE_VALUE = "com.unipi.lykourgoss.earthquakeobserver.SENSOR_BALANCE_VALUE";
 
+    // key of device id (DEVICE_ID) to be stored in SharedPreferences only the first time
+    public static final String DEVICE_ID = "com.unipi.lykourgoss.earthquakeobserver.DEVICE_ID";
+
     public static final String EVENT_FIREBASE_REF = "events";
 
     // used for setting up location Requests

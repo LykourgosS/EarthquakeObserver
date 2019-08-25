@@ -41,14 +41,14 @@ public class StartObserverJobService extends JobService { // JobService runs in 
         return true; // return boolean value means if we want to reschedule or not
     }
 
-    private boolean checkAcCharge() {
+    /*private boolean checkAcCharge() {
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         Intent batteryIntent = registerReceiver(null, intentFilter);
         int chargePlug = batteryIntent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
         Log.d(TAG, "checkAcCharge: AC = " + (chargePlug == BatteryManager.BATTERY_PLUGGED_AC));
         Toast.makeText(this, String.valueOf(chargePlug), Toast.LENGTH_SHORT).show();
         return chargePlug == BatteryManager.BATTERY_PLUGGED_AC;
-    }
+    }*/
 
     private void startService() {
         Intent service = new Intent(this, ObserverService.class);

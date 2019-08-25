@@ -57,11 +57,8 @@ public class Util {
         }
     }
 
-    public static String nanosFromBootToDateTime(long timeInNanos) {
-        long timeInMillis = (new Date()).getTime() - SystemClock.elapsedRealtime() + timeInNanos / 1000000L;
-        Date date = new Date(timeInMillis);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS z");
-        return dateFormat.format(date);
+    public static long nanosFromBootToMillis(long timeInNanos) {
+        return (new Date()).getTime() - SystemClock.elapsedRealtime() + timeInNanos / (1000 * 1000);
     }
 
     public static String millisToDateTime(long timeInMillis) {

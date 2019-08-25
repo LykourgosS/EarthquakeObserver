@@ -18,9 +18,11 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
+import com.unipi.lykourgoss.earthquakeobserver.services.ObserverService;
 import com.unipi.lykourgoss.earthquakeobserver.tools.FirebaseHandler;
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.receivers.BootCompletedReceiver;
+import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -45,8 +47,8 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(receiver, filter);
 
         if (checkLocationPermission()) {
-//            Intent service = new Intent(this, ObserverService.class);
-//            startService(service);
+            // Intent service = new Intent(this, ObserverService.class);
+            // ContextCompat.startForegroundService(this, service);
         }
 
         textViewBatteryStatus = findViewById(R.id.text_view_battery_status);
@@ -108,8 +110,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void clearEvents(View v) {
-        FirebaseHandler handler = new FirebaseHandler();
-        handler.deleteAllEvents();
+        SharedPrefManager sharedPrefManager = SharedPrefManager.getInstance(this);
+        String deviceId = sharedPrefManager.read(Constant.DEVICE_ID, "not-registered-device");
+        FirebaseHandler handler = new FirebaseHandler(deviceId);
+        handler.deleteSavedEvents();
     }
 
     private boolean checkLocationPermission() {

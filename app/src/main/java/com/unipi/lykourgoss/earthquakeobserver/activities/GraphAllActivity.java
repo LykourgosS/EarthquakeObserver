@@ -24,8 +24,8 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
-import com.unipi.lykourgoss.earthquakeobserver.Entities.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.R;
+import com.unipi.lykourgoss.earthquakeobserver.entities.MinimalEarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.services.ObserverService;
 import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 
@@ -85,11 +85,11 @@ public class GraphAllActivity extends AppCompatActivity implements ServiceConnec
         data.addDataSet(ZDataSet);
 
         // √(x²+y²+z²) DataSet
-        LineDataSet normXYZDataSet = createSet("√(x²+y²+z²)", 3f, Color.BLACK);
+        LineDataSet normXYZDataSet = createSet("√(x²+y²+z²)", 3f, Color.MAGENTA);
         data.addDataSet(normXYZDataSet);
 
         // x+y+z DataSet
-        LineDataSet sumXYZDataSet = createSet("x+y+z", 1f, Color.YELLOW);
+        LineDataSet sumXYZDataSet = createSet("x+y+z", 1f, Color.BLACK);
         data.addDataSet(sumXYZDataSet);
 
         lineChart.setData(data);
@@ -144,12 +144,12 @@ public class GraphAllActivity extends AppCompatActivity implements ServiceConnec
 
         // √(x²+y²+z²) : to normalize the value, like the magnitude of a vector (now always it
         // will be greater than zero, x, y and z, it only measures the distance from zero)
-        float normXYZ = EarthquakeEvent.normalizeSensorValue(x, y, z)/*todo remove comment - balanceValue*/;
+        float normXYZ = MinimalEarthquakeEvent.normalizeValueToZero(new float[] {x, y, z}, balanceValue);
         ILineDataSet normXYZDataSet = data.getDataSetByIndex(3);
         data.addEntry(new Entry(normXYZDataSet.getEntryCount(), normXYZ), 3);
 
         // x+y+z
-        float sumXYZ = EarthquakeEvent.normalizeSensorValue(x, y, z)/*todo remove comment  - balanceValue*/;
+        float sumXYZ = x + y + z - balanceValue;
         ILineDataSet sumXYZDataSet = data.getDataSetByIndex(4);
         data.addEntry(new Entry(sumXYZDataSet.getEntryCount(), sumXYZ), 4);
 

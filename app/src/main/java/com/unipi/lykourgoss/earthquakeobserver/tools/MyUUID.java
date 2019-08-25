@@ -17,13 +17,12 @@ public class MyUUID {
 
     // todo add the following to Util class
     public synchronized static String getUuid(Context context) {
-        SharedPreferences sharedPrefs = context.getSharedPreferences(Constant.PREF_UNIQUE_ID, Context.MODE_PRIVATE);
-        String uuid = sharedPrefs.getString(Constant.PREF_UNIQUE_ID, null);
+        SharedPrefManager manager = SharedPrefManager.getInstance(context);
+        String uuid = manager.read(Constant.PREF_UNIQUE_ID, null);
         if (uuid == null) {
             uuid = UUID.randomUUID().toString();
-            SharedPreferences.Editor editor = sharedPrefs.edit();
-            editor.putString(Constant.PREF_UNIQUE_ID, uuid);
-            editor.commit();
+
+            manager.write(Constant.PREF_UNIQUE_ID, uuid);
         }
         return uuid;
     }

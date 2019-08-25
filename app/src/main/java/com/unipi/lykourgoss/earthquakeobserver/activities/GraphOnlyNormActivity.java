@@ -24,8 +24,8 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
-import com.unipi.lykourgoss.earthquakeobserver.Entities.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.R;
+import com.unipi.lykourgoss.earthquakeobserver.entities.MinimalEarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.services.ObserverService;
 import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 
@@ -128,7 +128,7 @@ public class GraphOnlyNormActivity extends AppCompatActivity implements ServiceC
 
         // √(x²+y²+z²) : to normalize the value, like the magnitude of a vector (now always it
         // will be greater than zero, x, y and z, it only measures the distance from zero)
-        float normXYZ = EarthquakeEvent.normalizeSensorValue(x, y, z) - balanceValue;
+        float normXYZ = MinimalEarthquakeEvent.normalizeValueToZero(new float[] {x, y, z}, balanceValue);
         ILineDataSet normXYZDataSet = data.getDataSetByIndex(0);
         data.addEntry(new Entry(normXYZDataSet.getEntryCount(), normXYZ), 0);
 

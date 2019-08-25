@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver.Entities;
+package com.unipi.lykourgoss.earthquakeobserver.entities;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>

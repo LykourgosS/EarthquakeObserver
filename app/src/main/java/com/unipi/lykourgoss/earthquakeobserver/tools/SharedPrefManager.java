@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.unipi.lykourgoss.earthquakeobserver.Constant;
+
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
  * on 18,August,2019.
@@ -17,6 +19,7 @@ public class SharedPrefManager {
 
     private SharedPrefManager(Context context) {
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        // todo ? this.sharedPreferences = context.getSharedPreferences(Constant.PREF_UNIQUE_ID, Context.MODE_PRIVATE);
     }
     
     public static SharedPrefManager getInstance(Context context) {
