@@ -30,6 +30,10 @@ public class Constant {
     // 10 samples/s => 1 sample in 0.1 s = 100 ms = 100000 μs
     public static final int SAMPLING_PERIOD = 100000;
 
+    // used for passing info about sensor from SensorConfigurationActivity back to SignInActivity
+    // to add device to firebase
+    public static final String EXTRA_SENSOR_INFO = "com.unipi.lykourgoss.earthquakeobserver.EXTRA_SENSOR_INFO";
+
     // according to documentation, might defer from the real one
     // (ex. instead of 9.8 to be 9.87 or 9.9)
     // (used 1000 samples)
@@ -49,8 +53,14 @@ public class Constant {
     // key of device SENSOR_BALANCE_VALUE in balance to be stored in SharedPreferences
     public static final String SENSOR_BALANCE_VALUE = "com.unipi.lykourgoss.earthquakeobserver.SENSOR_BALANCE_VALUE";
 
+    // SensorValue threshold, used for recognize if values from accelerometer are big enough for
+    // adding to Firebase (reporting) an event
+    public static final int SENSOR_THRESHOLD = 1;
+
     // key of device id (DEVICE_ID) to be stored in SharedPreferences only the first time
     public static final String DEVICE_ID = "com.unipi.lykourgoss.earthquakeobserver.DEVICE_ID";
+    //
+    public static final String DEVICE_ADDED_TO_FIREBASE = "com.unipi.lykourgoss.earthquakeobserver.DEVICE_ADDED_TO_FIREBASE";
 
     public static final String EVENT_FIREBASE_REF = "events";
 

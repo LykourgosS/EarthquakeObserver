@@ -4,19 +4,25 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.net.NetworkRequest;
 import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
+import com.unipi.lykourgoss.earthquakeobserver.entities.SensorInfo;
+import com.unipi.lykourgoss.earthquakeobserver.entities.UserDevice;
 import com.unipi.lykourgoss.earthquakeobserver.services.StartObserverJobService;
+import com.unipi.lykourgoss.earthquakeobserver.tools.firebase.AuthHandler;
+import com.unipi.lykourgoss.earthquakeobserver.tools.firebase.DatabaseHandler;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
@@ -66,4 +72,37 @@ public class Util {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS z");
         return dateFormat.format(date);
     }
+
+
+    /**
+     * Method for generating unique id for devices (installations of each user), called to access
+     * the unique id of the device from SharedPreferences (the first time that will be called it
+     * will generate the unique id which will be used from this time and on)
+     * */
+    public synchronized static String getUniqueId(Context context) {
+        SharedPrefManager manager = SharedPrefManager.getInstance(context);
+        String uniqueId = manager.read(Constant.DEVICE_ID, null);
+        if (uniqueId == null) {
+            uniqueId = UUID.randomUUID().toString();
+
+            manager.write(Constant.DEVICE_ID, uniqueId);
+        }
+        return uniqueId;
+    }
+
+    /*public static void addDeviceToFirebase(Context context, SensorInfo sensorInfo) {
+        UserDevice device = new UserDevice.Builder()
+                .setDeviceId(Util.getUniqueId(context))
+                .setFirebaseAuthUid(AuthHandler.getInstance().getCurrentUser().getUid())
+                .setSensorInfo(sensorInfo)
+                .build();
+        DatabaseHandler databaseHandler = new DatabaseHandler(context, device.getDeviceId());
+        databaseHandler.addDevice(device);
+    }*/
+
+    /*public void setUpDeviceAddedSharedPref(Context context) {
+        SharedPrefManager manager = SharedPrefManager.getInstance(context);
+        manager.write(Constant.DEVICE_ADDED_TO_FIREBASE, true);
+        manager.write(Constant.SENSOR_BALANCE_VALUE)
+    }*/
 }

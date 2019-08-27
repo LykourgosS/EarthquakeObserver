@@ -18,8 +18,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
-import com.unipi.lykourgoss.earthquakeobserver.services.ObserverService;
-import com.unipi.lykourgoss.earthquakeobserver.tools.FirebaseHandler;
+import com.unipi.lykourgoss.earthquakeobserver.tools.firebase.DatabaseHandler;
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.receivers.BootCompletedReceiver;
 import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
@@ -112,8 +111,12 @@ public class MainActivity extends AppCompatActivity {
     public void clearEvents(View v) {
         SharedPrefManager sharedPrefManager = SharedPrefManager.getInstance(this);
         String deviceId = sharedPrefManager.read(Constant.DEVICE_ID, "not-registered-device");
-        FirebaseHandler handler = new FirebaseHandler(deviceId);
+        DatabaseHandler handler = new DatabaseHandler(this, deviceId);
         handler.deleteSavedEvents();
+    }
+
+    public void signIn(View v) {
+        startActivity(new Intent(this, SignInActivity.class));
     }
 
     private boolean checkLocationPermission() {

@@ -2,6 +2,7 @@ package com.unipi.lykourgoss.earthquakeobserver.entities;
 
 import android.hardware.SensorEvent;
 
+import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
 
 import java.util.List;
@@ -65,5 +66,17 @@ public class MinimalEarthquakeEvent {
             sum += event.getSensorValue();
         }
         return sum / list.size();
+    }
+
+    /**
+     * returns true if at least half of the Sensor Values are greater from 1*/
+    public static boolean getIfPossibleEarthquake(List<MinimalEarthquakeEvent> list) {
+        float count = 0;
+        for (MinimalEarthquakeEvent event : list) {
+            if (event.getSensorValue() >= Constant.SENSOR_THRESHOLD) {
+                count++;
+            }
+        }
+        return count >= Math.floor(list.size() / 2);
     }
 }

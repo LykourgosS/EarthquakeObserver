@@ -1,5 +1,6 @@
-package com.unipi.lykourgoss.earthquakeobserver.tools;
+package com.unipi.lykourgoss.earthquakeobserver.tools.firebase;
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -14,30 +15,40 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.entities.EarthquakeEvent;
+import com.unipi.lykourgoss.earthquakeobserver.entities.UserDevice;
+import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
+
+import java.util.Date;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
  * on 03,August,2019.
  */
 
-public class FirebaseHandler {
+public class DatabaseHandler {
 
-    private static final String TAG = "FirebaseHandler";
+    private static final String TAG = "DatabaseHandler";
 
     private static final String ACTIVE_EVENTS_REF = "active-events";
     private static final String SAVED_EVENTS_REF = "saved-events";
-    
+    private static final String DEVICES_REF = "devices";
+
+    private Context context;
+
     private static DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-    
+
     private DatabaseReference activeEventsRef;
     private DatabaseReference savedEventsRef;
-    
+    private DatabaseReference devicesRef;
+
     private ValueEventListener listener = new MyValueEventListener();
     private Query query;
 
-    public FirebaseHandler(String deviceId) {
+    public DatabaseHandler(Context context, String deviceId) {
+        this.context = context;
         activeEventsRef = databaseReference.child(ACTIVE_EVENTS_REF).child(deviceId);
         savedEventsRef = databaseReference.child(SAVED_EVENTS_REF).child(deviceId);
+        devicesRef = databaseReference.child(DEVICES_REF);
     }
 
     private void addListener() {
@@ -54,7 +65,7 @@ public class FirebaseHandler {
         activeEventsRef.setValue(newEvent).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                Log.d(TAG, "onComplete");
+                Log.d(TAG, "Completed = " + task.isSuccessful());
             }
         });
     }
@@ -77,11 +88,6 @@ public class FirebaseHandler {
     }
 
     public void terminateEvent() {
-        saveEvent();
-
-    }
-
-    private void saveEvent() {
         activeEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -92,13 +98,47 @@ public class FirebaseHandler {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
+
     }
 
     public void deleteSavedEvents() {
         savedEventsRef.setValue(null);
+    }
+
+    public void addDevice(UserDevice device) {
+        devicesRef.child(device.getDeviceId()).setValue(device).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                // save to shared preferences that device added to Firebase, if not device cannot
+                // work properly
+                SharedPrefManager.getInstance(context).write(Constant.DEVICE_ADDED_TO_FIREBASE, task.isSuccessful());
+            }
+        });
+    }
+
+    public void updateDeviceStatus(final String deviceId, final boolean isStarted) {
+        /*// update isRunning
+        devicesRef.child(deviceId).child(UserDevice.IS_RUNNING).setValue(isStarted);
+        if (!isStarted) {
+            // update lastObservingTimeInMillis only when the service stops to observe
+            devicesRef.child(deviceId).child(UserDevice.LAST_OBSERVING_TIME_IN_MILLIS).setValue(new Date().getTime());
+        }*/
+
+        devicesRef.child(deviceId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                UserDevice device = dataSnapshot.getValue(UserDevice.class);
+                device.setRunning(isStarted);
+                device.setLastObservingTimeInMillis(new Date().getTime());
+                devicesRef.child(deviceId).setValue(device);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
     }
 
     private class MyValueEventListener implements ValueEventListener {

@@ -57,6 +57,13 @@
         android:onClick="clearEvents"
         android:text="Clear events" />
 
+    <Button
+        android:id="@+id/button_sign_in"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="signIn"
+        android:text="Sign in" />
+
     <TextView
         android:id="@+id/text_view_battery_status"
         android:layout_width="match_parent"

@@ -3,11 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.unipi.lykourgoss.earthquakeobserver">
 
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -17,12 +12,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activities.SensorConfigurationActivity"></activity>
+        <activity android:name=".activities.MainActivity" />
+        <activity android:name=".activities.SensorConfigurationActivity" />
         <activity
             android:name=".activities.LogLocationActivity"
             android:launchMode="singleTop" />
         <activity android:name=".services.LocationActivity" />
-        <activity android:name=".activities.MainActivity">
+        <activity
+            android:name=".activities.SignInActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -50,5 +48,11 @@
         <service android:name=".services.ObserverService" />
         <service android:name=".services.LocationService" />
     </application>
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
 </manifest>

@@ -22,8 +22,8 @@ import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.activities.LogLocationActivity;
 import com.unipi.lykourgoss.earthquakeobserver.entities.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.entities.MinimalEarthquakeEvent;
+import com.unipi.lykourgoss.earthquakeobserver.tools.firebase.DatabaseHandler;
 import com.unipi.lykourgoss.earthquakeobserver.receivers.PowerDisconnectedReceiver;
-import com.unipi.lykourgoss.earthquakeobserver.tools.FirebaseHandler;
 import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class ObserverService extends Service implements SensorEventListener {
     private Locator locator;
     private Location lastLocation;
 
-    private FirebaseHandler firebaseHandler;
+    private DatabaseHandler databaseHandler;
 
     private SharedPrefManager sharedPrefManager;
     private float balanceValue;
@@ -137,9 +137,9 @@ public class ObserverService extends Service implements SensorEventListener {
         // todo only use foreground service on Oreo an higher -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
         if (true) { // if API is v.26 and higher start a foreground service
             Notification notification = new NotificationCompat.Builder(this, Constant.CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_track_changes_white_24dp)
                     .setContentTitle("Example Service")
                     .setContentText("Observing...")
-                    .setSmallIcon(R.drawable.ic_track_changes_white_24dp)
                     .setContentIntent(pendingIntent)
                     .build();
 
@@ -154,7 +154,8 @@ public class ObserverService extends Service implements SensorEventListener {
         sharedPrefManager = SharedPrefManager.getInstance(this);
         deviceId = sharedPrefManager.read(Constant.DEVICE_ID, "not-registered-device");
 
-        firebaseHandler = new FirebaseHandler(deviceId);
+        databaseHandler = new DatabaseHandler(this, deviceId);
+        databaseHandler.updateDeviceStatus(deviceId, true);
         balanceValue = sharedPrefManager.read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_SENSOR_BALANCE_VALUE);
         eventList = new ArrayList<>();
 
@@ -175,6 +176,13 @@ public class ObserverService extends Service implements SensorEventListener {
         isStarted = false;
         //Util.scheduleStartJob(this); // todo (is it needed) if user stop our service schedule to re-start it
         unregisterReceiver(receiver);
+        if (isQuaking) {
+            //todo terminate event
+            Log.d(TAG, "onSensorChanged: Terminate last event");
+            databaseHandler.terminateEvent();
+            isQuaking = false;
+        }
+        databaseHandler.updateDeviceStatus(deviceId, false);
         sensorManager.unregisterListener(this);
         locator.removeUpdates();
     }
@@ -207,9 +215,10 @@ public class ObserverService extends Service implements SensorEventListener {
             eventList.add(minimalEarthquakeEvent);
             if (eventList.size() == 10) {
                 float meanValue = MinimalEarthquakeEvent.getMeanValue(eventList);
-                if (meanValue > 1) {
+                boolean possibleEarthquake = MinimalEarthquakeEvent.getIfPossibleEarthquake(eventList);
+                if (meanValue > Constant.SENSOR_THRESHOLD && possibleEarthquake) {
                     if (!isQuaking) {
-                        //todo add
+                        //todo add all measurements from MinimalEarthquakeEvent objects instead of only meanValue
                         Log.d(TAG, "onSensorChanged: Add new event");
                         EarthquakeEvent earthquakeEvent = new EarthquakeEvent.Builder(eventList)
                                 .setDeviceId(deviceId)
@@ -217,19 +226,19 @@ public class ObserverService extends Service implements SensorEventListener {
                                 .setLatitude(0/*lastLocation.getLatitude()*/)
                                 .setLongitude(0/*lastLocation.getLongitude()*/)
                                 .build();
-                        firebaseHandler.addEvent(earthquakeEvent);
+                        databaseHandler.addEvent(earthquakeEvent);
                         isQuaking = true;
                     } else {
                         //todo update
                         Log.d(TAG, "onSensorChanged: Update existing event");
                         long endTime = eventList.get(eventList.size() - 1).getTimeInMillis();
-                        firebaseHandler.updateEvent(meanValue, endTime);
+                        databaseHandler.updateEvent(meanValue, endTime);
                     }
                 } else {
                     if (isQuaking) {
                         //todo terminate
                         Log.d(TAG, "onSensorChanged: Terminate last event");
-                        firebaseHandler.terminateEvent();
+                        databaseHandler.terminateEvent();
                         isQuaking = false;
                     }
                 }
