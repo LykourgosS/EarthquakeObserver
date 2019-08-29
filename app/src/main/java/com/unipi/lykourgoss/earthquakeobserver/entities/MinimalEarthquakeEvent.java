@@ -1,6 +1,7 @@
 package com.unipi.lykourgoss.earthquakeobserver.entities;
 
 import android.hardware.SensorEvent;
+import android.hardware.SensorManager;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
@@ -24,6 +25,11 @@ public class MinimalEarthquakeEvent {
      * occurred
      * */
     private long timeInMillis;
+
+    public MinimalEarthquakeEvent(float sensorValue, long timeInMillis) {
+        this.sensorValue = sensorValue;
+        this.timeInMillis = Util.nanosFromBootToMillis(timeInMillis);
+    }
 
     public MinimalEarthquakeEvent(SensorEvent event, float balanceValue) {
         this.sensorValue = normalizeValueToZero(event.values, balanceValue);

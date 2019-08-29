@@ -12,9 +12,9 @@ import android.util.Log;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.R;
+import com.unipi.lykourgoss.earthquakeobserver.entities.Device;
 import com.unipi.lykourgoss.earthquakeobserver.entities.MinimalEarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.entities.SensorInfo;
-import com.unipi.lykourgoss.earthquakeobserver.entities.UserDevice;
 import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
 import com.unipi.lykourgoss.earthquakeobserver.tools.firebase.AuthHandler;
@@ -63,10 +63,10 @@ public class SensorConfigurationActivity extends AppCompatActivity implements Se
         if (normValue >= Constant.DEFAULT_SENSOR_BALANCE_VALUE - 0.5 && normValue <= Constant.DEFAULT_SENSOR_BALANCE_VALUE + 0.5) {
             valueSum += normValue;
             valueCount++;
-            logForXYZ(event.values[0], event.values[1], event.values[2]);
+//            logForXYZ(event.values[0], event.values[1], event.values[2]);
             Log.d(TAG, "onSensorChanged: mean = " + valueSum / valueCount + ", count = " + valueCount);
             //Log.d(TAG, "onSensorChanged: count = " + valueCount);
-            if (valueCount == 1000) {
+            if (valueCount == 10/*todo again 1000*/) {
                 float meanValue = valueSum / valueCount;
                 boolean result = sharedPrefManager.write(Constant.SENSOR_BALANCE_VALUE, meanValue);
                 Log.d(TAG, "onSensorChanged: finish mean = " + meanValue + ", write: " + result);
@@ -90,7 +90,7 @@ public class SensorConfigurationActivity extends AppCompatActivity implements Se
 
     private void addDeviceToFirebase(float balanceValue) {
         SensorInfo sensorInfo = new SensorInfo(accelerometer, balanceValue);
-        UserDevice device = new UserDevice.Builder()
+        Device device = new Device.Builder()
                 .setDeviceId(Util.getUniqueId(this))
                 .setFirebaseAuthUid(AuthHandler.getInstance().getCurrentUser().getUid())
                 .setSensorInfo(sensorInfo)

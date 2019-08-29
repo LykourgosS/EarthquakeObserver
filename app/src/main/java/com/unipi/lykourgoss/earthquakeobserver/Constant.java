@@ -28,7 +28,7 @@ public class Constant {
     public static final String PREF_UNIQUE_ID = "PREF_UNIQUE_ID";
 
     // 10 samples/s => 1 sample in 0.1 s = 100 ms = 100000 μs
-    public static final int SAMPLING_PERIOD = 100000;
+    public static final int SAMPLING_PERIOD = 100 * 1000;
 
     // used for passing info about sensor from SensorConfigurationActivity back to SignInActivity
     // to add device to firebase
@@ -55,7 +55,7 @@ public class Constant {
 
     // SensorValue threshold, used for recognize if values from accelerometer are big enough for
     // adding to Firebase (reporting) an event
-    public static final int SENSOR_THRESHOLD = 1;
+    public static final float SENSOR_THRESHOLD = 1;
 
     // key of device id (DEVICE_ID) to be stored in SharedPreferences only the first time
     public static final String DEVICE_ID = "com.unipi.lykourgoss.earthquakeobserver.DEVICE_ID";

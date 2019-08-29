@@ -1,14 +1,12 @@
-package com.unipi.lykourgoss.earthquakeobserver.services;
+package com.unipi.lykourgoss.earthquakeobserver.listeners;
 
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Binder;
@@ -22,20 +20,21 @@ import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.activities.LogLocationActivity;
 import com.unipi.lykourgoss.earthquakeobserver.entities.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.entities.MinimalEarthquakeEvent;
+import com.unipi.lykourgoss.earthquakeobserver.receivers.PowerDisconnectedReceiver;
+import com.unipi.lykourgoss.earthquakeobserver.services.Locator;
+import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
 import com.unipi.lykourgoss.earthquakeobserver.tools.firebase.DatabaseHandler;
-import com.unipi.lykourgoss.earthquakeobserver.receivers.PowerDisconnectedReceiver;
-import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
- * on 10,July,2019.
+ * on 28,August,2019.
  */
 
-public class ObserverService extends Service implements SensorEventListener {
+public class ObserverServiceTestingListener extends Service implements EarthquakeEventListener.OnEarthquakeListener {
 
     public static final String TAG = "ObserverService";
 
@@ -65,13 +64,13 @@ public class ObserverService extends Service implements SensorEventListener {
      * runs in the same process as its clients, we don't need to deal with IPC.
      */
     public class ObserverBinder extends Binder {
-        public ObserverService getService() {
+        public ObserverServiceTestingListener getService() {
             // Return this instance of ObserverService so clients can call public methods
-            return ObserverService.this;
+            return ObserverServiceTestingListener.this;
         }
     }
 
-    public ObserverService() {
+    public ObserverServiceTestingListener() {
         Log.d(TAG, "ObserverService: Constructor");
     }
 
@@ -85,7 +84,11 @@ public class ObserverService extends Service implements SensorEventListener {
         filter.addAction(Constant.DEVICE_IS_MOVING);
         registerReceiver(receiver, filter);
 
-        initSensor();
+        sharedPrefManager = SharedPrefManager.getInstance(this);
+        //deviceId = sharedPrefManager.read(Constant.DEVICE_ID, "not-registered-device");
+        deviceId = Util.getUniqueId(this);
+//        EarthquakeEventListener earthquakeEventListener = new EarthquakeEventListener(this, deviceId);
+
         initLocator();
     }
 
@@ -101,28 +104,6 @@ public class ObserverService extends Service implements SensorEventListener {
             lastLocation = locator.getLastLocation();
             // todo important line (the following!!!)
             //isLocatorInitialized = true;
-        }
-    }
-
-    public void initSensor() {
-        if (true/*!isSensorInitialized*/) {
-            sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
-            // (slower to faster)
-            // - SensorManager.SENSOR_DELAY_NORMAL, delay of 200,000 microseconds = 0.2 seconds (Documentation)
-            //      (Measured: events every ~200ms => fs = 5 Hz)
-            // - Constant.SAMPLING_PERIOD, delay of 100,000 microseconds = 0.1 seconds (Custom)
-            //      (Measured: events every ~100ms => fs = 10 Hz)
-            // - SensorManager.SENSOR_DELAY_UI, delay of 60,000 microseconds = 0.06 seconds (Documentation)
-            //      (Measured: events every ~80ms => fs = 12.5 Hz)
-            // - SensorManager.SENSOR_DELAY_GAME, delay of 20,000 microseconds = 0.02 seconds (Documentation)
-            //      (Measured: events every ~20ms => fs = 50 Hz)
-            // - SensorManager.SENSOR_DELAY_FASTEST, 0 microsecond delay (Documentation)
-            //      (Measured: events every ~20ms => fs = 50 Hz)
-            sensorManager.registerListener(this, accelerometer, Constant.SAMPLING_PERIOD);
-            // todo important line (the following!!!)
-            //isSensorInitialized = true;
         }
     }
 
@@ -152,10 +133,6 @@ public class ObserverService extends Service implements SensorEventListener {
 
         // todo do heavy work on a background thread
         // following are used for observing events and if needed save them to Firebase Database
-        sharedPrefManager = SharedPrefManager.getInstance(this);
-        //deviceId = sharedPrefManager.read(Constant.DEVICE_ID, "not-registered-device");
-        deviceId = Util.getUniqueId(this);
-
         databaseHandler = new DatabaseHandler(this, deviceId);
         databaseHandler.updateDeviceStatus(deviceId, true);
         balanceValue = sharedPrefManager.read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_SENSOR_BALANCE_VALUE);
@@ -186,7 +163,7 @@ public class ObserverService extends Service implements SensorEventListener {
         if (isStarted) {
             databaseHandler.updateDeviceStatus(deviceId, false);
         }
-        sensorManager.unregisterListener(this);
+//        sensorManager.unregisterListener(this);
         locator.removeUpdates();
         // todo not sure if needed!
         //isStarted = false;
@@ -208,53 +185,29 @@ public class ObserverService extends Service implements SensorEventListener {
 
     private boolean isQuaking = false;
 
-    //    private long millis = SystemClock.elapsedRealtime();
     @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
-        Log.d(TAG, "onSensorChanged");
-//        long nowMillis = SystemClock.elapsedRealtime();
-//        Log.d(TAG, "onSensorChanged: diff between sensorEvents in millis: " + (nowMillis - millis));
-//        millis = nowMillis;
-        // SystemClock.elapsedRealtime() (i.e. time in millis that onSensorChanged() triggered) - event.timestamp =~ 0.3 millis
-        if (isStarted /*&& lastLocation != null*/) {
-            MinimalEarthquakeEvent minimalEarthquakeEvent = new MinimalEarthquakeEvent(sensorEvent, balanceValue);
-            eventList.add(minimalEarthquakeEvent);
-            if (eventList.size() == 10) {
-                float meanValue = MinimalEarthquakeEvent.getMeanValue(eventList);
-                boolean possibleEarthquake = MinimalEarthquakeEvent.getIfPossibleEarthquake(eventList);
-                if (meanValue > Constant.SENSOR_THRESHOLD && possibleEarthquake) {
-                    if (!isQuaking) {
-                        //todo add all measurements from MinimalEarthquakeEvent objects instead of only meanValue
-                        Log.d(TAG, "onSensorChanged: Add new event");
-                        EarthquakeEvent earthquakeEvent = new EarthquakeEvent.Builder(eventList)
-                                .setDeviceId(deviceId)
-                                .addSensorValue(meanValue)
-                                .setLatitude(0/*lastLocation.getLatitude()*/)
-                                .setLongitude(0/*lastLocation.getLongitude()*/)
-                                .build();
-                        databaseHandler.addEvent(earthquakeEvent);
-                        isQuaking = true;
-                    } else {
-                        //todo update
-                        Log.d(TAG, "onSensorChanged: Update existing event");
-                        long endTime = eventList.get(eventList.size() - 1).getTimeInMillis();
-                        databaseHandler.updateEvent(meanValue, endTime);
-                    }
-                } else {
-                    if (isQuaking) {
-                        //todo terminate
-                        Log.d(TAG, "onSensorChanged: Terminate last event");
-                        databaseHandler.terminateEvent();
-                        isQuaking = false;
-                    }
-                }
-                eventList.clear();
-            }
-        }
-        lastEvent = sensorEvent;
+    public void onSensorChanged(SensorEvent event, float acceleration) {
+        lastEvent = event;
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    public void addEvent(List<MinimalEarthquakeEvent> eventList, float sensorValue) {
+        EarthquakeEvent earthquakeEvent = new EarthquakeEvent.Builder(eventList)
+                .setDeviceId(deviceId)
+                .addSensorValue(sensorValue)
+                .setLatitude(0/*lastLocation.getLatitude()*/)
+                .setLongitude(0/*lastLocation.getLongitude()*/)
+                .build();
+        databaseHandler.addEvent(earthquakeEvent);
+    }
+
+    @Override
+    public void updateEvent(float sensorValue, long endTime) {
+        databaseHandler.updateEvent(sensorValue, endTime);
+    }
+
+    @Override
+    public void terminateEvent() {
+        databaseHandler.terminateEvent();
     }
 }

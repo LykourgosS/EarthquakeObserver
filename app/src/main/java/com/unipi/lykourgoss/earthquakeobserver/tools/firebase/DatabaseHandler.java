@@ -15,7 +15,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.entities.EarthquakeEvent;
-import com.unipi.lykourgoss.earthquakeobserver.entities.UserDevice;
+import com.unipi.lykourgoss.earthquakeobserver.entities.Device;
 import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 
 import java.util.Date;
@@ -107,7 +107,7 @@ public class DatabaseHandler {
         savedEventsRef.setValue(null);
     }
 
-    public void addDevice(UserDevice device) {
+    public void addDevice(Device device) {
         devicesRef.child(device.getDeviceId()).setValue(device).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -120,16 +120,16 @@ public class DatabaseHandler {
 
     public void updateDeviceStatus(final String deviceId, final boolean isStarted) {
         /*// update isRunning
-        devicesRef.child(deviceId).child(UserDevice.IS_RUNNING).setValue(isStarted);
+        devicesRef.child(deviceId).child(Device.IS_RUNNING).setValue(isStarted);
         if (!isStarted) {
             // update lastObservingTimeInMillis only when the service stops to observe
-            devicesRef.child(deviceId).child(UserDevice.LAST_OBSERVING_TIME_IN_MILLIS).setValue(new Date().getTime());
+            devicesRef.child(deviceId).child(Device.LAST_OBSERVING_TIME_IN_MILLIS).setValue(new Date().getTime());
         }*/
 
         devicesRef.child(deviceId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                UserDevice device = dataSnapshot.getValue(UserDevice.class);
+                Device device = dataSnapshot.getValue(Device.class);
                 device.setRunning(isStarted);
                 device.setLastObservingTimeInMillis(new Date().getTime());
                 devicesRef.child(deviceId).setValue(device);

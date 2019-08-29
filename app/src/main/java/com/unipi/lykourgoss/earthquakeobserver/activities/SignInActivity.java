@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -27,13 +26,10 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.entities.SensorInfo;
-import com.unipi.lykourgoss.earthquakeobserver.entities.UserDevice;
+import com.unipi.lykourgoss.earthquakeobserver.entities.Device;
 import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
 import com.unipi.lykourgoss.earthquakeobserver.tools.firebase.DatabaseHandler;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class SignInActivity extends BaseActivity implements View.OnClickListener {
 
@@ -50,6 +46,9 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+
+        // todo remove
+        startActivity(new Intent(this, MainActivity.class));
 
         findViewById(R.id.button_google_sign_in).setOnClickListener(this);
 
@@ -128,7 +127,7 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
 
     private void addDeviceToFirebase(SensorInfo sensorInfo) {
         showProgressDialog();
-        UserDevice device = new UserDevice.Builder()
+        Device device = new Device.Builder()
                 .setDeviceId(Util.getUniqueId(this))
                 .setFirebaseAuthUid(firebaseAuth.getCurrentUser().getUid())
                 .setSensorInfo(sensorInfo)

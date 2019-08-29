@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.BatteryManager;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +20,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
+import com.unipi.lykourgoss.earthquakeobserver.listeners.GraphAllActivityTest;
+import com.unipi.lykourgoss.earthquakeobserver.tools.ConnectivityStatus;
+import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
 import com.unipi.lykourgoss.earthquakeobserver.tools.firebase.DatabaseHandler;
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.receivers.BootCompletedReceiver;
@@ -26,7 +31,7 @@ import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private static final String TAG = "MainActivity";
 
@@ -41,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        checkIfDeviceIsAdded();
+
         // register receiver for
         IntentFilter filter = new IntentFilter(Constant.FAKE_BOOT);
         registerReceiver(receiver, filter);
@@ -51,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         textViewBatteryStatus = findViewById(R.id.text_view_battery_status);
-
         final IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 
         new Timer().schedule(new TimerTask() {
@@ -78,6 +84,39 @@ public class MainActivity extends AppCompatActivity {
         }, 0, 500);
     }
 
+    private void checkIfDeviceIsAdded() {
+        if (ConnectivityStatus.getInstance(this).isOnline()) {
+            final SharedPrefManager sharedPrefManager = SharedPrefManager.getInstance(MainActivity.this);
+            /*new CountDownTimer(5 * 1000, 1000){
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    boolean deviceAddedToFirebase = sharedPrefManager.read(Constant.DEVICE_ADDED_TO_FIREBASE, false);
+                    if (deviceAddedToFirebase) {
+                        this.cancel();
+                        Log.d(TAG, "onTick: device added successfully");
+                        // sharedPrefManager.write()
+                        hideProgressDialog();
+                        finish();
+                        startActivity(new Intent(MainActivity.this, MainActivity.class));
+                    }
+                }
+
+                @Override
+                public void onFinish() {
+                    hideProgressDialog();
+                    boolean deviceAddedToFirebase = sharedPrefManager.read(Constant.DEVICE_ADDED_TO_FIREBASE, false);
+                    if (!deviceAddedToFirebase) {
+                        Log.d(TAG, "onFinish: user deleted");
+                        firebaseAuth.getCurrentUser().delete();
+                        signOut();
+                        Toast.makeText(MainActivity.this, "Error while creating account. \nTry again.", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            }.start();*/
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -97,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void graphAll(View v) {
-        startActivity(new Intent(this, GraphAllActivity.class));
+        startActivity(new Intent(this, GraphAllActivityTest.class));
     }
 
     public void fakeBoot(View v) {
@@ -110,7 +149,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void clearEvents(View v) {
         SharedPrefManager sharedPrefManager = SharedPrefManager.getInstance(this);
-        String deviceId = sharedPrefManager.read(Constant.DEVICE_ID, "not-registered-device");
+        //String deviceId = sharedPrefManager.read(Constant.DEVICE_ID, "not-registered-device");
+        String deviceId = Util.getUniqueId(this);
         DatabaseHandler handler = new DatabaseHandler(this, deviceId);
         handler.deleteSavedEvents();
     }

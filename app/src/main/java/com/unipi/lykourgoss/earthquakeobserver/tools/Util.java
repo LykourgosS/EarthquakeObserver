@@ -4,24 +4,16 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.net.NetworkRequest;
 import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
-import com.unipi.lykourgoss.earthquakeobserver.entities.SensorInfo;
-import com.unipi.lykourgoss.earthquakeobserver.entities.UserDevice;
 import com.unipi.lykourgoss.earthquakeobserver.services.StartObserverJobService;
-import com.unipi.lykourgoss.earthquakeobserver.tools.firebase.AuthHandler;
-import com.unipi.lykourgoss.earthquakeobserver.tools.firebase.DatabaseHandler;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -91,7 +83,7 @@ public class Util {
     }
 
     /*public static void addDeviceToFirebase(Context context, SensorInfo sensorInfo) {
-        UserDevice device = new UserDevice.Builder()
+        Device device = new Device.Builder()
                 .setDeviceId(Util.getUniqueId(context))
                 .setFirebaseAuthUid(AuthHandler.getInstance().getCurrentUser().getUid())
                 .setSensorInfo(sensorInfo)

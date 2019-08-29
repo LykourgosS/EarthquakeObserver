@@ -1,7 +1,5 @@
 package com.unipi.lykourgoss.earthquakeobserver.entities;
 
-import android.hardware.Sensor;
-
 import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
 
 import java.util.Date;
@@ -11,7 +9,7 @@ import java.util.Date;
  * on 20,August,2019.
  */
 
-public class UserDevice {
+public class Device {
 
     public static final String IS_RUNNING = "isRunning";
     public static final String LAST_OBSERVING_TIME_IN_MILLIS = "lastObservingTimeInMillis";
@@ -32,10 +30,10 @@ public class UserDevice {
     // sensor (accelerometer) info (used for statistic purposes)
     private SensorInfo sensorInfo;
 
-    public UserDevice() {
+    public Device() {
     }
 
-    public UserDevice(String deviceId, String firebaseAuthUid, String createdDatetime, String lastObservingDateTime, long lastObservingTimeInMillis, boolean isRunning, SensorInfo sensorInfo) {
+    public Device(String deviceId, String firebaseAuthUid, String createdDatetime, String lastObservingDateTime, long lastObservingTimeInMillis, boolean isRunning, SensorInfo sensorInfo) {
         this.deviceId = deviceId;
         this.firebaseAuthUid = firebaseAuthUid;
         this.createdDatetime = createdDatetime;
@@ -111,8 +109,8 @@ public class UserDevice {
             return this;
         }
 
-        public UserDevice build() {
-            return new UserDevice(deviceId, firebaseAuthUid, createdDatetime, lastObservingDateTime, lastObservingTimeInMillis, isRunning, sensorInfo);
+        public Device build() {
+            return new Device(deviceId, firebaseAuthUid, createdDatetime, lastObservingDateTime, lastObservingTimeInMillis, isRunning, sensorInfo);
         }
     }
 
