@@ -1,10 +1,10 @@
 package com.unipi.lykourgoss.earthquakeobserver.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.tools.firebase.AuthHandler;

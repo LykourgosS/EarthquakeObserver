@@ -33,7 +33,7 @@ public class SensorActivity extends AppCompatActivity {
             float delta = mAccelCurrent - mAccelLast;
             mAccel = mAccel * 0.9f + delta; // perform low-cut filter
 
-            Log.d(TAG, "onSensorChanged: " + mAccel);
+            Log.d(TAG, "onSensorChanged: " + String.format("%.4f", mAccel));
         }
 
         @Override

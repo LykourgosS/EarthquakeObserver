@@ -111,7 +111,8 @@ public class DatabaseHandler {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 EarthquakeEvent event = dataSnapshot.getValue(EarthquakeEvent.class);
-                if (event != null && event.getDuration() > Constant.MIN_EVENT_DURATION) {
+                if (event.getDuration() > Constant.MIN_EVENT_DURATION) {
+                    Log.d(TAG, "terminateEvent: onDataChange: event saved");
                     savedEventsRef.child(event.getEventId()).setValue(event);
                 }
                 activeEventsRef.setValue(null);

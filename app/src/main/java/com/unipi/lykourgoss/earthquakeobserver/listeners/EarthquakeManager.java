@@ -91,8 +91,9 @@ public class EarthquakeManager implements SensorEventListener {
         millis = nowMillis;
         performLowPassFilter(event);
         // todo use one of the 2 following ways !!!
-        MinimalEarthquakeEvent minimalEarthquakeEvent = performLowPassFilter(event);
-//        MinimalEarthquakeEvent minimalEarthquakeEvent = new MinimalEarthquakeEvent(event, 9.91f); // todo use actual balanceValue
+        // todo probably remove performLowPassFilter(...) abnormal behavior, not following the automato
+        // MinimalEarthquakeEvent minimalEarthquakeEvent = performLowPassFilter(event);
+        MinimalEarthquakeEvent minimalEarthquakeEvent = new MinimalEarthquakeEvent(event, 9.91f); // todo use actual balanceValue
         eventList.add(minimalEarthquakeEvent);
         if (eventList.size() == 10) {
             float meanValue = MinimalEarthquakeEvent.getMeanValue(eventList);
