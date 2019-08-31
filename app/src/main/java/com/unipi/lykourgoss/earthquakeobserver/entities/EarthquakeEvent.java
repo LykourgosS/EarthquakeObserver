@@ -1,7 +1,6 @@
 package com.unipi.lykourgoss.earthquakeobserver.entities;
 
-import android.hardware.SensorEvent;
-
+import com.google.firebase.database.Exclude;
 import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
 
 import java.util.ArrayList;
@@ -14,9 +13,13 @@ import java.util.List;
 
 public class EarthquakeEvent {
 
+    public static final String SENSOR_VALUES = "sensorValues";
+    public static final String END_TIME = "endTime";
+    public static final String END_DATE_TIME = "endDateTime";
+
     /**
      * event unique eventId, acquired using Firebase push() method
-     * */
+     */
     private String eventId;
 
     private String deviceId;
@@ -38,19 +41,24 @@ public class EarthquakeEvent {
     /**
      * time in milliseconds, since January 1, 1970 UTC (1970-01-01-00:00:00), in which the event
      * started
-     * */
+     */
     private long startTime;
 
     /**
      * time in milliseconds, since January 1, 1970 UTC (1970-01-01-00:00:00), in which the event
      * ended
-     * */
+     */
     private long endTime;
 
     /**
      * dateTime (according to this format: yyyy-MM-dd HH:mm:ss.SSS z) in which the event started
-     * */
+     */
     private String startDateTime;
+
+    /**
+     * dateTime (according to this format: yyyy-MM-dd HH:mm:ss.SSS z) in which the event ended
+     */
+    private String endDateTime;
 
     private double latitude;
 
@@ -68,7 +76,7 @@ public class EarthquakeEvent {
         this.longitude = longitude;
     }*/
 
-    private EarthquakeEvent(String eventId, String deviceId, /*float meanSensorValue, */List<Float> sensorValues, long startTime, long endTime, String startDateTime, double latitude, double longitude) {
+    private EarthquakeEvent(String eventId, String deviceId, /*float meanSensorValue, */List<Float> sensorValues, long startTime, long endTime, String startDateTime, String endDateTime, double latitude, double longitude) {
         this.eventId = eventId;
         this.deviceId = deviceId;
         //this.meanSensorValue = meanSensorValue;
@@ -76,6 +84,7 @@ public class EarthquakeEvent {
         this.startTime = startTime;
         this.endTime = endTime;
         this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -110,10 +119,15 @@ public class EarthquakeEvent {
 
     public void setEndTime(long endTime) {
         this.endTime = endTime;
+        this.endDateTime = Util.millisToDateTime(endTime);
     }
 
     public String getStartDateTime() {
         return startDateTime;
+    }
+
+    public String getEndDateTime() {
+        return endDateTime;
     }
 
     public double getLatitude() {
@@ -124,6 +138,11 @@ public class EarthquakeEvent {
         return longitude;
     }
 
+    @Exclude
+    public long getDuration() {
+        return endTime - startTime;
+    }
+
     public static class Builder {
         private String eventId;
         private String deviceId;
@@ -132,13 +151,15 @@ public class EarthquakeEvent {
         private long startTime;
         private long endTime;
         private String startDateTime;
+        private String endDateTime;
         private double latitude;
         private double longitude;
 
         public Builder(List<MinimalEarthquakeEvent> eventList) {
             this.startTime = eventList.get(0).getTimeInMillis();
-            this.endTime = eventList.get(eventList.size() - 1).getTimeInMillis();
             this.startDateTime = Util.millisToDateTime(this.startTime);
+            this.endTime = eventList.get(eventList.size() - 1).getTimeInMillis();
+            this.endDateTime = Util.millisToDateTime(this.endTime);
         }
 
         public Builder setDeviceId(String deviceId) {
@@ -163,7 +184,7 @@ public class EarthquakeEvent {
         }
 
         public EarthquakeEvent build() {
-            return new EarthquakeEvent(eventId, deviceId, sensorValues, startTime, endTime, startDateTime, latitude, longitude);
+            return new EarthquakeEvent(eventId, deviceId, sensorValues, startTime, endTime, startDateTime, endDateTime, latitude, longitude);
         }
     }
 

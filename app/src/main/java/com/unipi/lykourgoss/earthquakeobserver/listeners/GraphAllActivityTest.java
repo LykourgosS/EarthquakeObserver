@@ -87,9 +87,9 @@ public class GraphAllActivityTest extends AppCompatActivity implements ServiceCo
         LineDataSet normXYZDataSet = createSet("√(x²+y²+z²)", 3f, Color.MAGENTA);
         data.addDataSet(normXYZDataSet);
 
-        // x+y+z DataSet
-        LineDataSet sumXYZDataSet = createSet("x+y+z", 1f, Color.BLACK);
-        data.addDataSet(sumXYZDataSet);
+        // Acceleration using LPF DataSet
+        LineDataSet accelerationLPFDataSet = createSet("Acceleration using LPF", 1f, Color.YELLOW);
+        data.addDataSet(accelerationLPFDataSet);
 
         lineChart.setData(data);
 
@@ -148,11 +148,11 @@ public class GraphAllActivityTest extends AppCompatActivity implements ServiceCo
         ILineDataSet normXYZDataSet = data.getDataSetByIndex(3);
         data.addEntry(new Entry(normXYZDataSet.getEntryCount(), normXYZ), 3);
 
-        // x+y+z
+        // Acceleration using LPF DataSet
         // float sumXYZ = x + y + z - balanceValue;
-        float sumXYZ = observerServiceTest.getAcceleration();
+        float acceleration = observerServiceTest.getAcceleration();
         ILineDataSet sumXYZDataSet = data.getDataSetByIndex(4);
-        data.addEntry(new Entry(sumXYZDataSet.getEntryCount(), sumXYZ), 4);
+        data.addEntry(new Entry(sumXYZDataSet.getEntryCount(), acceleration), 4);
 
         data.notifyDataChanged();
 

@@ -1,5 +1,7 @@
 package com.unipi.lykourgoss.earthquakeobserver;
 
+import android.hardware.SensorManager;
+
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
  * on 12,July,2019.
@@ -30,6 +32,12 @@ public class Constant {
     // 10 samples/s => 1 sample in 0.1 s = 100 ms = 100000 μs
     public static final int SAMPLING_PERIOD = 100 * 1000;
 
+    /**
+     * minimum duration in milliseconds for an earthquake event used to check while the event is terminated, to
+     * know if event should be saved to Firebase Database (from active-events to saved-events)
+     * */
+    public static final long MIN_EVENT_DURATION = 5 * 1000;
+
     // used for passing info about sensor from SensorConfigurationActivity back to SignInActivity
     // to add device to firebase
     public static final String EXTRA_SENSOR_INFO = "com.unipi.lykourgoss.earthquakeobserver.EXTRA_SENSOR_INFO";
@@ -55,7 +63,7 @@ public class Constant {
 
     // SensorValue threshold, used for recognize if values from accelerometer are big enough for
     // adding to Firebase (reporting) an event
-    public static final float SENSOR_THRESHOLD = 1;
+    public static final float SENSOR_THRESHOLD = 0.1f;
 
     // key of device id (DEVICE_ID) to be stored in SharedPreferences only the first time
     public static final String DEVICE_ID = "com.unipi.lykourgoss.earthquakeobserver.DEVICE_ID";

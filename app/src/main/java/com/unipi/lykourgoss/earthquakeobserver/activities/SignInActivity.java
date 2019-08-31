@@ -25,8 +25,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.R;
-import com.unipi.lykourgoss.earthquakeobserver.entities.SensorInfo;
 import com.unipi.lykourgoss.earthquakeobserver.entities.Device;
+import com.unipi.lykourgoss.earthquakeobserver.entities.SensorInfo;
 import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
 import com.unipi.lykourgoss.earthquakeobserver.tools.firebase.DatabaseHandler;
@@ -47,10 +47,8 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
-        // todo remove
-        startActivity(new Intent(this, MainActivity.class));
-
         findViewById(R.id.button_google_sign_in).setOnClickListener(this);
+        findViewById(R.id.button_sign_out).setOnClickListener(this);
 
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder()
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -66,7 +64,17 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
     protected void onStart() {
         super.onStart();
         // Check if user is signed in (non-null)
-        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        updateUi(firebaseAuth.getCurrentUser());
+    }
+
+    private void updateUi(FirebaseUser currentUser) {
+        if (currentUser == null) {
+            findViewById(R.id.button_google_sign_in).setVisibility(View.VISIBLE);
+            findViewById(R.id.button_sign_out).setVisibility(View.GONE);
+        } else {
+            findViewById(R.id.button_google_sign_in).setVisibility(View.GONE);
+            findViewById(R.id.button_sign_out).setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -135,7 +143,7 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
         DatabaseHandler databaseHandler = new DatabaseHandler(this, device.getDeviceId());
         databaseHandler.addDevice(device);
         final SharedPrefManager sharedPrefManager = SharedPrefManager.getInstance(SignInActivity.this);
-        new CountDownTimer(5 * 1000, 1000){
+        new CountDownTimer(5 * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 boolean deviceAddedToFirebase = sharedPrefManager.read(Constant.DEVICE_ADDED_TO_FIREBASE, false);
@@ -165,6 +173,8 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
     }
 
     private void signOut() {
+
+        firebaseAuth.getCurrentUser().delete();
         // Firebase sign out
         firebaseAuth.signOut();
 
@@ -173,7 +183,7 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
                 new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        // updateUI(null);
+                        updateUi(null);
                     }
                 });
     }
@@ -183,6 +193,9 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
         switch (v.getId()) {
             case R.id.button_google_sign_in:
                 signIn();
+                break;
+            case R.id.button_sign_out:
+                signOut();
                 break;
         }
     }

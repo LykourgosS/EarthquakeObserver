@@ -2,6 +2,7 @@ package com.unipi.lykourgoss.earthquakeobserver.entities;
 
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.util.Log;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
@@ -71,7 +72,7 @@ public class MinimalEarthquakeEvent {
         for (MinimalEarthquakeEvent event : list) {
             sum += event.getSensorValue();
         }
-        return sum / list.size();
+        return Math.abs(sum / list.size());
     }
 
     /**

@@ -3,10 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.unipi.lykourgoss.earthquakeobserver">
 
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-feature
+        android:name="android.hardware.sensor.accelerometer"
+        android:required="true" />
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
@@ -19,15 +22,8 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
-        <activity android:name=".listeners.SensorActivity"/>
-        <activity android:name=".activities.MainActivity" />
-        <activity android:name=".activities.SensorConfigurationActivity" />
         <activity
-            android:name=".activities.LogLocationActivity"
-            android:launchMode="singleTop" />
-        <activity android:name=".services.LocationActivity" />
-        <activity
-            android:name=".activities.SignInActivity"
+            android:name=".activities.SplashScreenActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,6 +31,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activities.MainActivity" />
+        <activity android:name=".activities.SignInActivity" />
+        <activity android:name=".listeners.SensorActivity" />
+        <activity android:name=".activities.SensorConfigurationActivity" />
+        <activity
+            android:name=".activities.LogLocationActivity"
+            android:launchMode="singleTop" />
+        <activity android:name=".services.LocationActivity" />
         <activity
             android:name=".activities.GraphAllActivity"
             android:launchMode="singleTop" />

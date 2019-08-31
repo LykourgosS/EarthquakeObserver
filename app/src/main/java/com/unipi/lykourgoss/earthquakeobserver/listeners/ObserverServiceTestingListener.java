@@ -34,7 +34,7 @@ import java.util.List;
  * on 28,August,2019.
  */
 
-public class ObserverServiceTestingListener extends Service implements EarthquakeEventListener.OnEarthquakeListener {
+public class ObserverServiceTestingListener extends Service implements EarthquakeManager.OnEarthquakeListener {
 
     public static final String TAG = "ObserverService";
 
@@ -87,7 +87,7 @@ public class ObserverServiceTestingListener extends Service implements Earthquak
         sharedPrefManager = SharedPrefManager.getInstance(this);
         //deviceId = sharedPrefManager.read(Constant.DEVICE_ID, "not-registered-device");
         deviceId = Util.getUniqueId(this);
-//        EarthquakeEventListener earthquakeEventListener = new EarthquakeEventListener(this, deviceId);
+//        EarthquakeManager earthquakeEventListener = new EarthquakeManager(this, deviceId);
 
         initLocator();
     }
@@ -202,8 +202,8 @@ public class ObserverServiceTestingListener extends Service implements Earthquak
     }
 
     @Override
-    public void updateEvent(float sensorValue, long endTime) {
-        databaseHandler.updateEvent(sensorValue, endTime);
+    public void updateEvent(int valueIndex, float sensorValue, long endTime) {
+        databaseHandler.updateEvent(valueIndex, sensorValue, endTime);
     }
 
     @Override

@@ -76,7 +76,6 @@ public class Util {
         String uniqueId = manager.read(Constant.DEVICE_ID, null);
         if (uniqueId == null) {
             uniqueId = UUID.randomUUID().toString();
-
             manager.write(Constant.DEVICE_ID, uniqueId);
         }
         return uniqueId;

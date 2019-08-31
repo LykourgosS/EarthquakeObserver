@@ -64,6 +64,13 @@
         android:onClick="signIn"
         android:text="Sign in" />
 
+    <Button
+        android:id="@+id/button_stop_service"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="stopService"
+        android:text="Stop Service" />
+
     <TextView
         android:id="@+id/text_view_battery_status"
         android:layout_width="match_parent"

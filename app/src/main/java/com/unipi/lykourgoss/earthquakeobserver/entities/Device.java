@@ -12,6 +12,7 @@ import java.util.Date;
 public class Device {
 
     public static final String IS_RUNNING = "isRunning";
+    public static final String LAST_OBSERVING_DATE_TIME = "lastObservingDateTime";
     public static final String LAST_OBSERVING_TIME_IN_MILLIS = "lastObservingTimeInMillis";
 
     // generated using UUID
@@ -68,11 +69,13 @@ public class Device {
         this.lastObservingDateTime = Util.millisToDateTime(lastObservingTimeInMillis);
     }
 
-    public boolean isRunning() {
+
+
+    public boolean getIsRunning() {
         return isRunning;
     }
 
-    public void setRunning(boolean running) {
+    public void setIsRunning(boolean running) {
         isRunning = running;
     }
 

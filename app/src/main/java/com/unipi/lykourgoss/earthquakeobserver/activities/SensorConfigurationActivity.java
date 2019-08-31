@@ -66,7 +66,7 @@ public class SensorConfigurationActivity extends AppCompatActivity implements Se
 //            logForXYZ(event.values[0], event.values[1], event.values[2]);
             Log.d(TAG, "onSensorChanged: mean = " + valueSum / valueCount + ", count = " + valueCount);
             //Log.d(TAG, "onSensorChanged: count = " + valueCount);
-            if (valueCount == 10/*todo again 1000*/) {
+            if (valueCount == 100/*todo again 1000*/) {
                 float meanValue = valueSum / valueCount;
                 boolean result = sharedPrefManager.write(Constant.SENSOR_BALANCE_VALUE, meanValue);
                 Log.d(TAG, "onSensorChanged: finish mean = " + meanValue + ", write: " + result);

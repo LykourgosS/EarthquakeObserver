@@ -7,26 +7,24 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.BatteryManager;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
+import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.listeners.GraphAllActivityTest;
+import com.unipi.lykourgoss.earthquakeobserver.receivers.BootCompletedReceiver;
+import com.unipi.lykourgoss.earthquakeobserver.services.ObserverService;
 import com.unipi.lykourgoss.earthquakeobserver.tools.ConnectivityStatus;
+import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
 import com.unipi.lykourgoss.earthquakeobserver.tools.firebase.DatabaseHandler;
-import com.unipi.lykourgoss.earthquakeobserver.R;
-import com.unipi.lykourgoss.earthquakeobserver.receivers.BootCompletedReceiver;
-import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -52,10 +50,10 @@ public class MainActivity extends BaseActivity {
         IntentFilter filter = new IntentFilter(Constant.FAKE_BOOT);
         registerReceiver(receiver, filter);
 
-        if (checkLocationPermission()) {
-            // Intent service = new Intent(this, ObserverService.class);
-            // ContextCompat.startForegroundService(this, service);
-        }
+        /*if (checkLocationPermission()) {
+            Intent service = new Intent(this, ObserverService.class);
+            ContextCompat.startForegroundService(this, service);
+        }*/
 
         textViewBatteryStatus = findViewById(R.id.text_view_battery_status);
         final IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
@@ -148,8 +146,6 @@ public class MainActivity extends BaseActivity {
     }
 
     public void clearEvents(View v) {
-        SharedPrefManager sharedPrefManager = SharedPrefManager.getInstance(this);
-        //String deviceId = sharedPrefManager.read(Constant.DEVICE_ID, "not-registered-device");
         String deviceId = Util.getUniqueId(this);
         DatabaseHandler handler = new DatabaseHandler(this, deviceId);
         handler.deleteSavedEvents();
@@ -157,6 +153,10 @@ public class MainActivity extends BaseActivity {
 
     public void signIn(View v) {
         startActivity(new Intent(this, SignInActivity.class));
+    }
+
+    public void stopService(View view) {
+        stopService(new Intent(this, ObserverService.class));
     }
 
     private boolean checkLocationPermission() {

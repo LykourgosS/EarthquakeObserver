@@ -14,11 +14,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
-import com.unipi.lykourgoss.earthquakeobserver.entities.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.entities.Device;
+import com.unipi.lykourgoss.earthquakeobserver.entities.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
+import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
@@ -60,6 +63,7 @@ public class DatabaseHandler {
     }
 
     public void addEvent(EarthquakeEvent newEvent) {
+        Log.d(TAG, "addEvent: value = " + newEvent.getSensorValues().get(0));
         String eventId = activeEventsRef.push().getKey();
         newEvent.setEventId(eventId);
         activeEventsRef.setValue(newEvent).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -70,8 +74,22 @@ public class DatabaseHandler {
         });
     }
 
-    public void updateEvent(final float sensorValue, final long endTime) {
-        activeEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+    public void updateEvent(int valueIndex, float sensorValue, long endTime) {
+        Log.d(TAG, "updateEvent: value = " + sensorValue);
+        Map<String, Object> eventUpdates = new HashMap<>();
+
+        String valuePath = "/" + EarthquakeEvent.SENSOR_VALUES + "/" + valueIndex;
+        eventUpdates.put(valuePath, sensorValue);
+
+        String endTimePath = "/" + EarthquakeEvent.END_TIME;
+        eventUpdates.put(endTimePath, endTime);
+
+        String endDateTimePath = "/" + EarthquakeEvent.END_DATE_TIME;
+        eventUpdates.put(endDateTimePath, Util.millisToDateTime(endTime));
+
+        activeEventsRef.updateChildren(eventUpdates);
+
+        /*activeEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 EarthquakeEvent event = dataSnapshot.getValue(EarthquakeEvent.class);
@@ -84,15 +102,18 @@ public class DatabaseHandler {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        });*/
     }
 
     public void terminateEvent() {
+        Log.d(TAG, "terminateEvent");
         activeEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 EarthquakeEvent event = dataSnapshot.getValue(EarthquakeEvent.class);
-                savedEventsRef.child(event.getEventId()).setValue(event);
+                if (event != null && event.getDuration() > Constant.MIN_EVENT_DURATION) {
+                    savedEventsRef.child(event.getEventId()).setValue(event);
+                }
                 activeEventsRef.setValue(null);
             }
 
@@ -126,7 +147,23 @@ public class DatabaseHandler {
             devicesRef.child(deviceId).child(Device.LAST_OBSERVING_TIME_IN_MILLIS).setValue(new Date().getTime());
         }*/
 
-        devicesRef.child(deviceId).addListenerForSingleValueEvent(new ValueEventListener() {
+        Log.d(TAG, "updateDeviceStatus");
+        Map<String, Object> deviceUpdates = new HashMap<>();
+
+        String isRunningPath = "/" + Device.IS_RUNNING;
+        deviceUpdates.put(isRunningPath, isStarted);
+
+        long millis = new Date().getTime();
+
+        String millisPath = "/" + Device.LAST_OBSERVING_TIME_IN_MILLIS;
+        deviceUpdates.put(millisPath, millis);
+
+        String dateTimePath = "/" + Device.LAST_OBSERVING_DATE_TIME;
+        deviceUpdates.put(dateTimePath, Util.millisToDateTime(millis));
+
+        devicesRef.child(deviceId).updateChildren(deviceUpdates);
+
+        /*devicesRef.child(deviceId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Device device = dataSnapshot.getValue(Device.class);
@@ -138,7 +175,7 @@ public class DatabaseHandler {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
-        });
+        });*/
     }
 
     private class MyValueEventListener implements ValueEventListener {
