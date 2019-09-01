@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver.entities;
+package com.unipi.lykourgoss.earthquakeobserver.models;
 
 import android.hardware.Sensor;
 import android.os.Parcel;

@@ -9,7 +9,7 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
-import com.unipi.lykourgoss.earthquakeobserver.entities.MinimalEarthquakeEvent;
+import com.unipi.lykourgoss.earthquakeobserver.models.MinimalEarthquakeEvent;
 
 import java.util.ArrayList;
 import java.util.List;

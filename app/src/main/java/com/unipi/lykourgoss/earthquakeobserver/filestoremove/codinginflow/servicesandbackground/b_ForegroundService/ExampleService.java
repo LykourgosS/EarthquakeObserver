@@ -30,7 +30,7 @@ public class ExampleService extends Service {
         Intent intentNotification = new Intent(this, ForegroundServiceActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intentNotification, 0);
 
-        Notification notification = new NotificationCompat.Builder(this, Constant.CHANNEL_ID)
+        Notification notification = new NotificationCompat.Builder(this, Constant.OBSERVER_SERVICE_CHANNEL_ID)
                 .setContentTitle("Example Service")
                 .setContentText(input)
                 .setSmallIcon(R.drawable.ic_track_changes_white_24dp)

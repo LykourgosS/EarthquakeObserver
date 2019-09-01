@@ -147,7 +147,7 @@ public class MainActivity extends BaseActivity {
 
     public void clearEvents(View v) {
         String deviceId = Util.getUniqueId(this);
-        DatabaseHandler handler = new DatabaseHandler(this, deviceId);
+        DatabaseHandler handler = new DatabaseHandler(deviceId);
         handler.deleteSavedEvents();
     }
 

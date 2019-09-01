@@ -11,12 +11,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
-import com.unipi.lykourgoss.earthquakeobserver.entities.Device;
-import com.unipi.lykourgoss.earthquakeobserver.entities.EarthquakeEvent;
-import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
+import com.unipi.lykourgoss.earthquakeobserver.models.Device;
+import com.unipi.lykourgoss.earthquakeobserver.models.EarthquakeEvent;
+import com.unipi.lykourgoss.earthquakeobserver.models.User;
 import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
 
 import java.util.Date;
@@ -35,32 +36,38 @@ public class DatabaseHandler {
     private static final String ACTIVE_EVENTS_REF = "active-events";
     private static final String SAVED_EVENTS_REF = "saved-events";
     private static final String DEVICES_REF = "devices";
-
-    private Context context;
+    private static final String USER_REF = "users";
 
     private static DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
     private DatabaseReference activeEventsRef;
     private DatabaseReference savedEventsRef;
     private DatabaseReference devicesRef;
+    private DatabaseReference usersRef;
 
-    private ValueEventListener listener = new MyValueEventListener();
-    private Query query;
+    private DatabaseListener databaseListener;
 
-    public DatabaseHandler(Context context, String deviceId) {
-        this.context = context;
+    /*private ValueEventListener listener = new MyValueEventListener();
+    private Query query;*/
+
+    public DatabaseHandler(String deviceId) {
         activeEventsRef = databaseReference.child(ACTIVE_EVENTS_REF).child(deviceId);
         savedEventsRef = databaseReference.child(SAVED_EVENTS_REF).child(deviceId);
         devicesRef = databaseReference.child(DEVICES_REF);
+        usersRef = databaseReference.child(USER_REF);
     }
 
-    private void addListener() {
+    public void setDatabaseListener(DatabaseListener databaseListener) {
+        this.databaseListener = databaseListener;
+    }
+
+    /*private void addListener() {
         query.addValueEventListener(listener);
     }
 
     private void removeListener() {
         query.removeEventListener(listener);
-    }
+    }*/
 
     public void addEvent(EarthquakeEvent newEvent) {
         Log.d(TAG, "addEvent: value = " + newEvent.getSensorValues().get(0));
@@ -129,13 +136,51 @@ public class DatabaseHandler {
         savedEventsRef.setValue(null);
     }
 
+    public void addUser(final User user) {
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+            @Override
+            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                if (task.isSuccessful()) {
+                    user.setFcmToken(task.getResult().getToken());
+                    usersRef.child(user.getUid()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            databaseListener.onUserAdded(task.isSuccessful());
+                        }
+                    });
+                } else {
+                    // something went wrong while acquiring FCM Token
+                    databaseListener.onUserAdded(task.isSuccessful());
+                }
+            }
+        });
+    }
+
+    public interface DatabaseListener {
+        /**
+         * Triggered when the {@link #addUser(User)} is completed.
+         *
+         * @param userAddedSuccessfully shows if the used added successfully.
+         * */
+        void onUserAdded(boolean userAddedSuccessfully);
+
+        /**
+         * Triggered when the {@link #addDevice(Device)} )} is completed.
+         *
+         * @param deviceAddedSuccessfully shows if the device added successfully.
+         * */
+        void onDeviceAdded(boolean deviceAddedSuccessfully);
+    }
+
+
     public void addDevice(Device device) {
         devicesRef.child(device.getDeviceId()).setValue(device).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
+                databaseListener.onDeviceAdded(task.isSuccessful());
                 // save to shared preferences that device added to Firebase, if not device cannot
                 // work properly
-                SharedPrefManager.getInstance(context).write(Constant.DEVICE_ADDED_TO_FIREBASE, task.isSuccessful());
+                // SharedPrefManager.getInstance(context).write(Constant.DEVICE_ADDED_TO_FIREBASE, task.isSuccessful());
             }
         });
     }
@@ -179,7 +224,7 @@ public class DatabaseHandler {
         });*/
     }
 
-    private class MyValueEventListener implements ValueEventListener {
+    /*private class MyValueEventListener implements ValueEventListener {
 
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -190,5 +235,5 @@ public class DatabaseHandler {
         public void onCancelled(@NonNull DatabaseError databaseError) {
 
         }
-    }
+    }*/
 }

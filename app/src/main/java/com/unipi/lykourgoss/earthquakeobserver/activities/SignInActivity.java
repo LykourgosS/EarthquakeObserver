@@ -25,13 +25,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.R;
-import com.unipi.lykourgoss.earthquakeobserver.entities.Device;
-import com.unipi.lykourgoss.earthquakeobserver.entities.SensorInfo;
+import com.unipi.lykourgoss.earthquakeobserver.models.Device;
+import com.unipi.lykourgoss.earthquakeobserver.models.SensorInfo;
+import com.unipi.lykourgoss.earthquakeobserver.models.User;
 import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
 import com.unipi.lykourgoss.earthquakeobserver.tools.firebase.DatabaseHandler;
 
-public class SignInActivity extends BaseActivity implements View.OnClickListener {
+public class SignInActivity extends BaseActivity implements View.OnClickListener, DatabaseHandler.DatabaseListener {
 
     private static final String TAG = "SignInActivity";
 
@@ -41,6 +42,8 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
     private FirebaseAuth firebaseAuth;
 
     private GoogleSignInClient googleSignInClient;
+
+    private DatabaseHandler databaseHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +61,9 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
 
         firebaseAuth = FirebaseAuth.getInstance();
+
+        databaseHandler = new DatabaseHandler(Util.getUniqueId(this));
+        databaseHandler.setDatabaseListener(this);
     }
 
     @Override
@@ -77,6 +83,33 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
+    // on the sign in button clicked methods called accordingly:
+    // {@link signIn() -> onActivityResult(...) -> firebaseAuthWithGoogle(...) ->
+
+    /*
+     * On the sign in button clicked methods called accordingly:
+     *  {@link #signIn()} -> onActivityResult(...) -> firebaseAuthWithGoogle(...) ->
+     * */
+    private void doI() {
+
+    }
+
+    /**
+     * Starts an activity (made by google) for result to select google account as a user for our
+     * app, when account is selected successfully the onActivityResult is triggered. On the sign in
+     * button clicked methods called accordingly:
+     * 1. {@link #signIn()}
+     * 2. {@link #onActivityResult(int, int, Intent)}
+     * 3. {@link #firebaseAuthWithGoogle(GoogleSignInAccount)}
+     * 4. {@link #onUserAdded(boolean)} + {@link #configureSensor()}
+     * 5. {@link #onActivityResult(int, int, Intent)}
+     * 6. {@link #addDeviceToFirebase(SensorInfo)} + {@link #onDeviceAdded(boolean)}
+     * */
+    private void signIn() {
+        Intent signInIntent = googleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -91,7 +124,7 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.d(TAG, "Google sign in failed", e);
-                // updateUI(null);
+                updateUi(null);
             }
         } else if (requestCode == RC_CONFIGURE_SENSOR && resultCode == RESULT_OK) {
             SensorInfo sensorInfo = data.getParcelableExtra(Constant.EXTRA_SENSOR_INFO);
@@ -99,6 +132,9 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
+    /**
+     * Sign in to Firebase Auth using the selected Google account.
+     * */
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         showProgressDialog();
@@ -110,8 +146,11 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "signInWithCredential:success");
-                            // Sign in success, open Sensor configuration activity to get
-                            // balance sensor value
+                            // add user to Firebase Database
+                            FirebaseUser user = task.getResult().getUser();
+                            databaseHandler.addUser(new User(user.getUid(), user.getEmail(), user.getDisplayName()));
+                            // Sign in success, open Sensor configuration activity to get balance
+                            // sensor value
                             configureSensor();
                         } else {
                             // If sign in fails, display a message to the user.
@@ -123,11 +162,9 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
                 });
     }
 
-    private void signIn() {
-        Intent signInIntent = googleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
+    /**
+     * Start SensorConfigurationActivity waiting for a result
+     * */
     private void configureSensor() {
         Intent intent = new Intent(this, SensorConfigurationActivity.class);
         startActivityForResult(intent, RC_CONFIGURE_SENSOR);
@@ -140,7 +177,6 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
                 .setFirebaseAuthUid(firebaseAuth.getCurrentUser().getUid())
                 .setSensorInfo(sensorInfo)
                 .build();
-        DatabaseHandler databaseHandler = new DatabaseHandler(this, device.getDeviceId());
         databaseHandler.addDevice(device);
         final SharedPrefManager sharedPrefManager = SharedPrefManager.getInstance(SignInActivity.this);
         new CountDownTimer(5 * 1000, 1000) {
@@ -198,5 +234,15 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
                 signOut();
                 break;
         }
+    }
+
+    @Override
+    public void onUserAdded(boolean userAddedSuccessfully) {
+        hideProgressDialog();
+    }
+
+    @Override
+    public void onDeviceAdded(boolean deviceAddedSuccessfully) {
+
     }
 }

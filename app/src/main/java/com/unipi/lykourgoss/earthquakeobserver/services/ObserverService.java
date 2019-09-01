@@ -18,8 +18,8 @@ import androidx.core.app.NotificationCompat;
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.activities.MainActivity;
-import com.unipi.lykourgoss.earthquakeobserver.entities.EarthquakeEvent;
-import com.unipi.lykourgoss.earthquakeobserver.entities.MinimalEarthquakeEvent;
+import com.unipi.lykourgoss.earthquakeobserver.models.EarthquakeEvent;
+import com.unipi.lykourgoss.earthquakeobserver.models.MinimalEarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.listeners.EarthquakeManager;
 import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
 import com.unipi.lykourgoss.earthquakeobserver.tools.firebase.DatabaseHandler;
@@ -120,10 +120,11 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
 
         // todo only use foreground service on Oreo an higher -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
         if (true) { // if API is v.26 and higher start a foreground service
-            Notification notification = new NotificationCompat.Builder(this, Constant.CHANNEL_ID)
+            Notification notification = new NotificationCompat.Builder(this, Constant.OBSERVER_SERVICE_CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_track_changes_white_24dp)
                     .setContentTitle("Example Service")
                     .setContentText("Observing...")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setContentIntent(pendingIntent)
                     .build();
 
@@ -136,7 +137,7 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         // todo do heavy work on a background thread
         // following are used for observing events and if needed save them to Firebase Database
         deviceId = Util.getUniqueId(this);
-        databaseHandler = new DatabaseHandler(this, deviceId);
+        databaseHandler = new DatabaseHandler(deviceId);
         databaseHandler.updateDeviceStatus(deviceId, true);
 
         sharedPrefManager = SharedPrefManager.getInstance(this);

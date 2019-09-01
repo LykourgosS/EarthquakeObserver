@@ -25,7 +25,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.R;
-import com.unipi.lykourgoss.earthquakeobserver.entities.MinimalEarthquakeEvent;
+import com.unipi.lykourgoss.earthquakeobserver.models.MinimalEarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 
 import java.util.Timer;

@@ -35,7 +35,7 @@ public class App extends Application {
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){ // notification channels are available for API v.26 and higher
             NotificationChannel serviceChannel = new NotificationChannel(
-                    Constant.CHANNEL_ID,
+                    Constant.OBSERVER_SERVICE_CHANNEL_ID,
                     "Channel name",
                     NotificationManager.IMPORTANCE_DEFAULT
             );

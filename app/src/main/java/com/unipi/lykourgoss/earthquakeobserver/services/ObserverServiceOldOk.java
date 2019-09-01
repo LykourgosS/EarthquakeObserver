@@ -20,8 +20,8 @@ import androidx.core.app.NotificationCompat;
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.R;
 import com.unipi.lykourgoss.earthquakeobserver.activities.LogLocationActivity;
-import com.unipi.lykourgoss.earthquakeobserver.entities.EarthquakeEvent;
-import com.unipi.lykourgoss.earthquakeobserver.entities.MinimalEarthquakeEvent;
+import com.unipi.lykourgoss.earthquakeobserver.models.EarthquakeEvent;
+import com.unipi.lykourgoss.earthquakeobserver.models.MinimalEarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.receivers.PowerDisconnectedReceiver;
 import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
@@ -137,7 +137,7 @@ public class ObserverServiceOldOk extends Service implements SensorEventListener
 
         // todo only use foreground service on Oreo an higher -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
         if (true) { // if API is v.26 and higher start a foreground service
-            Notification notification = new NotificationCompat.Builder(this, Constant.CHANNEL_ID)
+            Notification notification = new NotificationCompat.Builder(this, Constant.OBSERVER_SERVICE_CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_track_changes_white_24dp)
                     .setContentTitle("Example Service")
                     .setContentText("Observing...")
@@ -156,7 +156,7 @@ public class ObserverServiceOldOk extends Service implements SensorEventListener
         //deviceId = sharedPrefManager.read(Constant.DEVICE_ID, "not-registered-device");
         deviceId = Util.getUniqueId(this);
 
-        databaseHandler = new DatabaseHandler(this, deviceId);
+        databaseHandler = new DatabaseHandler(deviceId);
         databaseHandler.updateDeviceStatus(deviceId, true);
         balanceValue = sharedPrefManager.read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_SENSOR_BALANCE_VALUE);
         eventList = new ArrayList<>();

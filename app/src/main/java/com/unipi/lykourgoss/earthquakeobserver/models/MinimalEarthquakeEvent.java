@@ -1,8 +1,6 @@
-package com.unipi.lykourgoss.earthquakeobserver.entities;
+package com.unipi.lykourgoss.earthquakeobserver.models;
 
 import android.hardware.SensorEvent;
-import android.hardware.SensorManager;
-import android.util.Log;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.tools.Util;

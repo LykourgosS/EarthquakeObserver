@@ -40,7 +40,7 @@ public class NotificationChannelActivity extends AppCompatActivity implements Vi
             String title = editTextTitle.getText().toString().trim();
             String message = editTextMessage.getText().toString().trim();
 
-            Notification notification = new NotificationCompat.Builder(NotificationChannelActivity.this, Constant.CHANNEL_ID)
+            Notification notification = new NotificationCompat.Builder(NotificationChannelActivity.this, Constant.OBSERVER_SERVICE_CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_track_changes_white_24dp)
                     .setContentTitle(title)
                     .setContentText(message)

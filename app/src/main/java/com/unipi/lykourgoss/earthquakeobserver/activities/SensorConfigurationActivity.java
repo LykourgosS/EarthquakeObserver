@@ -12,9 +12,9 @@ import android.util.Log;
 
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.R;
-import com.unipi.lykourgoss.earthquakeobserver.entities.Device;
-import com.unipi.lykourgoss.earthquakeobserver.entities.MinimalEarthquakeEvent;
-import com.unipi.lykourgoss.earthquakeobserver.entities.SensorInfo;
+import com.unipi.lykourgoss.earthquakeobserver.models.Device;
+import com.unipi.lykourgoss.earthquakeobserver.models.MinimalEarthquakeEvent;
+import com.unipi.lykourgoss.earthquakeobserver.models.SensorInfo;
 import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
 import com.unipi.lykourgoss.earthquakeobserver.tools.firebase.AuthHandler;
@@ -95,7 +95,7 @@ public class SensorConfigurationActivity extends AppCompatActivity implements Se
                 .setFirebaseAuthUid(AuthHandler.getInstance().getCurrentUser().getUid())
                 .setSensorInfo(sensorInfo)
                 .build();
-        DatabaseHandler databaseHandler = new DatabaseHandler(this, device.getDeviceId());
+        DatabaseHandler databaseHandler = new DatabaseHandler(device.getDeviceId());
         databaseHandler.addDevice(device);
     }
 

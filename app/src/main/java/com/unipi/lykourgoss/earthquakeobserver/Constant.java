@@ -13,7 +13,8 @@ public class Constant {
     public static final String EXTRA_INPUT = "com.unipi.lykourgoss.earthquakeobserver.Constant.EXTRA_INPUT";
 
     // Notification channel id
-    public static final String CHANNEL_ID = "ServiceChannel";
+    public static final String OBSERVER_SERVICE_CHANNEL_ID = "ObserverServiceChannel";
+    public static final String EARTHQUAKE_NOTIFICATION_CHANNEL_ID = "EarthquakeNotificationChannel";
 
     public static final int OBSERVER_SERVICE_ID = 1;
 

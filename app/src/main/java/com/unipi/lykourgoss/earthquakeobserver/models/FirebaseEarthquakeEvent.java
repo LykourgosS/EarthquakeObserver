@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver.entities;
+package com.unipi.lykourgoss.earthquakeobserver.models;
 
 import java.util.List;
 

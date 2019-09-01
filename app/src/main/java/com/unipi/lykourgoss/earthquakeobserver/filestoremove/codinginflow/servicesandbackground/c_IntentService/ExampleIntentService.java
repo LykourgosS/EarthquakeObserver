@@ -45,7 +45,7 @@ public class ExampleIntentService extends IntentService { // runs in the backgro
         Log.d(TAG, "WakeLock acquired");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { // if API is v.26 and higher start a foreground service
-            Notification notification = new NotificationCompat.Builder(this, Constant.CHANNEL_ID)
+            Notification notification = new NotificationCompat.Builder(this, Constant.OBSERVER_SERVICE_CHANNEL_ID)
                     .setContentTitle("ExampleIntentService")
                     .setContentText("Running...")
                     .setSmallIcon(R.drawable.ic_track_changes_white_24dp)

@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver.entities;
+package com.unipi.lykourgoss.earthquakeobserver.models;
 
 import com.google.firebase.database.Exclude;
 import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
