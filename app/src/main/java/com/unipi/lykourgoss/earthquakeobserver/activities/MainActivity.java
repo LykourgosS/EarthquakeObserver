@@ -122,7 +122,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public void sensorConfiguration(View v) {
-        startActivity(new Intent(this, SensorConfigurationActivity.class));
+        startActivity(new Intent(this, ConfigDeviceActivity.class));
     }
 
     public void logLocation(View v) {

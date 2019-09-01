@@ -4,12 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    tools:context=".activities.SplashScreenActivity">
+    android:padding="16sp"
+    android:background="@color/colorPrimary"
+    tools:context=".activities.LaunchScreenActivity">
 
     <TextView
+        android:textColor="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Splash Screen"
+        android:text="Launch Screen"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 

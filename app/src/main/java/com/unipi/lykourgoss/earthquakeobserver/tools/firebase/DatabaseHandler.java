@@ -12,6 +12,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.core.Path;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
@@ -85,14 +86,14 @@ public class DatabaseHandler {
         Log.d(TAG, "updateEvent: value = " + sensorValue);
         Map<String, Object> eventUpdates = new HashMap<>();
 
-        String valuePath = "/" + EarthquakeEvent.SENSOR_VALUES + "/" + valueIndex;
+        String valuePath = /*"/" + */EarthquakeEvent.SENSOR_VALUES + "/" + valueIndex;
         eventUpdates.put(valuePath, sensorValue);
 
-        String endTimePath = "/" + EarthquakeEvent.END_TIME;
-        eventUpdates.put(endTimePath, endTime);
+        //String endTimePath = "/" + EarthquakeEvent.END_TIME;
+        eventUpdates.put(EarthquakeEvent.END_TIME, endTime);
 
         String endDateTimePath = "/" + EarthquakeEvent.END_DATE_TIME;
-        eventUpdates.put(endDateTimePath, Util.millisToDateTime(endTime));
+        eventUpdates.put(EarthquakeEvent.END_DATE_TIME, Util.millisToDateTime(endTime));
 
         activeEventsRef.updateChildren(eventUpdates);
 
@@ -173,39 +174,66 @@ public class DatabaseHandler {
     }
 
 
-    public void addDevice(Device device) {
-        devicesRef.child(device.getDeviceId()).setValue(device).addOnCompleteListener(new OnCompleteListener<Void>() {
+    /**
+     * Adds device to Firebase Database in two paths, 1st path is under /devices and the 2nd one is
+     * under /users/{uid}/devices
+     * */
+    public void addDevice(final Device device) {
+        Log.d(TAG, "addDevice");
+        Map<String, Object> deviceAddition = new HashMap<>();
+
+        // put the value true on path: /users/{firebaseAuthUid()}/devices/{deviceId()}
+        String userPath = usersRef.child(device.getFirebaseAuthUid()).child(User.DEVICES).child(device.getDeviceId()).getPath().toString();
+        deviceAddition.put(userPath, true);
+
+        // put the Device object device on path: /devices/{deviceId}
+        String devicesPath = devicesRef.child(device.getDeviceId()).getPath().toString();
+        deviceAddition.put(devicesPath, device);
+
+        databaseReference.updateChildren(deviceAddition).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 databaseListener.onDeviceAdded(task.isSuccessful());
-                // save to shared preferences that device added to Firebase, if not device cannot
-                // work properly
-                // SharedPrefManager.getInstance(context).write(Constant.DEVICE_ADDED_TO_FIREBASE, task.isSuccessful());
             }
         });
+
+        /*devicesRef.child(device.getDeviceId()).setValue(device).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    usersRef.child(device.getFirebaseAuthUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+
+
+            }
+        });*/
     }
 
     public void updateDeviceStatus(final String deviceId, final boolean isStarted) {
-        /*// update isRunning
-        devicesRef.child(deviceId).child(Device.IS_RUNNING).setValue(isStarted);
-        if (!isStarted) {
-            // update lastObservingTimeInMillis only when the service stops to observe
-            devicesRef.child(deviceId).child(Device.LAST_OBSERVING_TIME_IN_MILLIS).setValue(new Date().getTime());
-        }*/
-
         Log.d(TAG, "updateDeviceStatus");
         Map<String, Object> deviceUpdates = new HashMap<>();
 
-        String isRunningPath = "/" + Device.IS_RUNNING;
-        deviceUpdates.put(isRunningPath, isStarted);
+        // todo see if ok with following comment
+        //String isRunningPath = "/" + Device.IS_RUNNING;
+        deviceUpdates.put(Device.IS_RUNNING, isStarted);
 
         long millis = new Date().getTime();
 
-        String millisPath = "/" + Device.LAST_OBSERVING_TIME_IN_MILLIS;
-        deviceUpdates.put(millisPath, millis);
+        //String millisPath = "/" + Device.LAST_OBSERVING_TIME_IN_MILLIS;
+        deviceUpdates.put(Device.LAST_OBSERVING_TIME_IN_MILLIS, millis);
 
-        String dateTimePath = "/" + Device.LAST_OBSERVING_DATE_TIME;
-        deviceUpdates.put(dateTimePath, Util.millisToDateTime(millis));
+        //String dateTimePath = "/" + Device.LAST_OBSERVING_DATE_TIME;
+        deviceUpdates.put(Device.LAST_OBSERVING_DATE_TIME, Util.millisToDateTime(millis));
 
         devicesRef.child(deviceId).updateChildren(deviceUpdates);
 

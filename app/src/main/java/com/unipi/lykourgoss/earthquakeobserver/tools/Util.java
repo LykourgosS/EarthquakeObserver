@@ -80,20 +80,4 @@ public class Util {
         }
         return uniqueId;
     }
-
-    /*public static void addDeviceToFirebase(Context context, SensorInfo sensorInfo) {
-        Device device = new Device.Builder()
-                .setDeviceId(Util.getUniqueId(context))
-                .setFirebaseAuthUid(AuthHandler.getInstance().getCurrentUser().getUid())
-                .setSensorInfo(sensorInfo)
-                .build();
-        DatabaseHandler databaseHandler = new DatabaseHandler(context, device.getDeviceId());
-        databaseHandler.addDevice(device);
-    }*/
-
-    /*public void setUpDeviceAddedSharedPref(Context context) {
-        SharedPrefManager manager = SharedPrefManager.getInstance(context);
-        manager.write(Constant.DEVICE_ADDED_TO_FIREBASE, true);
-        manager.write(Constant.SENSOR_BALANCE_VALUE)
-    }*/
 }

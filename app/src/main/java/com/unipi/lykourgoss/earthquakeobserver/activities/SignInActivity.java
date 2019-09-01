@@ -2,7 +2,6 @@ package com.unipi.lykourgoss.earthquakeobserver.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -23,12 +22,9 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.R;
-import com.unipi.lykourgoss.earthquakeobserver.models.Device;
 import com.unipi.lykourgoss.earthquakeobserver.models.SensorInfo;
 import com.unipi.lykourgoss.earthquakeobserver.models.User;
-import com.unipi.lykourgoss.earthquakeobserver.tools.SharedPrefManager;
 import com.unipi.lykourgoss.earthquakeobserver.tools.Util;
 import com.unipi.lykourgoss.earthquakeobserver.tools.firebase.DatabaseHandler;
 
@@ -37,7 +33,7 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
     private static final String TAG = "SignInActivity";
 
     private static final int RC_SIGN_IN = 9001;
-    private static final int RC_CONFIGURE_SENSOR = 9002;
+    //private static final int RC_CONFIGURE_SENSOR = 9002;
 
     private FirebaseAuth firebaseAuth;
 
@@ -83,28 +79,19 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
-    // on the sign in button clicked methods called accordingly:
-    // {@link signIn() -> onActivityResult(...) -> firebaseAuthWithGoogle(...) ->
-
-    /*
-     * On the sign in button clicked methods called accordingly:
-     *  {@link #signIn()} -> onActivityResult(...) -> firebaseAuthWithGoogle(...) ->
-     * */
-    private void doI() {
-
-    }
-
     /**
-     * Starts an activity (made by google) for result to select google account as a user for our
-     * app, when account is selected successfully the onActivityResult is triggered. On the sign in
-     * button clicked methods called accordingly:
+     * On the sign in button clicked methods called accordingly:
      * 1. {@link #signIn()}
      * 2. {@link #onActivityResult(int, int, Intent)}
      * 3. {@link #firebaseAuthWithGoogle(GoogleSignInAccount)}
      * 4. {@link #onUserAdded(boolean)} + {@link #configureSensor()}
      * 5. {@link #onActivityResult(int, int, Intent)}
-     * 6. {@link #addDeviceToFirebase(SensorInfo)} + {@link #onDeviceAdded(boolean)}
-     * */
+     * 6. {@link #addDeviceToFirebase(SensorInfo)} + {@link #onDeviceAdded(boolean)}*/
+
+    /**
+     * Starts an activity (made by google) for result to select google account as a user for our
+     * app, when account is selected successfully the onActivityResult is triggered.
+     */
     private void signIn() {
         Intent signInIntent = googleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -115,7 +102,7 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
         super.onActivityResult(requestCode, resultCode, data);
 
         //Result returned from launching Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
+        if (requestCode == RC_SIGN_IN && resultCode == RESULT_OK) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 // Google Sign In was successful, authenticate with Firebase
@@ -126,15 +113,12 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
                 Log.d(TAG, "Google sign in failed", e);
                 updateUi(null);
             }
-        } else if (requestCode == RC_CONFIGURE_SENSOR && resultCode == RESULT_OK) {
-            SensorInfo sensorInfo = data.getParcelableExtra(Constant.EXTRA_SENSOR_INFO);
-            addDeviceToFirebase(sensorInfo);
         }
     }
 
     /**
      * Sign in to Firebase Auth using the selected Google account.
-     * */
+     */
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         showProgressDialog();
@@ -148,68 +132,19 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
                             Log.d(TAG, "signInWithCredential:success");
                             // add user to Firebase Database
                             FirebaseUser user = task.getResult().getUser();
-                            databaseHandler.addUser(new User(user.getUid(), user.getEmail(), user.getDisplayName()));
-                            // Sign in success, open Sensor configuration activity to get balance
-                            // sensor value
-                            configureSensor();
+                            databaseHandler.addUser(new User(user.getUid(), user.getEmail()));
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.d(TAG, "signInWithCredential:failure", task.getException());
+                            hideProgressDialog();
                             Snackbar.make(findViewById(R.id.button_google_sign_in), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
                         }
-                        hideProgressDialog();
                     }
                 });
     }
 
-    /**
-     * Start SensorConfigurationActivity waiting for a result
-     * */
-    private void configureSensor() {
-        Intent intent = new Intent(this, SensorConfigurationActivity.class);
-        startActivityForResult(intent, RC_CONFIGURE_SENSOR);
-    }
-
-    private void addDeviceToFirebase(SensorInfo sensorInfo) {
-        showProgressDialog();
-        Device device = new Device.Builder()
-                .setDeviceId(Util.getUniqueId(this))
-                .setFirebaseAuthUid(firebaseAuth.getCurrentUser().getUid())
-                .setSensorInfo(sensorInfo)
-                .build();
-        databaseHandler.addDevice(device);
-        final SharedPrefManager sharedPrefManager = SharedPrefManager.getInstance(SignInActivity.this);
-        new CountDownTimer(5 * 1000, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                boolean deviceAddedToFirebase = sharedPrefManager.read(Constant.DEVICE_ADDED_TO_FIREBASE, false);
-                if (deviceAddedToFirebase) {
-                    this.cancel();
-                    Log.d(TAG, "onTick: device added successfully");
-                    // sharedPrefManager.write()
-                    hideProgressDialog();
-                    finish();
-                    startActivity(new Intent(SignInActivity.this, MainActivity.class));
-                }
-            }
-
-            @Override
-            public void onFinish() {
-                hideProgressDialog();
-                boolean deviceAddedToFirebase = sharedPrefManager.read(Constant.DEVICE_ADDED_TO_FIREBASE, false);
-                if (!deviceAddedToFirebase) {
-                    Log.d(TAG, "onFinish: user deleted");
-                    firebaseAuth.getCurrentUser().delete();
-                    signOut();
-                    Toast.makeText(SignInActivity.this, "Error while creating account. \nTry again.", Toast.LENGTH_SHORT).show();
-                }
-
-            }
-        }.start();
-    }
-
-    private void signOut() {
-
+    private void deleteAndSignOut() {
+        // delete user just created because it didn't added on Firebase Database too
         firebaseAuth.getCurrentUser().delete();
         // Firebase sign out
         firebaseAuth.signOut();
@@ -231,7 +166,7 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
                 signIn();
                 break;
             case R.id.button_sign_out:
-                signOut();
+                deleteAndSignOut();
                 break;
         }
     }
@@ -239,10 +174,19 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
     @Override
     public void onUserAdded(boolean userAddedSuccessfully) {
         hideProgressDialog();
+        if (userAddedSuccessfully) {
+            // Sign in success, go to ConfigDeviceActivity to set up device to firebase
+            startActivity(new Intent(SignInActivity.this, ConfigDeviceActivity.class));
+            finish();
+        } else {
+            // Sign In or Saving User object to Firebase Database got wrong, request signing in again
+            deleteAndSignOut();
+            Toast.makeText(this, "Something got wrong. Try again.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
     public void onDeviceAdded(boolean deviceAddedSuccessfully) {
-
+        // useless because we don't do anything with devices here
     }
 }

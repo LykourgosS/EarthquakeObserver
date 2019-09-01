@@ -11,7 +11,7 @@ import android.os.Parcelable;
 
 public class SensorInfo implements Parcelable {
 
-    // will be acquired after running SensorConfigurationActivity
+    // will be acquired after running ConfigDeviceActivity
     private float balanceSensorValue;
 
     // Sensor class info
@@ -69,6 +69,7 @@ public class SensorInfo implements Parcelable {
         return minDelay;
     }
 
+    // todo remove Parcelable functionality
     protected SensorInfo(Parcel in) {
         balanceSensorValue = in.readFloat();
         name = in.readString();

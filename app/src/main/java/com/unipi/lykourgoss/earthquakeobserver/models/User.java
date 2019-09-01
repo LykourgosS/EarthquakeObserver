@@ -1,6 +1,6 @@
 package com.unipi.lykourgoss.earthquakeobserver.models;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
@@ -9,23 +9,22 @@ import java.util.List;
 
 public class User {
 
+    public static final String DEVICES = "devices";
+
     private String uid;
 
     private String email;
 
-    private String displayName;
-
     private String fcmToken;
 
-    private List<String> devices;
+    private Map<String, Boolean> devices;
 
     public User() {
     }
 
-    public User(String uid, String email, String displayName) {
+    public User(String uid, String email) {
         this.uid = uid;
         this.email = email;
-        this.displayName = displayName;
     }
 
     public String getUid() {
@@ -36,10 +35,6 @@ public class User {
         return email;
     }
 
-    public String getDisplayName() {
-        return displayName;
-    }
-
     public String getFcmToken() {
         return fcmToken;
     }
@@ -48,7 +43,7 @@ public class User {
         this.fcmToken = fcmToken;
     }
 
-    public List<String> getDevices() {
+    public Map<String, Boolean> getDevices() {
         return devices;
     }
 }

@@ -23,9 +23,9 @@ public class Constant {
     public static final int STOP_SERVICE_JOB_ID = 3;
 
     // for Debugging purposes: custom action broadcasts
-    public static final String FAKE_BOOT = "com.unipi.lykourgoss.earthquakeobserver.FAKE_BOOT";
-    public static final String FAKE_POWER_DISCONNECTED = "com.unipi.lykourgoss.earthquakeobserver.FAKE_POWER_DISCONNECTED";
-    public static final String DEVICE_IS_MOVING = "com.unipi.lykourgoss.earthquakeobserver.DEVICE_IS_MOVING";
+    public static final String FAKE_BOOT = "com.unipi.lykourgoss.earthquakeobserver.Constant.FAKE_BOOT";
+    public static final String FAKE_POWER_DISCONNECTED = "com.unipi.lykourgoss.earthquakeobserver.Constant.FAKE_POWER_DISCONNECTED";
+    public static final String DEVICE_IS_MOVING = "com.unipi.lykourgoss.earthquakeobserver.Constant.DEVICE_IS_MOVING";
 
     // used for identifying the user and the installation
     public static final String PREF_UNIQUE_ID = "PREF_UNIQUE_ID";
@@ -39,9 +39,9 @@ public class Constant {
      * */
     public static final long MIN_EVENT_DURATION = 5 * 1000;
 
-    // used for passing info about sensor from SensorConfigurationActivity back to SignInActivity
+    // used for passing info about sensor from ConfigDeviceActivity back to SignInActivity
     // to add device to firebase
-    public static final String EXTRA_SENSOR_INFO = "com.unipi.lykourgoss.earthquakeobserver.EXTRA_SENSOR_INFO";
+    public static final String EXTRA_SENSOR_INFO = "com.unipi.lykourgoss.earthquakeobserver.Constant.EXTRA_SENSOR_INFO";
 
     // according to documentation, might defer from the real one
     // (ex. instead of 9.8 to be 9.87 or 9.9)
@@ -60,16 +60,16 @@ public class Constant {
     public static final float DEFAULT_SENSOR_BALANCE_VALUE = 9.8f;
 
     // key of device SENSOR_BALANCE_VALUE in balance to be stored in SharedPreferences
-    public static final String SENSOR_BALANCE_VALUE = "com.unipi.lykourgoss.earthquakeobserver.SENSOR_BALANCE_VALUE";
+    public static final String SENSOR_BALANCE_VALUE = "com.unipi.lykourgoss.earthquakeobserver.Constant.SENSOR_BALANCE_VALUE";
 
     // SensorValue threshold, used for recognize if values from accelerometer are big enough for
     // adding to Firebase (reporting) an event
     public static final float SENSOR_THRESHOLD = 0.1f;
 
     // key of device id (DEVICE_ID) to be stored in SharedPreferences only the first time
-    public static final String DEVICE_ID = "com.unipi.lykourgoss.earthquakeobserver.DEVICE_ID";
+    public static final String DEVICE_ID = "com.unipi.lykourgoss.earthquakeobserver.Constant.DEVICE_ID";
     //
-    public static final String DEVICE_ADDED_TO_FIREBASE = "com.unipi.lykourgoss.earthquakeobserver.DEVICE_ADDED_TO_FIREBASE";
+    public static final String DEVICE_ADDED_TO_FIREBASE = "com.unipi.lykourgoss.earthquakeobserver.Constant.DEVICE_ADDED_TO_FIREBASE";
 
     public static final String EVENT_FIREBASE_REF = "events";
 
