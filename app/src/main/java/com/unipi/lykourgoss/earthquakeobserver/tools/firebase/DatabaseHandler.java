@@ -15,6 +15,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.core.Path;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.unipi.lykourgoss.earthquakeobserver.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.models.Device;
 import com.unipi.lykourgoss.earthquakeobserver.models.EarthquakeEvent;
@@ -138,6 +139,28 @@ public class DatabaseHandler {
     }
 
     public void addUser(final User user) {
+
+        // todo is it ok???
+        // Subscribe to topic in FCM
+        /*FirebaseMessaging.getInstance().subscribeToTopic(Constant.EARTHQUAKES_FEED_TOPIC).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    // user.setFcmToken(task.getResult().getToken());
+                    usersRef.child(user.getUid()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            databaseListener.onUserAdded(task.isSuccessful());
+                        }
+                    });
+                } else {
+                    // something went wrong while subscribing to FCM topic
+                    databaseListener.onUserAdded(task.isSuccessful());
+                }
+            }
+        });*/
+
+        // first get FCM token and then add user to Firebase Database
         FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
             @Override
             public void onComplete(@NonNull Task<InstanceIdResult> task) {

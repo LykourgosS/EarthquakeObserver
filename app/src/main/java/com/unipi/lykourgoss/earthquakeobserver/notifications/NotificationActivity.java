@@ -45,7 +45,7 @@ public class NotificationActivity extends AppCompatActivity {
     }
 
     public void showNotification(View v) {
-        Notification notification = new NotificationCompat.Builder(this, Constant.EARTHQUAKE_NOTIFICATION_CHANNEL_ID)
+        Notification notification = new NotificationCompat.Builder(this, Constant.EARTHQUAKES_FEED_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notifications_white_24dp)
                 .setContentTitle("Notification title")
                 .setContentText("Notification text")

@@ -12,9 +12,12 @@ public class Constant {
     // used to pass something to intent and do something with that inside a service
     public static final String EXTRA_INPUT = "com.unipi.lykourgoss.earthquakeobserver.Constant.EXTRA_INPUT";
 
-    // Notification channel id
+    // Notification channel ids
     public static final String OBSERVER_SERVICE_CHANNEL_ID = "ObserverServiceChannel";
-    public static final String EARTHQUAKE_NOTIFICATION_CHANNEL_ID = "EarthquakeNotificationChannel";
+    public static final String EARTHQUAKES_FEED_CHANNEL_ID = "EarthquakeFeedChannel";
+
+    // Topic of FCM for Earthquake Updates
+    public static final String EARTHQUAKES_FEED_TOPIC = "earthquakes-feed";
 
     public static final int OBSERVER_SERVICE_ID = 1;
 
@@ -27,8 +30,8 @@ public class Constant {
     public static final String FAKE_POWER_DISCONNECTED = "com.unipi.lykourgoss.earthquakeobserver.Constant.FAKE_POWER_DISCONNECTED";
     public static final String DEVICE_IS_MOVING = "com.unipi.lykourgoss.earthquakeobserver.Constant.DEVICE_IS_MOVING";
 
-    // used for identifying the user and the installation
-    public static final String PREF_UNIQUE_ID = "PREF_UNIQUE_ID";
+
+    // todo remove it's never used public static final String PREF_UNIQUE_ID = "PREF_UNIQUE_ID";
 
     // 10 samples/s => 1 sample in 0.1 s = 100 ms = 100000 μs
     public static final int SAMPLING_PERIOD = 100 * 1000;

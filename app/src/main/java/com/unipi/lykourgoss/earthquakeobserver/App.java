@@ -39,13 +39,15 @@ public class App extends Application {
             //will be used for displaying notifications when an earthquake occurred (messages send
             // from FCM)
             NotificationChannel earthquakeNotificationChannel = new NotificationChannel(
-                    Constant.EARTHQUAKE_NOTIFICATION_CHANNEL_ID,
+                    Constant.EARTHQUAKES_FEED_CHANNEL_ID,
                     "Earthquake Notification Channel (name)",
                     NotificationManager.IMPORTANCE_DEFAULT
             );
             // todo set description for each channel!!!
             // if make any changes (i.e. notification's behavior) here uninstall and re-install the app
             earthquakeNotificationChannel.setDescription("This is channel's description");
+            //todo !!! earthquakeNotificationChannel.setSound();
+            earthquakeNotificationChannel.enableVibration(true);
 
             // creating notification channels
             NotificationManager manager = getSystemService(NotificationManager.class);
