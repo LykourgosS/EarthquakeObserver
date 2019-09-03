@@ -41,6 +41,14 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
 
     private DatabaseHandler databaseHandler;
 
+    /**
+     * On the sign in button clicked methods called accordingly:
+     * 1. {@link #signIn()}
+     * 2. {@link #onActivityResult(int, int, Intent)}
+     * 3. {@link #firebaseAuthWithGoogle(GoogleSignInAccount)}
+     * 4. {@link #onUserAdded(boolean)}
+     * */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,15 +88,6 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
     }
 
     /**
-     * On the sign in button clicked methods called accordingly:
-     * 1. {@link #signIn()}
-     * 2. {@link #onActivityResult(int, int, Intent)}
-     * 3. {@link #firebaseAuthWithGoogle(GoogleSignInAccount)}
-     * 4. {@link #onUserAdded(boolean)} + {@link #configureSensor()}
-     * 5. {@link #onActivityResult(int, int, Intent)}
-     * 6. {@link #addDeviceToFirebase(SensorInfo)} + {@link #onDeviceAdded(boolean)}*/
-
-    /**
      * Starts an activity (made by google) for result to select google account as a user for our
      * app, when account is selected successfully the onActivityResult is triggered.
      */
@@ -124,26 +123,26 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
         showProgressDialog();
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        firebaseAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "signInWithCredential:success");
-                            // add user to Firebase Database
-                            FirebaseUser user = task.getResult().getUser();
-                            databaseHandler.addUser(new User(user.getUid(), user.getEmail()));
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.d(TAG, "signInWithCredential:failure", task.getException());
-                            hideProgressDialog();
-                            Snackbar.make(findViewById(R.id.button_google_sign_in), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+        firebaseAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "signInWithCredential:success");
+                    // add user to Firebase Database
+                    FirebaseUser user = task.getResult().getUser();
+                    databaseHandler.addUser(new User(user.getUid(), user.getEmail()));
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.d(TAG, "signInWithCredential:failure", task.getException());
+                    hideProgressDialog();
+                    Snackbar.make(findViewById(R.id.button_google_sign_in), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void deleteAndSignOut() {
+        showProgressDialog();
         // delete user just created because it didn't added on Firebase Database too
         firebaseAuth.getCurrentUser().delete();
         // Firebase sign out
@@ -154,6 +153,7 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
                 new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
+                        hideProgressDialog();
                         updateUi(null);
                     }
                 });

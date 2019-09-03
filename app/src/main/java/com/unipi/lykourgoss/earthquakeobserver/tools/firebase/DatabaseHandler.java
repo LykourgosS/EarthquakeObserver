@@ -161,7 +161,7 @@ public class DatabaseHandler {
         });*/
 
         // first get FCM token and then add user to Firebase Database
-        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+        /*FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
             @Override
             public void onComplete(@NonNull Task<InstanceIdResult> task) {
                 if (task.isSuccessful()) {
@@ -177,33 +177,54 @@ public class DatabaseHandler {
                     databaseListener.onUserAdded(task.isSuccessful());
                 }
             }
+        });*/
+
+        Log.d(TAG, "addUser");
+        Map<String, Object> userUpdates = new HashMap<>();
+
+        userUpdates.put(User.UID, user.getUid());
+
+        userUpdates.put(User.EMAIL, user.getEmail());
+
+        usersRef.child(user.getUid()).updateChildren(userUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                databaseListener.onUserAdded(task.isSuccessful());
+            }
         });
+
+        /*usersRef.child(user.getUid()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                databaseListener.onUserAdded(task.isSuccessful());
+            }
+        });*/
     }
 
     public interface DatabaseListener {
         /**
          * Triggered when the {@link #addUser(User)} is completed.
          *
-         * @param userAddedSuccessfully shows if the used added successfully.
+         * @param userAddedSuccessfully shows if the used added successfully or not.
          * */
         void onUserAdded(boolean userAddedSuccessfully);
 
         /**
          * Triggered when the {@link #addDevice(Device)} )} is completed.
          *
-         * @param deviceAddedSuccessfully shows if the device added successfully.
+         * @param deviceAddedSuccessfully shows if the device added successfully or not.
          * */
         void onDeviceAdded(boolean deviceAddedSuccessfully);
     }
 
 
     /**
-     * Adds device to Firebase Database in two paths, 1st path is under /devices and the 2nd one is
-     * under /users/{uid}/devices
+     * Adds device to Firebase Database in two paths, 1st path is under: /devices. 2nd one is
+     * under: /users/{uid}/devices.
      * */
     public void addDevice(final Device device) {
         Log.d(TAG, "addDevice");
-        Map<String, Object> deviceAddition = new HashMap<>();
+        final Map<String, Object> deviceAddition = new HashMap<>();
 
         // put the value true on path: /users/{firebaseAuthUid()}/devices/{deviceId()}
         String userPath = usersRef.child(device.getFirebaseAuthUid()).child(User.DEVICES).child(device.getDeviceId()).getPath().toString();
@@ -213,33 +234,23 @@ public class DatabaseHandler {
         String devicesPath = devicesRef.child(device.getDeviceId()).getPath().toString();
         deviceAddition.put(devicesPath, device);
 
-        databaseReference.updateChildren(deviceAddition).addOnCompleteListener(new OnCompleteListener<Void>() {
+        FirebaseMessaging.getInstance().subscribeToTopic(Constant.EARTHQUAKES_FEED_TOPIC).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                databaseListener.onDeviceAdded(task.isSuccessful());
-            }
-        });
-
-        /*devicesRef.child(device.getDeviceId()).setValue(device).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
+                Log.d(TAG, "onComplete: subscribeToTopic = " + task.isSuccessful());
                 if (task.isSuccessful()) {
-                    usersRef.child(device.getFirebaseAuthUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    databaseReference.updateChildren(deviceAddition).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                        public void onComplete(@NonNull Task<Void> task) {
+                            databaseListener.onDeviceAdded(task.isSuccessful());
                         }
                     });
+                } else {
+                    // something went wrong while subscribing to FCM topic
+                    databaseListener.onDeviceAdded(task.isSuccessful());
                 }
-
-
             }
-        });*/
+        });
     }
 
     public void updateDeviceStatus(final String deviceId, final boolean isStarted) {
@@ -274,17 +285,4 @@ public class DatabaseHandler {
             }
         });*/
     }
-
-    /*private class MyValueEventListener implements ValueEventListener {
-
-        @Override
-        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-        }
-
-        @Override
-        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-        }
-    }*/
 }

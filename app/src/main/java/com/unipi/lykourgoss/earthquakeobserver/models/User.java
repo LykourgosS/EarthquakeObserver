@@ -9,13 +9,13 @@ import java.util.Map;
 
 public class User {
 
+    public static final String UID = "uid";
+    public static final String EMAIL = "email";
     public static final String DEVICES = "devices";
 
     private String uid;
 
     private String email;
-
-    private String fcmToken;
 
     private Map<String, Boolean> devices;
 
@@ -33,14 +33,6 @@ public class User {
 
     public String getEmail() {
         return email;
-    }
-
-    public String getFcmToken() {
-        return fcmToken;
-    }
-
-    public void setFcmToken(String fcmToken) {
-        this.fcmToken = fcmToken;
     }
 
     public Map<String, Boolean> getDevices() {

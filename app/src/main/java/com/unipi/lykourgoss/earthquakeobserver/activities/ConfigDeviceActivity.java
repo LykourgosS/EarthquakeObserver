@@ -109,6 +109,7 @@ public class ConfigDeviceActivity extends BaseActivity implements View.OnClickLi
 
     @Override
     public void onDeviceAdded(boolean deviceAddedSuccessfully) {
+        Log.d(TAG, "onDeviceAdded");
         hideProgressDialog();
         // save to shared preferences that device added to Firebase, if not app might not work properly
         sharedPrefManager.write(Constant.DEVICE_ADDED_TO_FIREBASE, deviceAddedSuccessfully);
