@@ -30,6 +30,11 @@ public class MinimalEarthquakeEvent {
         this.timeInMillis = Util.nanosFromBootToMillis(timeInMillis);
     }
 
+    public MinimalEarthquakeEvent(SensorEvent event) {
+        this.sensorValue = normalizeValue(event.values);
+        this.timeInMillis = Util.nanosFromBootToMillis(event.timestamp);
+    }
+
     public MinimalEarthquakeEvent(SensorEvent event, float balanceValue) {
         this.sensorValue = normalizeValueToZero(event.values, balanceValue);
         this.timeInMillis = Util.nanosFromBootToMillis(event.timestamp);

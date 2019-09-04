@@ -1,5 +1,4 @@
-/*
-package com.unipi.lykourgoss.earthquakeobserver.client.services;
+package com.unipi.lykourgoss.earthquakeobserver.client.location;
 
 import android.annotation.SuppressLint;
 import android.content.IntentSender;
@@ -27,6 +26,8 @@ import com.unipi.lykourgoss.earthquakeobserver.client.R;
 public class Main2Activity extends AppCompatActivity {
 
     private static final String TAG = "Main2Activity";
+
+    private static final int REQUEST_CHECK_SETTINGS = 9001;
 
     private FusedLocationProviderClient fusedLocationClient;
 
@@ -94,15 +95,14 @@ public class Main2Activity extends AppCompatActivity {
                     if (task.getException() instanceof ResolvableApiException) {
                         // Location settings are not satisfied, but this can be fixed
                         // by showing the user a dialog.
-                        */
-/*try {
+                        try {
                             // Show the dialog by calling startResolutionForResult(),
                             // and check the result in onActivityResult().
                             ResolvableApiException resolvable = (ResolvableApiException) exception;
                             resolvable.startResolutionForResult(Main2Activity.this, REQUEST_CHECK_SETTINGS);
                         } catch (IntentSender.SendIntentException sendEx) {
                             // Ignore the error.
-                        }*//*
+                        }
 
                     }
                 }
@@ -110,4 +110,3 @@ public class Main2Activity extends AppCompatActivity {
         });
     }
 }
-*/

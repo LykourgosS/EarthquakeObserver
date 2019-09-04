@@ -5,9 +5,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Binder;
 import android.os.IBinder;
@@ -20,13 +18,11 @@ import com.unipi.lykourgoss.earthquakeobserver.client.R;
 import com.unipi.lykourgoss.earthquakeobserver.client.activities.MainActivity;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.MinimalEarthquakeEvent;
-import com.unipi.lykourgoss.earthquakeobserver.client.listeners.EarthquakeManager;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
-import com.unipi.lykourgoss.earthquakeobserver.client.tools.firebase.DatabaseHandler;
+import com.unipi.lykourgoss.earthquakeobserver.client.tools.DatabaseHandler;
 import com.unipi.lykourgoss.earthquakeobserver.client.receivers.PowerDisconnectedReceiver;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.SharedPrefManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,10 +39,9 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
     // Binder given to clients
     private final IBinder binder = new ObserverBinder();
 
-    private SensorManager sensorManager;
-    private Sensor accelerometer;
-    private SensorEvent lastEvent;
-    private List<MinimalEarthquakeEvent> eventList;
+    private SensorEvent sensorEvent;
+    private MinimalEarthquakeEvent minimalEarthquakeEvent;
+    private float acceleration;
 
     private EarthquakeManager earthquakeManager;
 
@@ -55,8 +50,6 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
 
     private DatabaseHandler databaseHandler;
 
-    private SharedPrefManager sharedPrefManager;
-    private float balanceValue;
     private String deviceId;
 
     private PowerDisconnectedReceiver receiver = new PowerDisconnectedReceiver();
@@ -72,6 +65,7 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         }
     }
 
+    // todo remove (used for debugging)
     public ObserverService() {
         Log.d(TAG, "ObserverService: Constructor");
     }
@@ -80,7 +74,8 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
     public void onCreate() { // triggered only once in the lifetime of the service
         super.onCreate();
         Log.d(TAG, "onCreate");
-        // register receiver for
+
+        // register receiver for actions:
         IntentFilter filter = new IntentFilter(Intent.ACTION_POWER_DISCONNECTED);
         filter.addAction(Constant.FAKE_POWER_DISCONNECTED);
         filter.addAction(Constant.DEVICE_IS_MOVING);
@@ -88,6 +83,11 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
 
         initSensor();
         initLocator();
+
+        // following are used for observing events and if needed save them to Firebase Database
+        deviceId = Util.getUniqueId(this);
+        databaseHandler = new DatabaseHandler(deviceId);
+        databaseHandler.updateDeviceStatus(deviceId, true);
     }
 
     public void initLocator() {
@@ -106,7 +106,8 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
     }
 
     public void initSensor() {
-        earthquakeManager = new EarthquakeManager(this);
+        float balanceValue = SharedPrefManager.getInstance(this).read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_SENSOR_BALANCE_VALUE);
+        earthquakeManager = new EarthquakeManager(this, balanceValue);
         earthquakeManager.registerListener(this);
     }
 
@@ -135,14 +136,10 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         }
 
         // todo do heavy work on a background thread
-        // following are used for observing events and if needed save them to Firebase Database
+        /*// following are used for observing events and if needed save them to Firebase Database
         deviceId = Util.getUniqueId(this);
         databaseHandler = new DatabaseHandler(deviceId);
-        databaseHandler.updateDeviceStatus(deviceId, true);
-
-        sharedPrefManager = SharedPrefManager.getInstance(this);
-        balanceValue = sharedPrefManager.read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_SENSOR_BALANCE_VALUE);
-        eventList = new ArrayList<>();
+        databaseHandler.updateDeviceStatus(deviceId, true);*/
 
         // to stop service from here (it will trigger onDestroy())
         //stopSelf();
@@ -175,8 +172,16 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         return binder;
     }
 
-    public SensorEvent getLastEvent() {
-        return lastEvent;
+    public SensorEvent getSensorEvent() {
+        return sensorEvent;
+    }
+
+    public MinimalEarthquakeEvent getMinimalEarthquakeEvent() {
+        return minimalEarthquakeEvent;
+    }
+
+    public float getAcceleration() {
+        return acceleration;
     }
 
     public Location getLastLocation() {
@@ -184,29 +189,35 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event, float acceleration) {
-        lastEvent = event;
-        // this.acceleration = acceleration;
+    public void onSensorChanged(SensorEvent sensorEvent, MinimalEarthquakeEvent minimalEarthquakeEvent, float acceleration) {
+        this.sensorEvent = sensorEvent;
+        this.minimalEarthquakeEvent = minimalEarthquakeEvent;
+        this.acceleration = acceleration;
     }
 
     @Override
-    public void addEvent(List<MinimalEarthquakeEvent> eventList, float sensorValue) {
+    public void addMinorEvent(List<MinimalEarthquakeEvent> eventList, float sensorValue) {
         EarthquakeEvent earthquakeEvent = new EarthquakeEvent.Builder(eventList)
                 .setDeviceId(deviceId)
                 .addSensorValue(sensorValue)
                 .setLatitude(0/*lastLocation.getLatitude()*/)
                 .setLongitude(0/*lastLocation.getLongitude()*/)
                 .build();
-        databaseHandler.addEvent(earthquakeEvent);
+        databaseHandler.addEventToMinors(earthquakeEvent);
     }
 
     @Override
-    public void updateEvent(int valueIndex, float sensorValue, long endTime) {
-        databaseHandler.updateEvent(valueIndex, sensorValue, endTime);
+    public void addMajorEvent() {
+        databaseHandler.addEventToMajors();
     }
 
     @Override
-    public void terminateEvent() {
-        databaseHandler.terminateEvent();
+    public void updateEvent(boolean isMajor, int valueIndex, float sensorValue, long endTime) {
+        databaseHandler.updateEvent(isMajor, valueIndex, sensorValue, endTime);
+    }
+
+    @Override
+    public void terminateEvent(boolean isMajor) {
+        databaseHandler.terminateEvent(isMajor);
     }
 }

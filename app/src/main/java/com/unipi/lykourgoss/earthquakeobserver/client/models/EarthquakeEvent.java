@@ -143,6 +143,10 @@ public class EarthquakeEvent {
         return endTime - startTime;
     }
 
+    public static long getDuration(long startTime, long lastTime) {
+        return lastTime - startTime;
+    }
+
     public static class Builder {
         private String eventId;
         private String deviceId;

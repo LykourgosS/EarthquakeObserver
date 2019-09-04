@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver.client.models;
+package com.unipi.lykourgoss.earthquakeobserver.client.filestoremove;
 
 import java.util.List;
 

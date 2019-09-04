@@ -25,7 +25,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.unipi.lykourgoss.earthquakeobserver.client.R;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.User;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
-import com.unipi.lykourgoss.earthquakeobserver.client.tools.firebase.DatabaseHandler;
+import com.unipi.lykourgoss.earthquakeobserver.client.tools.DatabaseHandler;
 
 public class SignInActivity extends BaseActivity implements View.OnClickListener, DatabaseHandler.DatabaseListener {
 

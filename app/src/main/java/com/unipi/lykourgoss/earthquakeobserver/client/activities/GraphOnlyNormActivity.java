@@ -42,7 +42,6 @@ public class GraphOnlyNormActivity extends AppCompatActivity implements ServiceC
     private Timer timer;
 
     private boolean graphIsStopped = false;
-    private float balanceValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +49,6 @@ public class GraphOnlyNormActivity extends AppCompatActivity implements ServiceC
         setContentView(R.layout.activity_graph);
 
         initializeChart();
-        balanceValue = SharedPrefManager.getInstance(this).read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_SENSOR_BALANCE_VALUE);
     }
 
     private void initializeChart() {
@@ -80,10 +78,6 @@ public class GraphOnlyNormActivity extends AppCompatActivity implements ServiceC
         // √(x²+y²+z²) DataSet
         LineDataSet normXYZDataSet = createSet("√(x²+y²+z²)", 1f, Color.MAGENTA);
         data.addDataSet(normXYZDataSet);
-
-//        // x+y+z DataSet
-//        LineDataSet sumXYZDataSet = createSet("x+y+z", 1f, Color.YELLOW);
-//        data.addDataSet(sumXYZDataSet);
 
         lineChart.setData(data);
 
@@ -120,27 +114,20 @@ public class GraphOnlyNormActivity extends AppCompatActivity implements ServiceC
         return set;
     }
 
-//    float sum = 0;
-//    float counter = 0;
-
-    private void addEntry(float x, float y, float z) {
+    private void addEntry(float sensorValue) {
         LineData data = lineChart.getData();
 
         // √(x²+y²+z²) : to normalize the value, like the magnitude of a vector (now always it
         // will be greater than zero, x, y and z, it only measures the distance from zero)
-        float normXYZ = MinimalEarthquakeEvent.normalizeValueToZero(new float[] {x, y, z}, balanceValue);
+        //float normXYZ = MinimalEarthquakeEvent.normalizeValueToZero(new float[] {x, y, z}, balanceValue);
         ILineDataSet normXYZDataSet = data.getDataSetByIndex(0);
-        data.addEntry(new Entry(normXYZDataSet.getEntryCount(), normXYZ), 0);
-
-//        // x+y+z
-//        float sumXYZ = EarthquakeEvent.normalizeSensorValue(x, y, z) - balanceValue;
-//        ILineDataSet sumXYZDataSet = data.getDataSetByIndex(1);
-//        data.addEntry(new Entry(sumXYZDataSet.getEntryCount(), sumXYZ), 1);
+        data.addEntry(new Entry(normXYZDataSet.getEntryCount(), sensorValue), 0);
 
         data.notifyDataChanged();
 
-//        lineChart.getAxisLeft().setSpaceTop(data.getYMax());
-//        lineChart.getAxisLeft().setSpaceBottom(data.getYMax());
+        // todo need removal ?
+        //lineChart.getAxisLeft().setSpaceTop(data.getYMax());
+        //lineChart.getAxisLeft().setSpaceBottom(data.getYMax());
 
         // let the chart know it's data has changed
         lineChart.notifyDataSetChanged();
@@ -151,10 +138,6 @@ public class GraphOnlyNormActivity extends AppCompatActivity implements ServiceC
 
         // move to the latest entry
         lineChart.moveViewToX(data.getEntryCount());
-
-        /*sum += normXYZ;
-        counter++;
-        Log.d(TAG, "addEntry: " + sum/counter);*/
     }
 
     private void startGraphing() {
@@ -162,12 +145,12 @@ public class GraphOnlyNormActivity extends AppCompatActivity implements ServiceC
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                final SensorEvent event = observerService.getLastEvent();
+                final MinimalEarthquakeEvent event = observerService.getMinimalEarthquakeEvent();
                 if (event != null) {
                     GraphOnlyNormActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            addEntry(event.values[0], event.values[1], event.values[2]);
+                            addEntry(event.getSensorValue());
                         }
                     });
                 }
@@ -192,8 +175,8 @@ public class GraphOnlyNormActivity extends AppCompatActivity implements ServiceC
 
 
     /**
-     * @link: https://developer.android.com/guide/components/bound-services#Additional_Notes
-     * <p>
+     * {}@link: https://developer.android.com/guide/components/bound-services#Additional_Notes
+     *
      * Note: You don't usually bind and unbind during your activity's onResume() and onPause(),
      * because these callbacks occur at every lifecycle transition and you should keep the
      * processing that occurs at these transitions to a minimum. Also, if multiple activities in
@@ -220,7 +203,6 @@ public class GraphOnlyNormActivity extends AppCompatActivity implements ServiceC
         Log.d(TAG, "onStop");
         timer.cancel();
 
-        // used for taking accelerometer data from service
         unbindService(this);
     }
 

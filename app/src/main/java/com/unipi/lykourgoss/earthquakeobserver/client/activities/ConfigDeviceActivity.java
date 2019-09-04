@@ -20,7 +20,7 @@ import com.unipi.lykourgoss.earthquakeobserver.client.models.MinimalEarthquakeEv
 import com.unipi.lykourgoss.earthquakeobserver.client.models.SensorInfo;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.SharedPrefManager;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
-import com.unipi.lykourgoss.earthquakeobserver.client.tools.firebase.DatabaseHandler;
+import com.unipi.lykourgoss.earthquakeobserver.client.tools.DatabaseHandler;
 
 public class ConfigDeviceActivity extends BaseActivity implements View.OnClickListener, SensorEventListener, DatabaseHandler.DatabaseListener {
 

@@ -24,10 +24,12 @@ public class NotificationHelper {
     // startForeground(int id, Notification notification)
     public static final int NOTIFICATION_ID = 2;
 
-    public static void showNotification(Context context, String title, String body) {
+    public static void sendNotification(Context context, String title, String body) {
 
         // todo go to earthquakeobserver activity
         Intent intent = new Intent(context, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         // todo maybe change flags on following
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 

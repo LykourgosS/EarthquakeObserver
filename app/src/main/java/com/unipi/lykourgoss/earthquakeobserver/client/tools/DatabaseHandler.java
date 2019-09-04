@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver.client.tools.firebase;
+package com.unipi.lykourgoss.earthquakeobserver.client.tools;
 
 import android.util.Log;
 
@@ -16,7 +16,6 @@ import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.Device;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.User;
-import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -31,14 +30,16 @@ public class DatabaseHandler {
 
     private static final String TAG = "DatabaseHandler";
 
-    private static final String ACTIVE_EVENTS_REF = "active-events";
+    private static final String MINOR_ACTIVE_EVENTS_REF = "minor-active-events";
+    private static final String MAJOR_ACTIVE_EVENTS_REF = "major-active-events";
     private static final String SAVED_EVENTS_REF = "saved-events";
     private static final String DEVICES_REF = "devices";
     private static final String USER_REF = "users";
 
     private static DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
-    private DatabaseReference activeEventsRef;
+    private DatabaseReference minorActiveEventsRef;
+    private DatabaseReference majorActiveEventsRef;
     private DatabaseReference savedEventsRef;
     private DatabaseReference devicesRef;
     private DatabaseReference usersRef;
@@ -49,7 +50,8 @@ public class DatabaseHandler {
     private Query query;*/
 
     public DatabaseHandler(String deviceId) {
-        activeEventsRef = databaseReference.child(ACTIVE_EVENTS_REF).child(deviceId);
+        minorActiveEventsRef = databaseReference.child(MINOR_ACTIVE_EVENTS_REF).child(deviceId);
+        majorActiveEventsRef = databaseReference.child(MAJOR_ACTIVE_EVENTS_REF).child(deviceId);
         savedEventsRef = databaseReference.child(SAVED_EVENTS_REF).child(deviceId);
         devicesRef = databaseReference.child(DEVICES_REF);
         usersRef = databaseReference.child(USER_REF);
@@ -67,11 +69,12 @@ public class DatabaseHandler {
         query.removeEventListener(listener);
     }*/
 
-    public void addEvent(EarthquakeEvent newEvent) {
-        Log.d(TAG, "addEvent: value = " + newEvent.getSensorValues().get(0));
-        String eventId = activeEventsRef.push().getKey();
+    public void addEventToMinors(EarthquakeEvent newEvent) {
+        Log.d(TAG, "addEvent: minor");
+        String eventId = minorActiveEventsRef.push().getKey();
         newEvent.setEventId(eventId);
-        activeEventsRef.setValue(newEvent).addOnCompleteListener(new OnCompleteListener<Void>() {
+        // todo remove listener
+        minorActiveEventsRef.setValue(newEvent).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 Log.d(TAG, "Completed = " + task.isSuccessful());
@@ -79,28 +82,50 @@ public class DatabaseHandler {
         });
     }
 
-    public void updateEvent(int valueIndex, float sensorValue, long endTime) {
-        Log.d(TAG, "updateEvent: value = " + sensorValue);
+    public void addEventToMajors() {
+        Log.d(TAG, "addEventToMajors: event is now major");
+        minorActiveEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    EarthquakeEvent event = dataSnapshot.getValue(EarthquakeEvent.class);
+                    // add the event from minor-events to major-events
+                    majorActiveEventsRef.setValue(event);
+                    // delete the event that moved from minor-events to major-events
+                    minorActiveEventsRef.setValue(null);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+    }
+
+    public void updateEvent(boolean isMajor, int valueIndex, float sensorValue, long endTime) {
+        Log.d(TAG, "updateEvent: isMajor = " + isMajor);
         Map<String, Object> eventUpdates = new HashMap<>();
 
-        String valuePath = /*"/" + */EarthquakeEvent.SENSOR_VALUES + "/" + valueIndex;
+        String valuePath = EarthquakeEvent.SENSOR_VALUES + "/" + valueIndex;
         eventUpdates.put(valuePath, sensorValue);
 
-        //String endTimePath = "/" + EarthquakeEvent.END_TIME;
         eventUpdates.put(EarthquakeEvent.END_TIME, endTime);
 
-        String endDateTimePath = "/" + EarthquakeEvent.END_DATE_TIME;
         eventUpdates.put(EarthquakeEvent.END_DATE_TIME, Util.millisToDateTime(endTime));
 
-        activeEventsRef.updateChildren(eventUpdates);
+        if (isMajor) {
+            majorActiveEventsRef.updateChildren(eventUpdates);
+        } else {
+            minorActiveEventsRef.updateChildren(eventUpdates);
+        }
 
-        /*activeEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        /*minorActiveEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 EarthquakeEvent event = dataSnapshot.getValue(EarthquakeEvent.class);
                 event.addSensorValue(sensorValue);
                 event.setEndTime(endTime);
-                activeEventsRef.setValue(event);
+                minorActiveEventsRef.setValue(event);
             }
 
             @Override
@@ -110,26 +135,27 @@ public class DatabaseHandler {
         });*/
     }
 
-    public void terminateEvent() {
-        Log.d(TAG, "terminateEvent");
-        activeEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    EarthquakeEvent event = dataSnapshot.getValue(EarthquakeEvent.class);
-                    if (event.getDuration() > Constant.MIN_EVENT_DURATION) {
+    public void terminateEvent(boolean isMajor) {
+        Log.d(TAG, "terminateEvent: isMajor = " + isMajor);
+        if (isMajor) {
+            majorActiveEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        EarthquakeEvent event = dataSnapshot.getValue(EarthquakeEvent.class);
                         Log.d(TAG, "terminateEvent: onDataChange: event saved");
                         savedEventsRef.child(event.getEventId()).setValue(event);
+                        majorActiveEventsRef.setValue(null);
                     }
-                    activeEventsRef.setValue(null);
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
-
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                }
+            });
+        } else {
+            minorActiveEventsRef.setValue(null);
+        }
     }
 
     public void deleteSavedEvents() {

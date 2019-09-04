@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver.client.tools;
+package com.unipi.lykourgoss.earthquakeobserver.client.filestoremove;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

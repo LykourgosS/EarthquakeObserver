@@ -6,11 +6,11 @@
     <uses-feature
         android:name="android.hardware.sensor.accelerometer"
         android:required="true" />
-
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:name=".App"
@@ -31,19 +31,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.MainActivity" />
+        <activity
+            android:name=".activities.MainActivity"
+            android:launchMode="singleTop" />
         <activity android:name=".activities.SignInActivity" />
-        <activity android:name=".listeners.SensorActivity" />
         <activity android:name=".activities.ConfigDeviceActivity" />
         <activity
             android:name=".activities.LogLocationActivity"
             android:launchMode="singleTop" />
-        <activity android:name=".services.LocationActivity" />
+        <activity android:name=".location.LocationActivity" />
         <activity
             android:name=".activities.GraphAllActivity"
             android:launchMode="singleTop" />
         <activity android:name=".activities.GraphOnlyNormActivity" />
-        <activity android:name=".listeners.GraphAllActivityTest" />
 
         <receiver android:name=".receivers.BootCompletedReceiver">
             <intent-filter>
@@ -59,11 +59,10 @@
             android:name=".services.StartObserverJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service android:name=".services.ObserverService" />
-        <service android:name=".services.LocationService" />
-        <service android:name=".listeners.ObserverServiceTestingListener" />
-        <service android:name=".listeners.ObserverServiceTest" />
+        <service android:name=".location.LocationService" />
         <!--todo what should become exported="false" ???-->
-        <service android:name=".notifications.FCMService"
+        <service
+            android:name=".notifications.FCMService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

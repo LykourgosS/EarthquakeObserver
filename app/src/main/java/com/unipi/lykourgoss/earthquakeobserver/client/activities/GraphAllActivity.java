@@ -25,7 +25,6 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.client.R;
-import com.unipi.lykourgoss.earthquakeobserver.client.models.MinimalEarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.client.services.ObserverService;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.SharedPrefManager;
 
@@ -88,9 +87,9 @@ public class GraphAllActivity extends AppCompatActivity implements ServiceConnec
         LineDataSet normXYZDataSet = createSet("√(x²+y²+z²)", 3f, Color.MAGENTA);
         data.addDataSet(normXYZDataSet);
 
-        // x+y+z DataSet
-        LineDataSet sumXYZDataSet = createSet("x+y+z", 1f, Color.BLACK);
-        data.addDataSet(sumXYZDataSet);
+        // Acceleration using LPF DataSet
+        LineDataSet accelerationLPFDataSet = createSet("Acceleration using LPF", 1f, Color.YELLOW);
+        data.addDataSet(accelerationLPFDataSet);
 
         lineChart.setData(data);
 
@@ -144,14 +143,15 @@ public class GraphAllActivity extends AppCompatActivity implements ServiceConnec
 
         // √(x²+y²+z²) : to normalize the value, like the magnitude of a vector (now always it
         // will be greater than zero, x, y and z, it only measures the distance from zero)
-        float normXYZ = MinimalEarthquakeEvent.normalizeValueToZero(new float[] {x, y, z}, balanceValue);
+        //float normXYZ = MinimalEarthquakeEvent.normalizeValueToZero(new float[] {x, y, z}, balanceValue);
+        float normXYZ = observerService.getMinimalEarthquakeEvent().getSensorValue();
         ILineDataSet normXYZDataSet = data.getDataSetByIndex(3);
         data.addEntry(new Entry(normXYZDataSet.getEntryCount(), normXYZ), 3);
 
-        // x+y+z
-        float sumXYZ = x + y + z - balanceValue;
-        ILineDataSet sumXYZDataSet = data.getDataSetByIndex(4);
-        data.addEntry(new Entry(sumXYZDataSet.getEntryCount(), sumXYZ), 4);
+        // Acceleration using LPF DataSet
+        float acceleration = observerService.getAcceleration();
+        ILineDataSet accelerationLPFDataSet = data.getDataSetByIndex(4);
+        data.addEntry(new Entry(accelerationLPFDataSet.getEntryCount(), acceleration), 4);
 
         data.notifyDataChanged();
 
@@ -178,7 +178,7 @@ public class GraphAllActivity extends AppCompatActivity implements ServiceConnec
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                final SensorEvent event = observerService.getLastEvent();
+                final SensorEvent event = observerService.getSensorEvent();
                 if (event != null) {
                     GraphAllActivity.this.runOnUiThread(new Runnable() {
                         @Override

@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver.client.services;
+package com.unipi.lykourgoss.earthquakeobserver.client.location;
 
 import android.annotation.SuppressLint;
 import android.app.Service;

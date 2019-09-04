@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver.client.listeners;
+package com.unipi.lykourgoss.earthquakeobserver.client.filestoremove;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;

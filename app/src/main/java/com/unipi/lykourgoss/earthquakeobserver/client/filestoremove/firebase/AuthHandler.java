@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver.client.tools.firebase;
+package com.unipi.lykourgoss.earthquakeobserver.client.filestoremove.firebase;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;

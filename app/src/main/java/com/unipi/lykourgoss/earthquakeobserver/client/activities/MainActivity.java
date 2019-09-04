@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.BatteryManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,13 +19,10 @@ import androidx.core.content.ContextCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.client.R;
-import com.unipi.lykourgoss.earthquakeobserver.client.listeners.GraphAllActivityTest;
 import com.unipi.lykourgoss.earthquakeobserver.client.receivers.BootCompletedReceiver;
 import com.unipi.lykourgoss.earthquakeobserver.client.services.ObserverService;
-import com.unipi.lykourgoss.earthquakeobserver.client.tools.ConnectivityStatus;
-import com.unipi.lykourgoss.earthquakeobserver.client.tools.SharedPrefManager;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
-import com.unipi.lykourgoss.earthquakeobserver.client.tools.firebase.DatabaseHandler;
+import com.unipi.lykourgoss.earthquakeobserver.client.tools.DatabaseHandler;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -43,14 +41,13 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        checkIfDeviceIsAdded();
+        Log.d(TAG, "onCreate");
 
         // register receiver for
         IntentFilter filter = new IntentFilter(Constant.FAKE_BOOT);
         registerReceiver(receiver, filter);
 
-        /*if (checkLocationPermission()) {
+        /*if (todo checkLocationPermission()) {
             Intent service = new Intent(this, ObserverService.class);
             ContextCompat.startForegroundService(this, service);
         }*/
@@ -82,39 +79,6 @@ public class MainActivity extends BaseActivity {
         }, 0, 500);
     }
 
-    private void checkIfDeviceIsAdded() {
-        if (ConnectivityStatus.getInstance(this).isOnline()) {
-            final SharedPrefManager sharedPrefManager = SharedPrefManager.getInstance(MainActivity.this);
-            /*new CountDownTimer(5 * 1000, 1000){
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    boolean deviceAddedToFirebase = sharedPrefManager.read(Constant.DEVICE_ADDED_TO_FIREBASE, false);
-                    if (deviceAddedToFirebase) {
-                        this.cancel();
-                        Log.d(TAG, "onTick: device added successfully");
-                        // sharedPrefManager.write()
-                        hideProgressDialog();
-                        finish();
-                        startActivity(new Intent(MainActivity.this, MainActivity.class));
-                    }
-                }
-
-                @Override
-                public void onFinish() {
-                    hideProgressDialog();
-                    boolean deviceAddedToFirebase = sharedPrefManager.read(Constant.DEVICE_ADDED_TO_FIREBASE, false);
-                    if (!deviceAddedToFirebase) {
-                        Log.d(TAG, "onFinish: user deleted");
-                        firebaseAuth.getCurrentUser().delete();
-                        signOut();
-                        Toast.makeText(MainActivity.this, "Error while creating account. \nTry again.", Toast.LENGTH_SHORT).show();
-                    }
-
-                }
-            }.start();*/
-        }
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -134,7 +98,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public void graphAll(View v) {
-        startActivity(new Intent(this, GraphAllActivityTest.class));
+        startActivity(new Intent(this, GraphAllActivity.class));
     }
 
     public void fakeBoot(View v) {

@@ -21,15 +21,11 @@ public class Constant {
 
     // used for scheduling jobs
     public static final int START_SERVICE_JOB_ID = 2;
-    public static final int STOP_SERVICE_JOB_ID = 3;
 
     // for Debugging purposes: custom action broadcasts
     public static final String FAKE_BOOT = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.FAKE_BOOT";
     public static final String FAKE_POWER_DISCONNECTED = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.FAKE_POWER_DISCONNECTED";
     public static final String DEVICE_IS_MOVING = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.DEVICE_IS_MOVING";
-
-
-    // todo remove it's never used public static final String PREF_UNIQUE_ID = "PREF_UNIQUE_ID";
 
     // 10 samples/s => 1 sample in 0.1 s = 100 ms = 100000 μs
     public static final int SAMPLING_PERIOD = 100 * 1000;
@@ -40,6 +36,7 @@ public class Constant {
      * */
     public static final long MIN_EVENT_DURATION = 5 * 1000;
 
+    // todo remove
     // used for passing info about sensor from ConfigDeviceActivity back to SignInActivity
     // to add device to firebase
     public static final String EXTRA_SENSOR_INFO = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.EXTRA_SENSOR_INFO";
@@ -72,12 +69,11 @@ public class Constant {
     //
     public static final String DEVICE_ADDED_TO_FIREBASE = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.DEVICE_ADDED_TO_FIREBASE";
 
-    public static final String EVENT_FIREBASE_REF = "events";
-
     // used for setting up location Requests
     public static final int LOCATION_REQUEST_INTERVAL = 1000 * 30; // 30 seconds
     public static final int LOCATION_REQUEST_FAST_INTERVAL = 1000 * 10; // 10 seconds
 
+    // todo remove
     // used for logging locations in LogLocationActivity and ObserverService
     public static final String EXTRA_LOCATION_LOG = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.EXTRA_LOCATION_LOG";
 }
