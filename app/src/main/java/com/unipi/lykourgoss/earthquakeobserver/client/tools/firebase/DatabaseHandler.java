@@ -115,12 +115,14 @@ public class DatabaseHandler {
         activeEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                EarthquakeEvent event = dataSnapshot.getValue(EarthquakeEvent.class);
-                if (event.getDuration() > Constant.MIN_EVENT_DURATION) {
-                    Log.d(TAG, "terminateEvent: onDataChange: event saved");
-                    savedEventsRef.child(event.getEventId()).setValue(event);
+                if (dataSnapshot.exists()) {
+                    EarthquakeEvent event = dataSnapshot.getValue(EarthquakeEvent.class);
+                    if (event.getDuration() > Constant.MIN_EVENT_DURATION) {
+                        Log.d(TAG, "terminateEvent: onDataChange: event saved");
+                        savedEventsRef.child(event.getEventId()).setValue(event);
+                    }
+                    activeEventsRef.setValue(null);
                 }
-                activeEventsRef.setValue(null);
             }
 
             @Override
@@ -201,7 +203,7 @@ public class DatabaseHandler {
         /**
          * Triggered when the {@link #addUser(User)} is completed.
          *
-         * @param userAddedSuccessfully shows if the used added successfully or not.
+         * @param userAddedSuccessfully shows if the user added successfully or not.
          * */
         void onUserAdded(boolean userAddedSuccessfully);
 
