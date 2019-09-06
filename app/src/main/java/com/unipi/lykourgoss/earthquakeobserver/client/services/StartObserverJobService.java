@@ -55,7 +55,7 @@ public class StartObserverJobService extends JobService { // JobService runs in 
         // startForeground(...) within Service onStartCommand()!!!
         ContextCompat.startForegroundService(this, service);
 
-        //startService(): If this service is not already running, it will be instantiated and
+        // startService(): If this service is not already running, it will be instantiated and
         // started (creating a process for it if needed); if it is running then it remains running
     }
 }

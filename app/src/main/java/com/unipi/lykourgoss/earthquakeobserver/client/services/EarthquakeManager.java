@@ -109,6 +109,8 @@ public class EarthquakeManager implements SensorEventListener {
     private long startTime;
     private boolean isMajor = false;
 
+
+
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         long nowMillis = SystemClock.elapsedRealtime();
@@ -120,7 +122,7 @@ public class EarthquakeManager implements SensorEventListener {
         // MinimalEarthquakeEvent minimalEarthquakeEvent = performLowPassFilter(event);
         MinimalEarthquakeEvent minimalEarthquakeEvent = new MinimalEarthquakeEvent(sensorEvent, balanceValue); // todo use actual balanceValue
         eventList.add(minimalEarthquakeEvent);
-        if (eventList.size() == 10) {
+        if (eventList.size() == Constant.SAMPLES_BATCH_COUNT) {
             float meanValue = MinimalEarthquakeEvent.getMeanValue(eventList);
             // Log.d(TAG, "onSensorChanged: diff = " + (nowMillis - millis) + ", meanValue = " + String.format("%.4f", meanValue));
             boolean possibleEarthquake = MinimalEarthquakeEvent.getIfPossibleEarthquake(eventList);

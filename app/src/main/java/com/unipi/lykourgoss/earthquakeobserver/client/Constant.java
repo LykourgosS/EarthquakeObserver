@@ -66,6 +66,7 @@ public class Constant {
     // SensorValue threshold, used for recognize if values from accelerometer are big enough for
     // adding to Firebase (reporting) an event
     public static final float SENSOR_THRESHOLD = 0.1f;
+    public static final int SAMPLES_BATCH_COUNT = 10;
 
     public static final String USER_IS_ADMIN = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.USER_IS_ADMIN";
 

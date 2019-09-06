@@ -11,6 +11,7 @@ import androidx.core.app.NotificationManagerCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.client.R;
+import com.unipi.lykourgoss.earthquakeobserver.client.activities.EarthquakeActivity;
 import com.unipi.lykourgoss.earthquakeobserver.client.activities.LaunchScreenActivity;
 import com.unipi.lykourgoss.earthquakeobserver.client.activities.MainActivity;
 
@@ -28,7 +29,7 @@ public class NotificationHelper {
     public static void sendNotification(Context context, String title, String body, String id) {
 
         // todo go to earthquakeobserver activity
-        Intent intent = new Intent(context, LaunchScreenActivity.class);
+        Intent intent = new Intent(context, EarthquakeActivity.class);
         intent.putExtra(Constant.EXTRA_EARTHQUAKE_ID, id);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         // todo maybe change flags on following

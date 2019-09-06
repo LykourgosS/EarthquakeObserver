@@ -122,6 +122,15 @@ public class MainActivity extends BaseActivity {
         startActivity(new Intent(this, SignInActivity.class));
     }
 
+    public void startService(View view) {
+        Intent intentService = new Intent(this, ObserverService.class);
+
+        // to start the service while app is on the background call
+        // startForegroundService(intentService), but after 5 seconds max should call
+        // startForeground(...) within Service onStartCommand()!!!
+        ContextCompat.startForegroundService(this, intentService);
+    }
+
     // todo remove onClick from XML files and make them private
     public void stopService(View view) {
         stopService(new Intent(this, ObserverService.class));
@@ -138,6 +147,7 @@ public class MainActivity extends BaseActivity {
         findViewById(R.id.button_disconnect_power).setVisibility(visibility);
         findViewById(R.id.button_clear_event).setVisibility(visibility);
         findViewById(R.id.button_sign_in).setVisibility(visibility);
+        findViewById(R.id.button_start_service).setVisibility(visibility);
         findViewById(R.id.button_stop_service).setVisibility(visibility);
         findViewById(R.id.text_view_battery_status).setVisibility(visibility);
     }
