@@ -188,7 +188,7 @@ public class GraphAllActivity extends AppCompatActivity implements ServiceConnec
                     });
                 }
             }
-        }, 0, 110/*todo replace with Constant.SAMPLING_PERIOD*/); // period = 110, because accelerometer sampling period is 100 millis
+        }, 0, Constant.SAMPLING_PERIOD + 10); // period = 110, because accelerometer sampling period is 100 millis
     }
 
     public void stopStartGraph(View v) {

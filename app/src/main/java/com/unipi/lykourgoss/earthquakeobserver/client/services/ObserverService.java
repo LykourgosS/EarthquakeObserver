@@ -200,8 +200,8 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         EarthquakeEvent earthquakeEvent = new EarthquakeEvent.Builder(eventList)
                 .setDeviceId(deviceId)
                 .addSensorValue(sensorValue)
-                .setLatitude(0/*lastLocation.getLatitude()*/)
-                .setLongitude(0/*lastLocation.getLongitude()*/)
+                .setLatitude(0/*todo use lastLocation.getLatitude()*/)
+                .setLongitude(0/*todo use lastLocation.getLongitude()*/)
                 .build();
         databaseHandler.addEventToMinors(earthquakeEvent);
     }

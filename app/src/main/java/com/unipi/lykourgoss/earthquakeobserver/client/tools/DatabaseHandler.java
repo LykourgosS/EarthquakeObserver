@@ -218,6 +218,8 @@ public class DatabaseHandler {
         });
     }
 
+    // TODO: 09/06/2019 remove comments from previous methods states
+
     public void addUser(final User user) {
 
         // todo is it ok???

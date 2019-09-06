@@ -38,6 +38,7 @@ public class StartObserverJobService extends JobService { // JobService runs in 
         return true; // return boolean value means if we want to reschedule or not
     }
 
+    // TODO: 09/06/2019 remove useless comments
     /*private boolean checkAcCharge() {
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         Intent batteryIntent = registerReceiver(null, intentFilter);

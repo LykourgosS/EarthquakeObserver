@@ -26,9 +26,6 @@ public class ConfigDeviceActivity extends BaseActivity implements View.OnClickLi
 
     private static final String TAG = ConfigDeviceActivity.class.getSimpleName();
 
-    // todo 1000 samples is it ok?
-    private static final int SAMPLES_SUM = 10;
-
     private SensorManager sensorManager;
     private Sensor accelerometer;
 
@@ -50,7 +47,7 @@ public class ConfigDeviceActivity extends BaseActivity implements View.OnClickLi
         buttonConfigDevice = findViewById(R.id.button_config_device);
         buttonConfigDevice.setOnClickListener(this);
         progressBarConfig = findViewById(R.id.progress_config_device);
-        progressBarConfig.setMax(SAMPLES_SUM);
+        progressBarConfig.setMax(Constant.CONFIG_DEVICE_SAMPLE_COUNT);
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -64,12 +61,11 @@ public class ConfigDeviceActivity extends BaseActivity implements View.OnClickLi
     @Override
     public void onSensorChanged(SensorEvent event) {
         float normValue = MinimalEarthquakeEvent.normalizeValue(event.values);
-        //if (normValue >= Constant.DEFAULT_SENSOR_BALANCE_VALUE - 0.5 && normValue <= Constant.DEFAULT_SENSOR_BALANCE_VALUE + 0.5) {
-        if (Math.abs(normValue - Constant.DEFAULT_SENSOR_BALANCE_VALUE) <= 0.5) {
+        if (Math.abs(normValue - Constant.DEFAULT_SENSOR_BALANCE_VALUE) <= Constant.CONFIG_DEVICE_REJECT_SAMPLE_THRESHOLD) {
             valueSum += normValue;
             valueCount++;
             Log.d(TAG, "onSensorChanged: mean = " + valueSum / valueCount + ", count = " + valueCount);
-            if (valueCount == SAMPLES_SUM) {
+            if (valueCount == Constant.CONFIG_DEVICE_SAMPLE_COUNT) {
                 float meanValue = valueSum / valueCount;
                 boolean result = sharedPrefManager.write(Constant.SENSOR_BALANCE_VALUE, meanValue);
                 Log.d(TAG, "onSensorChanged: finish mean = " + meanValue + ", write: " + result);

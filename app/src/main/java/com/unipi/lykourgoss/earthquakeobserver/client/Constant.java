@@ -75,6 +75,14 @@ public class Constant {
     //
     public static final String DEVICE_ADDED_TO_FIREBASE = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.DEVICE_ADDED_TO_FIREBASE";
 
+    // used in ConfigDeviceActivity, how many samples should take to get the mean sensor value in
+    // calm state
+    // todo 1000 samples is it ok?
+    public static final int CONFIG_DEVICE_SAMPLE_COUNT = 10;
+    // if the absolute difference of a sample and the DEFAULT_SENSOR_BALANCE_VALUE is greater than
+    // CONFIG_DEVICE_REJECT_SAMPLE_THRESHOLD the configuration will restart
+    public static final float CONFIG_DEVICE_REJECT_SAMPLE_THRESHOLD = 0.5f;
+
     // used for setting up location Requests
     public static final int LOCATION_REQUEST_INTERVAL = 1000 * 30; // 30 seconds
     public static final int LOCATION_REQUEST_FAST_INTERVAL = 1000 * 10; // 10 seconds

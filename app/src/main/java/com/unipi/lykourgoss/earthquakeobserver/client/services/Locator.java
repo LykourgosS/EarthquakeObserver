@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
+
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
  * on 06,August,2019.
@@ -18,8 +20,7 @@ public class Locator implements LocationListener {
 
     private static final String TAG = "Locator";
 
-    // todo use following instead of hardcoded!!!
-    public static final int UPDATES_PERIOD = 0/*1000 * 30*/; // get updates every 30 seconds
+    private static final float MAX_DISTANCE_CONNECTED__TO_AC = 10f; // 10 meters
 
     private Location lastLocation;
 
@@ -45,7 +46,7 @@ public class Locator implements LocationListener {
          * locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, UPDATES_PERIOD, 0, this);
          * */
 //        LocationProvider provider = locationManager.getProvider(locationManager.getBestProvider(createCriteria(), true));
-        locationManager.requestLocationUpdates(provider, 30000, 0, this);
+        locationManager.requestLocationUpdates(provider, Constant.LOCATION_REQUEST_INTERVAL, 0, this);
         lastLocation = locationManager.getLastKnownLocation(provider);
         lastUpdateTime = SystemClock.elapsedRealtime();
         Log.d(TAG, "Locator: " + lastLocation);
@@ -97,7 +98,7 @@ public class Locator implements LocationListener {
         /*if (lastLocation.getLatitude() != location.getLatitude() || lastLocation.getLongitude() != location.getLongitude()) {
             isMoving = true;
         }*/
-        if (lastLocation != null && location.distanceTo(lastLocation) > 10) {
+        if (lastLocation != null && location.distanceTo(lastLocation) > MAX_DISTANCE_CONNECTED__TO_AC) {
             isMoving = true;
         }
         lastLocation = location;

@@ -27,8 +27,6 @@ public class NotificationHelper {
     public static final int NOTIFICATION_ID = 2;
 
     public static void sendNotification(Context context, String title, String body, String id) {
-
-        // todo go to earthquakeobserver activity
         Intent intent = new Intent(context, EarthquakeActivity.class);
         intent.putExtra(Constant.EXTRA_EARTHQUAKE_ID, id);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -51,4 +49,6 @@ public class NotificationHelper {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         notificationManager.notify(NOTIFICATION_ID, notification.build());
     }
+
+    // TODO: 09/06/2019 add showServiceNotification
 }

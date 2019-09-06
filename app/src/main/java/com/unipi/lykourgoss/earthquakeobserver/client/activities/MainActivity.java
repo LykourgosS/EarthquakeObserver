@@ -58,6 +58,7 @@ public class MainActivity extends BaseActivity {
         textViewBatteryStatus = findViewById(R.id.text_view_battery_status);
         final IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 
+        // todo remove Timer
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {

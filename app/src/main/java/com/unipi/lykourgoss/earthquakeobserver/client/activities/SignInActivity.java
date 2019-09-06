@@ -34,7 +34,7 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
     private static final String TAG = "SignInActivity";
 
     private static final int RC_SIGN_IN = 9001;
-    //private static final int RC_CONFIGURE_SENSOR = 9002;
+    // todo remove private static final int RC_CONFIGURE_SENSOR = 9002;
 
     private FirebaseAuth firebaseAuth;
 
