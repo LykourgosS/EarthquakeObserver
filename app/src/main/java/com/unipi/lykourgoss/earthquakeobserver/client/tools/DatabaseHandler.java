@@ -14,11 +14,14 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.Device;
+import com.unipi.lykourgoss.earthquakeobserver.client.models.Earthquake;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.User;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,19 +35,25 @@ public class DatabaseHandler {
 
     private static final String MINOR_ACTIVE_EVENTS_REF = "minor-active-events";
     private static final String MAJOR_ACTIVE_EVENTS_REF = "major-active-events";
+    private static final String ACTIVE_EARTHQUAKES_REF = "active-earthquakes";
     private static final String SAVED_EVENTS_REF = "saved-events";
     private static final String DEVICES_REF = "devices";
-    private static final String USER_REF = "users";
+    private static final String USERS_REF = "users";
+    private static final String ADMINS_REF = "admins";
 
     private static DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
     private DatabaseReference minorActiveEventsRef;
     private DatabaseReference majorActiveEventsRef;
+    private DatabaseReference activeEarthquakesRef;
     private DatabaseReference savedEventsRef;
     private DatabaseReference devicesRef;
     private DatabaseReference usersRef;
+    private DatabaseReference adminsRef;
 
-    private DatabaseListener databaseListener;
+    private OnUserAddListener onUserAddListener;
+    private OnDeviceAddListener onDeviceAddListener;
+    private OnEarthquakeFetchListener onEarthquakeFetchListener;
 
     /*private ValueEventListener listener = new MyValueEventListener();
     private Query query;*/
@@ -52,13 +61,23 @@ public class DatabaseHandler {
     public DatabaseHandler(String deviceId) {
         minorActiveEventsRef = databaseReference.child(MINOR_ACTIVE_EVENTS_REF).child(deviceId);
         majorActiveEventsRef = databaseReference.child(MAJOR_ACTIVE_EVENTS_REF).child(deviceId);
+        activeEarthquakesRef = databaseReference.child(ACTIVE_EARTHQUAKES_REF);
         savedEventsRef = databaseReference.child(SAVED_EVENTS_REF).child(deviceId);
         devicesRef = databaseReference.child(DEVICES_REF);
-        usersRef = databaseReference.child(USER_REF);
+        usersRef = databaseReference.child(USERS_REF);
+        adminsRef = databaseReference.child(ADMINS_REF);
     }
 
-    public void setDatabaseListener(DatabaseListener databaseListener) {
-        this.databaseListener = databaseListener;
+    public void addOnUserAddListener(OnUserAddListener onUserAddListener) {
+        this.onUserAddListener = onUserAddListener;
+    }
+
+    public void addOnDeviceAddListener(OnDeviceAddListener onDeviceAddListener) {
+        this.onDeviceAddListener = onDeviceAddListener;
+    }
+
+    public void addOnEarthquakeFetchListener(OnEarthquakeFetchListener onEarthquakeFetchListener) {
+        this.onEarthquakeFetchListener = onEarthquakeFetchListener;
     }
 
     /*private void addListener() {
@@ -158,8 +177,45 @@ public class DatabaseHandler {
         }
     }
 
+    public void getEarthquake(String id) {
+        activeEarthquakesRef.child(id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    onEarthquakeFetchListener.onEarthquakeFetched(dataSnapshot.getValue(Earthquake.class));
+                } else {
+                    onEarthquakeFetchListener.onEarthquakeFetched(null);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                onEarthquakeFetchListener.onEarthquakeFetched(null);
+            }
+        });
+    }
+
     public void deleteSavedEvents() {
         savedEventsRef.setValue(null);
+    }
+
+    public void checkIfUserIsAdmin(final String email) {
+        adminsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    List<String> admins = (ArrayList) dataSnapshot.getValue();
+                    onUserAddListener.onCheckIfAdmin(admins.contains(email));
+                } else {
+                    onUserAddListener.onCheckIfAdmin(false);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                onUserAddListener.onCheckIfAdmin(false);
+            }
+        });
     }
 
     public void addUser(final User user) {
@@ -213,7 +269,7 @@ public class DatabaseHandler {
         usersRef.child(user.getUid()).updateChildren(userUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                databaseListener.onUserAdded(task.isSuccessful());
+                onUserAddListener.onUserAdded(task.isSuccessful());
             }
         });
 
@@ -225,27 +281,10 @@ public class DatabaseHandler {
         });*/
     }
 
-    public interface DatabaseListener {
-        /**
-         * Triggered when the {@link #addUser(User)} is completed.
-         *
-         * @param userAddedSuccessfully shows if the user added successfully or not.
-         * */
-        void onUserAdded(boolean userAddedSuccessfully);
-
-        /**
-         * Triggered when the {@link #addDevice(Device)} )} is completed.
-         *
-         * @param deviceAddedSuccessfully shows if the device added successfully or not.
-         * */
-        void onDeviceAdded(boolean deviceAddedSuccessfully);
-    }
-
-
     /**
      * Adds device to Firebase Database in two paths, 1st path is under: /devices. 2nd one is
      * under: /users/{uid}/devices.
-     * */
+     */
     public void addDevice(final Device device) {
         Log.d(TAG, "addDevice");
         final Map<String, Object> deviceAddition = new HashMap<>();
@@ -266,12 +305,12 @@ public class DatabaseHandler {
                     databaseReference.updateChildren(deviceAddition).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            databaseListener.onDeviceAdded(task.isSuccessful());
+                            onDeviceAddListener.onDeviceAdded(task.isSuccessful());
                         }
                     });
                 } else {
                     // something went wrong while subscribing to FCM topic
-                    databaseListener.onDeviceAdded(task.isSuccessful());
+                    onDeviceAddListener.onDeviceAdded(task.isSuccessful());
                 }
             }
         });
@@ -308,5 +347,39 @@ public class DatabaseHandler {
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });*/
+    }
+
+    public interface OnUserAddListener {
+        /**
+         * Triggered when the {@link #addUser(User)} is completed.
+         *
+         * @param userAddedSuccessfully shows if the user added successfully or not.
+         */
+        void onUserAdded(boolean userAddedSuccessfully);
+
+        /**
+         * Triggered when the {@link #checkIfUserIsAdmin(String)} is completed.
+         *
+         * @param isAdmin shows if the user added is an admin.
+         */
+        void onCheckIfAdmin(boolean isAdmin);
+    }
+
+    public interface OnDeviceAddListener {
+        /**
+         * Triggered when the {@link #addDevice(Device)} )} is completed.
+         *
+         * @param deviceAddedSuccessfully shows if the device added successfully or not.
+         */
+        void onDeviceAdded(boolean deviceAddedSuccessfully);
+    }
+
+    public interface OnEarthquakeFetchListener {
+        /**
+         * Triggered when the {@link #getEarthquake(String)} is completed.
+         *
+         * @param earthquake the Earthquake object fetched from Firebase.
+         */
+        void onEarthquakeFetched(Earthquake earthquake);
     }
 }

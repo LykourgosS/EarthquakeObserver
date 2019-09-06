@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.client.R;
+import com.unipi.lykourgoss.earthquakeobserver.client.models.Earthquake;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.SharedPrefManager;
 
 public class LaunchScreenActivity extends AppCompatActivity {
@@ -27,6 +28,8 @@ public class LaunchScreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lanch_screen);
 
+        Log.d(TAG, "onCreate");
+
         sharedPrefManager = SharedPrefManager.getInstance(this);
 
         firebaseAuth = FirebaseAuth.getInstance();
@@ -38,7 +41,18 @@ public class LaunchScreenActivity extends AppCompatActivity {
                     startActivity(new Intent(LaunchScreenActivity.this, SignInActivity.class));
                 } else {
                     if (sharedPrefManager.read(Constant.DEVICE_ADDED_TO_FIREBASE, false)) {
-                        startActivity(new Intent(LaunchScreenActivity.this, MainActivity.class));
+                        Bundle bundle = getIntent().getExtras();
+                        if (bundle != null) {
+                            for (String key : bundle.keySet()) {
+                                Object value = bundle.get(key);
+                                Log.d(TAG, "Key: " + key + " Value: " + value);
+                            }
+                            Intent intent = new Intent(LaunchScreenActivity.this, EarthquakeActivity.class);
+                            intent.putExtra(Constant.EXTRA_EARTHQUAKE_ID, bundle.get(Earthquake.ID).toString());
+                            startActivity(intent);
+                        } else {
+                            startActivity(new Intent(LaunchScreenActivity.this, MainActivity.class));
+                        }
                     } else {
                         startActivity(new Intent(LaunchScreenActivity.this, ConfigDeviceActivity.class));
                     }

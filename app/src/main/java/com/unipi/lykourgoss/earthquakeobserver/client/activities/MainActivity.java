@@ -21,6 +21,7 @@ import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.client.R;
 import com.unipi.lykourgoss.earthquakeobserver.client.receivers.BootCompletedReceiver;
 import com.unipi.lykourgoss.earthquakeobserver.client.services.ObserverService;
+import com.unipi.lykourgoss.earthquakeobserver.client.tools.SharedPrefManager;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.DatabaseHandler;
 
@@ -42,6 +43,8 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate");
+
+        updateUiForAdmin(SharedPrefManager.getInstance(this).read(Constant.USER_IS_ADMIN, false));
 
         // register receiver for
         IntentFilter filter = new IntentFilter(Constant.FAKE_BOOT);
@@ -119,10 +122,26 @@ public class MainActivity extends BaseActivity {
         startActivity(new Intent(this, SignInActivity.class));
     }
 
+    // todo remove onClick from XML files and make them private
     public void stopService(View view) {
         stopService(new Intent(this, ObserverService.class));
     }
 
+    private void updateUiForAdmin(boolean isAdmin) {
+        int visibility = View.VISIBLE;
+        if (!isAdmin) visibility = View.GONE;
+        findViewById(R.id.button_sensor_configuration).setVisibility(visibility);
+        findViewById(R.id.button_log_location).setVisibility(visibility);
+        findViewById(R.id.button_graph_only_norm).setVisibility(visibility);
+        findViewById(R.id.button_graph_all).setVisibility(visibility);
+        findViewById(R.id.button_boot).setVisibility(visibility);
+        findViewById(R.id.button_disconnect_power).setVisibility(visibility);
+        findViewById(R.id.button_clear_event).setVisibility(visibility);
+        findViewById(R.id.button_sign_in).setVisibility(visibility);
+        findViewById(R.id.button_stop_service).setVisibility(visibility);
+        findViewById(R.id.text_view_battery_status).setVisibility(visibility);
+    }
+    
     private boolean checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show();

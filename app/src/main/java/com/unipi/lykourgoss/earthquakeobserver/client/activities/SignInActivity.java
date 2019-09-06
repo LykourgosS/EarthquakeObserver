@@ -22,12 +22,14 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.client.R;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.User;
+import com.unipi.lykourgoss.earthquakeobserver.client.tools.SharedPrefManager;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.DatabaseHandler;
 
-public class SignInActivity extends BaseActivity implements View.OnClickListener, DatabaseHandler.DatabaseListener {
+public class SignInActivity extends BaseActivity implements View.OnClickListener, DatabaseHandler.OnUserAddListener {
 
     private static final String TAG = "SignInActivity";
 
@@ -66,7 +68,7 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
         firebaseAuth = FirebaseAuth.getInstance();
 
         databaseHandler = new DatabaseHandler(Util.getUniqueId(this));
-        databaseHandler.setDatabaseListener(this);
+        databaseHandler.addOnUserAddListener(this);
     }
 
     @Override
@@ -172,12 +174,10 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
 
     @Override
     public void onUserAdded(boolean userAddedSuccessfully) {
-        hideProgressDialog();
         if (userAddedSuccessfully) {
-            // Sign in success, go to ConfigDeviceActivity to set up device to firebase
-            startActivity(new Intent(SignInActivity.this, ConfigDeviceActivity.class));
-            finish();
+            databaseHandler.checkIfUserIsAdmin(firebaseAuth.getCurrentUser().getEmail());
         } else {
+            hideProgressDialog();
             // Sign In or Saving User object to Firebase Database got wrong, request signing in again
             deleteAndSignOut();
             Toast.makeText(this, "Something got wrong. Try again.", Toast.LENGTH_SHORT).show();
@@ -185,7 +185,11 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
     }
 
     @Override
-    public void onDeviceAdded(boolean deviceAddedSuccessfully) {
-        // useless because we don't do anything with devices here
+    public void onCheckIfAdmin(boolean isAdmin) {
+        hideProgressDialog();
+        SharedPrefManager.getInstance(this).write(Constant.USER_IS_ADMIN, isAdmin);
+        // Sign in success, go to ConfigDeviceActivity to set up device to firebase
+        startActivity(new Intent(SignInActivity.this, ConfigDeviceActivity.class));
+        finish();
     }
 }

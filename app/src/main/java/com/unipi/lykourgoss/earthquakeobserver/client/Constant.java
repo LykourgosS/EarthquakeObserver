@@ -10,6 +10,9 @@ public class Constant {
     // used to pass something to intent and do something with that inside a service
     public static final String EXTRA_INPUT = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.EXTRA_INPUT";
 
+    // to pass the id of the earthquake when the FCM notification is clicked
+    public static final String EXTRA_EARTHQUAKE_ID = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.EXTRA_EARTHQUAKE_ID";
+
     // Notification channel ids
     public static final String OBSERVER_SERVICE_CHANNEL_ID = "ObserverServiceChannel";
     public static final String EARTHQUAKES_FEED_CHANNEL_ID = "EarthquakeFeedChannel";
@@ -63,6 +66,8 @@ public class Constant {
     // SensorValue threshold, used for recognize if values from accelerometer are big enough for
     // adding to Firebase (reporting) an event
     public static final float SENSOR_THRESHOLD = 0.1f;
+
+    public static final String USER_IS_ADMIN = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.USER_IS_ADMIN";
 
     // key of device id (DEVICE_ID) to be stored in SharedPreferences only the first time
     public static final String DEVICE_ID = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.DEVICE_ID";

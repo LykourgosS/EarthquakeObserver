@@ -76,7 +76,7 @@ public class GraphOnlyNormActivity extends AppCompatActivity implements ServiceC
         LineData data = new LineData();
 
         // √(x²+y²+z²) DataSet
-        LineDataSet normXYZDataSet = createSet("√(x²+y²+z²)", 1f, Color.MAGENTA);
+        LineDataSet normXYZDataSet = createSet("√(x²+y²+z²)", 3f, Color.MAGENTA);
         data.addDataSet(normXYZDataSet);
 
         lineChart.setData(data);

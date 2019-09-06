@@ -8,8 +8,6 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.Earthquake;
 
-import java.util.Map;
-
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
  * on 02,September,2019.
@@ -33,16 +31,12 @@ public class FCMService extends FirebaseMessagingService {
 
         Log.d(TAG, "onMessageReceived");
 
-        Map<String, String> data = remoteMessage.getData();
-
-        String id = data.get("id");
-        Log.d(TAG, "onMessageReceived: " + id);
-
-        /*if (remoteMessage.getNotification() != null) {
+        if (remoteMessage.getNotification() != null && remoteMessage.getData().get(Earthquake.ID) != null) {
             String title = remoteMessage.getNotification().getTitle();
-            String body = remoteMessage.getNotification().getBody() + id;
+            String body = remoteMessage.getNotification().getBody();
+            String id = remoteMessage.getData().get(Earthquake.ID);
 
-            NotificationHelper.sendNotification(this, title, body);
-        }*/
+            NotificationHelper.sendNotification(this, title, body, id);
+        }
     }
 }

@@ -4,16 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:padding="16sp"
-    android:background="@color/colorPrimary"
-    tools:context=".activities.LaunchScreenActivity">
+    android:orientation="vertical"
+    tools:context=".activities.EarthquakeActivity">
 
     <TextView
-        android:textColor="@android:color/white"
+        android:id="@+id/text_view_earthquake_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/app_name"
         android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        tools:text="Earthquake info" />
 
 </LinearLayout>

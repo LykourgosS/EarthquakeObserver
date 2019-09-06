@@ -3,15 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.unipi.lykourgoss.earthquakeobserver.client">
 
-    <uses-feature
-        android:name="android.hardware.sensor.accelerometer"
-        android:required="true" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -21,7 +12,17 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".activities.EarthquakeActivity"></activity>
+        <!-- [START fcm_default_icon] -->
+        <!--
+ Set custom default icon. This is used when no icon is set for incoming notification messages.
+             See README(https://goo.gl/l4GJaQ) for more.
+        -->
         <activity android:name=".notifications.NotificationActivity" />
+        <!--
+ Set color used with incoming notification messages. This is used when no color is set for the incoming
+             notification message. See README(https://goo.gl/6BKBk7) for more.
+        -->
         <activity
             android:name=".activities.LaunchScreenActivity"
             android:theme="@style/AppTheme.LaunchTheme">
@@ -30,10 +31,11 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+        </activity> <!-- [END fcm_default_icon] -->
+        <!-- [START fcm_default_channel] -->
         <activity
             android:name=".activities.MainActivity"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop" /> <!-- [END fcm_default_channel] -->
         <activity android:name=".activities.SignInActivity" />
         <activity android:name=".activities.ConfigDeviceActivity" />
         <activity
@@ -44,6 +46,15 @@
             android:name=".activities.GraphAllActivity"
             android:launchMode="singleTop" />
         <activity android:name=".activities.GraphOnlyNormActivity" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notifications_white_24dp" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorAccent" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="EarthquakeFeedChannel" />
 
         <receiver android:name=".receivers.BootCompletedReceiver">
             <intent-filter>
@@ -59,8 +70,7 @@
             android:name=".services.StartObserverJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service android:name=".services.ObserverService" />
-        <service android:name=".location.LocationService" />
-        <!--todo what should become exported="false" ???-->
+        <service android:name=".location.LocationService" /> <!-- todo what should become exported="false" ??? -->
         <service
             android:name=".notifications.FCMService"
             android:exported="false">
@@ -69,5 +79,14 @@
             </intent-filter>
         </service>
     </application>
+
+    <uses-feature
+        android:name="android.hardware.sensor.accelerometer"
+        android:required="true" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
 </manifest>

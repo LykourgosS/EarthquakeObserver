@@ -11,6 +11,7 @@ import androidx.core.app.NotificationManagerCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.client.R;
+import com.unipi.lykourgoss.earthquakeobserver.client.activities.LaunchScreenActivity;
 import com.unipi.lykourgoss.earthquakeobserver.client.activities.MainActivity;
 
 /**
@@ -24,17 +25,18 @@ public class NotificationHelper {
     // startForeground(int id, Notification notification)
     public static final int NOTIFICATION_ID = 2;
 
-    public static void sendNotification(Context context, String title, String body) {
+    public static void sendNotification(Context context, String title, String body, String id) {
 
         // todo go to earthquakeobserver activity
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        Intent intent = new Intent(context, LaunchScreenActivity.class);
+        intent.putExtra(Constant.EXTRA_EARTHQUAKE_ID, id);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         // todo maybe change flags on following
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         NotificationCompat.Builder notification = new NotificationCompat.Builder(context, Constant.EARTHQUAKES_FEED_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notifications_white_24dp)
+                .setColor(context.getResources().getColor(R.color.colorAccent))
                 .setContentTitle(title)
                 .setContentText(body)
                 .setAutoCancel(true) // when clicked notification will be dismissed

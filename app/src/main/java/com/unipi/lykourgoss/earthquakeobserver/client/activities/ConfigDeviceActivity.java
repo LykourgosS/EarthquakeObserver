@@ -22,7 +22,7 @@ import com.unipi.lykourgoss.earthquakeobserver.client.tools.SharedPrefManager;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.DatabaseHandler;
 
-public class ConfigDeviceActivity extends BaseActivity implements View.OnClickListener, SensorEventListener, DatabaseHandler.DatabaseListener {
+public class ConfigDeviceActivity extends BaseActivity implements View.OnClickListener, SensorEventListener, DatabaseHandler.OnDeviceAddListener {
 
     private static final String TAG = ConfigDeviceActivity.class.getSimpleName();
 
@@ -58,7 +58,7 @@ public class ConfigDeviceActivity extends BaseActivity implements View.OnClickLi
         sharedPrefManager = SharedPrefManager.getInstance(this);
 
         databaseHandler = new DatabaseHandler(Util.getUniqueId(this));
-        databaseHandler.setDatabaseListener(this);
+        databaseHandler.addOnDeviceAddListener(this);
     }
 
     @Override
@@ -100,11 +100,6 @@ public class ConfigDeviceActivity extends BaseActivity implements View.OnClickLi
     }
 
     @Override
-    public void onUserAdded(boolean userAddedSuccessfully) {
-        // useless because we don't do anything with users here
-    }
-
-    @Override
     public void onDeviceAdded(boolean deviceAddedSuccessfully) {
         Log.d(TAG, "onDeviceAdded");
         hideProgressDialog();
@@ -141,6 +136,7 @@ public class ConfigDeviceActivity extends BaseActivity implements View.OnClickLi
     protected void onDestroy() {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
+        // todo maybe unregister in onPause or onStop
         sensorManager.unregisterListener(ConfigDeviceActivity.this);
     }
 }
