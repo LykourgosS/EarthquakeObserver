@@ -25,7 +25,7 @@ public class BootCompletedReceiver extends BroadcastReceiver {
                 || Constant.FAKE_BOOT.equals(intent.getAction())) {
             Log.d(TAG, "onReceive");
             Toast.makeText(context, TAG, Toast.LENGTH_SHORT).show();
-            Util.scheduleStartJob(context);
+            Util.scheduleObserverService(context);
         }
     }
 }

@@ -23,7 +23,9 @@ public class Constant {
     public static final int OBSERVER_SERVICE_ID = 1;
 
     // used for scheduling jobs
-    public static final int START_SERVICE_JOB_ID = 2;
+    public static final int START_OBSERVER_SERVICE_JOB_ID = 2;
+    public static final int START_UPDATE_SERVICE_JOB_ID = 3;
+    public static final String EXTRA_CLIENT_SETTINGS = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.EXTRA_CLIENT_SETTINGS";
 
     // for Debugging purposes: custom action broadcasts
     public static final String FAKE_BOOT = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.FAKE_BOOT";
@@ -38,6 +40,15 @@ public class Constant {
      * know if event should be saved to Firebase Database (from active-events to saved-events)
      * */
     public static final long MIN_EVENT_DURATION = 5 * 1000;
+
+    /* todo remove
+    // Client Settings
+    public static final String SAMPLING_PERIOD_PREF = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.SAMPLING_PERIOD_PREF";
+    public static final String _PREF = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.SAMPLES_BATCH_COUNT_PREF";
+    public static final String _PREF = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.MIN_EVENT_DURATION_PREF";
+    public static final String _PREF = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.DEFAULT_BALANCE_SENSOR_VALUE_PREF";
+    public static final String SENSOR_VALUE_THRESHOLD_PREF = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.SENSOR_VALUE_THRESHOLD_PREF";
+    public static final String CONFIG_DEVICE_REJECT_SAMPLE_THRESHOLD_PREF = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.SENSOR_VALUE_THRESHOLD_PREF";*/
 
     // todo remove
     // used for passing info about sensor from ConfigDeviceActivity back to SignInActivity
@@ -58,7 +69,7 @@ public class Constant {
     // 3. Samsung T580 API 27:
     // meanX = -0,271595, meanY = -0,018965, meanZ = 9,772408
     // meanNormXYZ = 9.776207
-    public static final float DEFAULT_SENSOR_BALANCE_VALUE = 9.8f;
+    public static final float DEFAULT_BALANCE_SENSOR_VALUE = 9.8f;
 
     // key of device SENSOR_BALANCE_VALUE in balance to be stored in SharedPreferences
     public static final String SENSOR_BALANCE_VALUE = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.SENSOR_BALANCE_VALUE";
@@ -79,10 +90,11 @@ public class Constant {
     // calm state
     // todo 1000 samples is it ok?
     public static final int CONFIG_DEVICE_SAMPLE_COUNT = 10;
-    // if the absolute difference of a sample and the DEFAULT_SENSOR_BALANCE_VALUE is greater than
+    // if the absolute difference of a sample and the DEFAULT_BALANCE_SENSOR_VALUE is greater than
     // CONFIG_DEVICE_REJECT_SAMPLE_THRESHOLD the configuration will restart
     public static final float CONFIG_DEVICE_REJECT_SAMPLE_THRESHOLD = 0.5f;
 
+    // TODO: 09/07/2019 add following to client settings
     // used for setting up location Requests
     public static final int LOCATION_REQUEST_INTERVAL = 1000 * 30; // 30 seconds
     public static final int LOCATION_REQUEST_FAST_INTERVAL = 1000 * 10; // 10 seconds

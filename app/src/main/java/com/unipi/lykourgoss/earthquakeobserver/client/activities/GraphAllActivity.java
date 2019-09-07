@@ -49,7 +49,7 @@ public class GraphAllActivity extends AppCompatActivity implements ServiceConnec
         setContentView(R.layout.activity_graph);
 
         initializeChart();
-        balanceValue = SharedPrefManager.getInstance(this).read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_SENSOR_BALANCE_VALUE);
+        balanceValue = SharedPrefManager.getInstance(this).read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_BALANCE_SENSOR_VALUE);
     }
 
     private void initializeChart() {

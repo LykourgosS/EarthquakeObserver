@@ -13,6 +13,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
+import com.unipi.lykourgoss.earthquakeobserver.client.models.ClientSettings;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.Device;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.Earthquake;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.EarthquakeEvent;
@@ -35,25 +36,38 @@ public class DatabaseHandler {
 
     private static final String MINOR_ACTIVE_EVENTS_REF = "minor-active-events";
     private static final String MAJOR_ACTIVE_EVENTS_REF = "major-active-events";
-    private static final String EARTHQUAKES_REF = "earthquakes";
+
     private static final String SAVED_EVENTS_REF = "saved-events";
+
+    private static final String EARTHQUAKES_REF = "earthquakes";
+
     private static final String DEVICES_REF = "devices";
     private static final String USERS_REF = "users";
+
     private static final String ADMINS_REF = "admins";
+
+    private static final String CLIENT_SETTINGS_REF = "client-settings";
 
     private static DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
     private DatabaseReference minorActiveEventRef;
     private DatabaseReference majorActiveEventRef;
-    private DatabaseReference earthquakesRef;
+
     private DatabaseReference savedEventsRef;
+
+    private DatabaseReference earthquakesRef;
+
     private DatabaseReference devicesRef;
     private DatabaseReference usersRef;
+
     private DatabaseReference adminsRef;
+
+    private DatabaseReference clientSettingsRef;
 
     private OnUserAddListener onUserAddListener;
     private OnDeviceAddListener onDeviceAddListener;
     private OnEarthquakeFetchListener onEarthquakeFetchListener;
+    private OnUpdateSettingsListener onUpdateSettingsListener;
 
     /*private ValueEventListener listener = new MyValueEventListener();
     private Query query;*/
@@ -66,6 +80,7 @@ public class DatabaseHandler {
         devicesRef = databaseReference.child(DEVICES_REF);
         usersRef = databaseReference.child(USERS_REF);
         adminsRef = databaseReference.child(ADMINS_REF);
+        clientSettingsRef = databaseReference.child(CLIENT_SETTINGS_REF);
     }
 
     public void addOnUserAddListener(OnUserAddListener onUserAddListener) {
@@ -80,13 +95,9 @@ public class DatabaseHandler {
         this.onEarthquakeFetchListener = onEarthquakeFetchListener;
     }
 
-    /*private void addListener() {
-        query.addValueEventListener(listener);
+    public void addOnUpdateSettingsListener(OnUpdateSettingsListener onUpdateSettingsListener) {
+        this.onUpdateSettingsListener = onUpdateSettingsListener;
     }
-
-    private void removeListener() {
-        query.removeEventListener(listener);
-    }*/
 
     public void addEventToMinors(EarthquakeEvent newEvent) {
         Log.d(TAG, "addEvent: minor");
@@ -351,6 +362,23 @@ public class DatabaseHandler {
         });*/
     }
 
+    public void getSettings() {
+        clientSettingsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    ClientSettings settings = dataSnapshot.getValue(ClientSettings.class);
+                    onUpdateSettingsListener.onSettingsUpdate(settings);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     public interface OnUserAddListener {
         /**
          * Triggered when the {@link #addUser(User)} is completed.
@@ -383,5 +411,14 @@ public class DatabaseHandler {
          * @param earthquake the Earthquake object fetched from Firebase.
          */
         void onEarthquakeFetched(Earthquake earthquake);
+    }
+
+    public interface OnUpdateSettingsListener {
+        /**
+         * Triggered when the {@link #getSettings()} is completed.
+         *
+         * @param settings ClientSettings object fetched from Firebase.
+         */
+        void onSettingsUpdate(ClientSettings settings);
     }
 }

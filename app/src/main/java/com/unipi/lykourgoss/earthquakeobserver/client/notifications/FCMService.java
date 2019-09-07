@@ -1,12 +1,20 @@
 package com.unipi.lykourgoss.earthquakeobserver.client.notifications;
 
+import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
+import com.unipi.lykourgoss.earthquakeobserver.client.models.ClientSettings;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.Earthquake;
+import com.unipi.lykourgoss.earthquakeobserver.client.services.UpdateJobIntentService;
+import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
+
+import java.util.Map;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
@@ -16,6 +24,8 @@ import com.unipi.lykourgoss.earthquakeobserver.client.models.Earthquake;
 public class FCMService extends FirebaseMessagingService {
 
     private static final String TAG = "FCMService";
+
+    private static final String UPDATE_SETTINGS = "updateSettings";
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
@@ -31,12 +41,24 @@ public class FCMService extends FirebaseMessagingService {
 
         Log.d(TAG, "onMessageReceived");
 
-        if (remoteMessage.getNotification() != null && remoteMessage.getData().get(Earthquake.ID) != null) {
-            String title = remoteMessage.getNotification().getTitle();
-            String body = remoteMessage.getNotification().getBody();
-            String id = remoteMessage.getData().get(Earthquake.ID);
+        if (remoteMessage.getNotification() != null) {
+            if (remoteMessage.getData().get(Earthquake.ID) != null) {
+                // show notification for new earthquake
+                String title = remoteMessage.getNotification().getTitle();
+                String body = remoteMessage.getNotification().getBody();
+                String id = remoteMessage.getData().get(Earthquake.ID);
 
-            NotificationHelper.sendNotification(this, title, body, id);
+                NotificationHelper.sendEarthquakeNotification(this, title, body, id);
+            } else if (UPDATE_SETTINGS.equals(remoteMessage.getNotification().getTitle())) {
+                // update settings
+
+                Map<String, String> bundle = remoteMessage.getData();
+
+                Intent intent = new Intent(this, UpdateJobIntentService.class);
+                intent.putExtra(Constant.EXTRA_CLIENT_SETTINGS, new ClientSettings());
+                UpdateJobIntentService.enqueueWork(this, intent);
+            }
+
         }
     }
 }

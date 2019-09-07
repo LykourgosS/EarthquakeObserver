@@ -18,6 +18,7 @@ import com.unipi.lykourgoss.earthquakeobserver.client.R;
 import com.unipi.lykourgoss.earthquakeobserver.client.activities.MainActivity;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.MinimalEarthquakeEvent;
+import com.unipi.lykourgoss.earthquakeobserver.client.notifications.NotificationHelper;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.DatabaseHandler;
 import com.unipi.lykourgoss.earthquakeobserver.client.receivers.PowerDisconnectedReceiver;
@@ -106,7 +107,7 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
     }
 
     public void initSensor() {
-        float balanceValue = SharedPrefManager.getInstance(this).read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_SENSOR_BALANCE_VALUE);
+        float balanceValue = SharedPrefManager.getInstance(this).read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_BALANCE_SENSOR_VALUE);
         earthquakeManager = new EarthquakeManager(this, balanceValue);
         earthquakeManager.registerListener(this);
     }
@@ -116,18 +117,9 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         Log.d(TAG, "onStartCommand");
         isStarted = true;
 
-        Intent intentNotification = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intentNotification, 0);
-
         // todo only use foreground service on Oreo an higher -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
         if (true) { // if API is v.26 and higher start a foreground service
-            Notification notification = new NotificationCompat.Builder(this, Constant.OBSERVER_SERVICE_CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_track_changes_white_24dp)
-                    .setContentTitle("Example Service")
-                    .setContentText("Observing...")
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setContentIntent(pendingIntent)
-                    .build();
+            Notification notification = NotificationHelper.getObserverServiceNotification(this);
 
             // when service started with:
             // 1. startService() -> without the following line system will kill the service after 1 min
@@ -155,7 +147,7 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         super.onDestroy();
         Log.d(TAG, "onDestroy");
 
-        //Util.scheduleStartJob(this); // todo (is it needed) if user stop our service schedule to re-start it
+        //Util.scheduleObserverService(this); // todo (is it needed) if user stop our service schedule to re-start it
         unregisterReceiver(receiver);
         if (isStarted) {
             databaseHandler.updateDeviceStatus(deviceId, false);

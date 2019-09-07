@@ -6,6 +6,8 @@ import android.app.NotificationManager;
 import android.os.Build;
 import android.util.Log;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
  * on 10,July,2019.
@@ -22,6 +24,12 @@ public class App extends Application {
         // every time the app is launched onCreate is triggered, but once a channel is already
         // created trying to created again does nothing...
         createNotificationChannels();
+
+        subscribeToTopic(); // TODO: 09/07/2019 maybe remove not sure if useful
+    }
+
+    private void subscribeToTopic() {
+        FirebaseMessaging.getInstance().subscribeToTopic(Constant.EARTHQUAKES_FEED_TOPIC);
     }
 
     private void createNotificationChannels() {

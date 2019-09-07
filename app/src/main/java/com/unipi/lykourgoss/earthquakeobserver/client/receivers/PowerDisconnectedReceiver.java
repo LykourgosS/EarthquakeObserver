@@ -28,7 +28,7 @@ public class PowerDisconnectedReceiver extends BroadcastReceiver { // to take ac
             Toast.makeText(context, "Power Disconnected", Toast.LENGTH_SHORT).show();
 
             context.stopService(new Intent(context, ObserverService.class));
-            Util.scheduleStartJob(context); // reschedule job (to start again service) when the power is connected again
+            Util.scheduleObserverService(context); // reschedule job (to start again service) when the power is connected again
         }
     }
 }

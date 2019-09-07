@@ -136,7 +136,7 @@
 //        // following are used for observing events and if needed save them to Firebase Database
 //        databaseHandler = new DatabaseHandler(deviceId);
 //        databaseHandler.updateDeviceStatus(deviceId, true);
-//        balanceValue = sharedPrefManager.read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_SENSOR_BALANCE_VALUE);
+//        balanceValue = sharedPrefManager.read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_BALANCE_SENSOR_VALUE);
 //        eventList = new ArrayList<>();
 //
 //        // to stop service from here (it will trigger onDestroy())
@@ -153,7 +153,7 @@
 //        super.onDestroy();
 //        Log.d(TAG, "onDestroy");
 //
-//        //Util.scheduleStartJob(this); // todo (is it needed) if user stop our service schedule to re-start it
+//        //Util.scheduleObserverService(this); // todo (is it needed) if user stop our service schedule to re-start it
 //        unregisterReceiver(receiver);
 //        if (isQuaking) {
 //            //todo terminate event

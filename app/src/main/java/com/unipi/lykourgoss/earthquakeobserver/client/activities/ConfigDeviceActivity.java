@@ -61,7 +61,7 @@ public class ConfigDeviceActivity extends BaseActivity implements View.OnClickLi
     @Override
     public void onSensorChanged(SensorEvent event) {
         float normValue = MinimalEarthquakeEvent.normalizeValue(event.values);
-        if (Math.abs(normValue - Constant.DEFAULT_SENSOR_BALANCE_VALUE) <= Constant.CONFIG_DEVICE_REJECT_SAMPLE_THRESHOLD) {
+        if (Math.abs(normValue - Constant.DEFAULT_BALANCE_SENSOR_VALUE) <= Constant.CONFIG_DEVICE_REJECT_SAMPLE_THRESHOLD) {
             valueSum += normValue;
             valueCount++;
             Log.d(TAG, "onSensorChanged: mean = " + valueSum / valueCount + ", count = " + valueCount);

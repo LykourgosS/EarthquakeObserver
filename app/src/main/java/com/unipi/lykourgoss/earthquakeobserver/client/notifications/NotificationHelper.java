@@ -26,7 +26,7 @@ public class NotificationHelper {
     // startForeground(int id, Notification notification)
     public static final int NOTIFICATION_ID = 2;
 
-    public static void sendNotification(Context context, String title, String body, String id) {
+    public static void sendEarthquakeNotification(Context context, String title, String body, String id) {
         Intent intent = new Intent(context, EarthquakeActivity.class);
         intent.putExtra(Constant.EXTRA_EARTHQUAKE_ID, id);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -51,4 +51,19 @@ public class NotificationHelper {
     }
 
     // TODO: 09/06/2019 add showServiceNotification
+    public static Notification getObserverServiceNotification(Context context) {
+
+        Intent intentNotification = new Intent(context, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intentNotification, 0);
+
+        Notification notification = new NotificationCompat.Builder(context, Constant.OBSERVER_SERVICE_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_track_changes_white_24dp)
+                .setColor(context.getResources().getColor(R.color.colorAccent))
+                .setContentTitle("Example Service")
+                .setContentText("Observing...")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .build();
+        return notification;
+    }
 }

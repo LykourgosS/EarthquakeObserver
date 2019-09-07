@@ -26,7 +26,7 @@ public class StartObserverJobService extends JobService { // JobService runs in 
         /*if (checkAcCharge()){
             startService();
         } else{
-            Util.scheduleStartJob(this);
+            Util.scheduleObserverService(this);
         }*/
         startService();
         return false; // false if the task is short and can be executed here (means job is over), true if will be executed in a background thread
