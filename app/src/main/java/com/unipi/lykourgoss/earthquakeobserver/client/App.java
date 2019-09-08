@@ -24,12 +24,6 @@ public class App extends Application {
         // every time the app is launched onCreate is triggered, but once a channel is already
         // created trying to created again does nothing...
         createNotificationChannels();
-
-        subscribeToTopic(); // TODO: 09/07/2019 maybe remove not sure if useful
-    }
-
-    private void subscribeToTopic() {
-        FirebaseMessaging.getInstance().subscribeToTopic(Constant.EARTHQUAKES_FEED_TOPIC);
     }
 
     private void createNotificationChannels() {
@@ -43,6 +37,13 @@ public class App extends Application {
             // todo set description for each channel!!!
             // if make any changes (i.e. notification's behavior) here uninstall and re-install the app
             observerServiceChannel.setDescription("This is channel's description");
+
+            NotificationChannel updateNotificationChannel = new NotificationChannel(
+                    Constant.UPDATE_CHANNEL_ID,
+                    "Update Notification Channel (name)",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            updateNotificationChannel.setDescription("Description");
 
             //will be used for displaying notifications when an earthquakeobserver occurred (messages send
             // from FCM)
@@ -60,6 +61,7 @@ public class App extends Application {
             // creating notification channels
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(observerServiceChannel);
+            manager.createNotificationChannel(updateNotificationChannel);
             manager.createNotificationChannel(earthquakeNotificationChannel);
         }
     }

@@ -11,6 +11,8 @@ import android.os.Parcelable;
 
 public class SensorInfo implements Parcelable {
 
+    public static final String BALANCE_SENSOR_VALUE = "balanceSensorValue";
+
     // will be acquired after running ConfigDeviceActivity
     private float balanceSensorValue;
 

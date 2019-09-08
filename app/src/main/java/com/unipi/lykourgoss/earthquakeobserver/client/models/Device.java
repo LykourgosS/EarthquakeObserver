@@ -14,6 +14,8 @@ public class Device {
     public static final String IS_RUNNING = "isRunning";
     public static final String LAST_OBSERVING_DATE_TIME = "lastObservingDateTime";
     public static final String LAST_OBSERVING_TIME_IN_MILLIS = "lastObservingTimeInMillis";
+    public static final String LAST_UPDATE_TIMESTAMP = "lastUpdateTimestamp";
+    public static final String SENSOR_INFO = "sensorInfo";
 
     // generated using UUID
     private String deviceId;
@@ -28,19 +30,23 @@ public class Device {
     private long lastObservingTimeInMillis;
     private boolean isRunning;
 
+    // will take the value of the last update
+    private long lastUpdateTimestamp;
+
     // sensor (accelerometer) info (used for statistic purposes)
     private SensorInfo sensorInfo;
 
     public Device() {
     }
 
-    public Device(String deviceId, String firebaseAuthUid, String createdDatetime, String lastObservingDateTime, long lastObservingTimeInMillis, boolean isRunning, SensorInfo sensorInfo) {
+    public Device(String deviceId, String firebaseAuthUid, String createdDatetime, String lastObservingDateTime, long lastObservingTimeInMillis, boolean isRunning, long lastUpdateTimestamp, SensorInfo sensorInfo) {
         this.deviceId = deviceId;
         this.firebaseAuthUid = firebaseAuthUid;
         this.createdDatetime = createdDatetime;
         this.lastObservingDateTime = lastObservingDateTime;
         this.lastObservingTimeInMillis = lastObservingTimeInMillis;
         this.isRunning = isRunning;
+        this.lastUpdateTimestamp = lastUpdateTimestamp;
         this.sensorInfo = sensorInfo;
     }
 
@@ -69,14 +75,20 @@ public class Device {
         this.lastObservingDateTime = Util.millisToDateTime(lastObservingTimeInMillis);
     }
 
-
-
     public boolean getIsRunning() {
         return isRunning;
     }
 
     public void setIsRunning(boolean running) {
         isRunning = running;
+    }
+
+    public long getLastUpdateTimestamp() {
+        return lastUpdateTimestamp;
+    }
+
+    public void setLastUpdateTimestamp(long lastUpdateTimestamp) {
+        this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 
     public SensorInfo getSensorInfo() {
@@ -90,6 +102,7 @@ public class Device {
         private String lastObservingDateTime;
         private long lastObservingTimeInMillis;
         private boolean isRunning;
+        private long lastUpdateTimestamp;
         private SensorInfo sensorInfo;
 
         public Builder() {
@@ -113,7 +126,7 @@ public class Device {
         }
 
         public Device build() {
-            return new Device(deviceId, firebaseAuthUid, createdDatetime, lastObservingDateTime, lastObservingTimeInMillis, isRunning, sensorInfo);
+            return new Device(deviceId, firebaseAuthUid, createdDatetime, lastObservingDateTime, lastObservingTimeInMillis, isRunning, lastUpdateTimestamp, sensorInfo);
         }
     }
 

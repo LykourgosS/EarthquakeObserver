@@ -8,6 +8,7 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.client.R;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.Earthquake;
@@ -30,6 +31,8 @@ public class LaunchScreenActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate");
 
+        subscribeToTopics();
+
         sharedPrefManager = SharedPrefManager.getInstance(this);
 
         firebaseAuth = FirebaseAuth.getInstance();
@@ -43,13 +46,12 @@ public class LaunchScreenActivity extends AppCompatActivity {
                     if (sharedPrefManager.read(Constant.DEVICE_ADDED_TO_FIREBASE, false)) {
                         Bundle bundle = getIntent().getExtras();
                         if (bundle != null) {
-                            for (String key : bundle.keySet()) {
-                                Object value = bundle.get(key);
-                                Log.d(TAG, "Key: " + key + " Value: " + value);
+                            String earthquakeId = (String) getIntent().getExtras().get(Earthquake.ID);
+                            if (earthquakeId != null) { // when user clicked notification about new earthquake
+                                Intent intent = new Intent(LaunchScreenActivity.this, EarthquakeActivity.class);
+                                intent.putExtra(Constant.EXTRA_EARTHQUAKE_ID, earthquakeId);
+                                startActivity(intent);
                             }
-                            Intent intent = new Intent(LaunchScreenActivity.this, EarthquakeActivity.class);
-                            intent.putExtra(Constant.EXTRA_EARTHQUAKE_ID, bundle.get(Earthquake.ID).toString());
-                            startActivity(intent);
                         } else {
                             startActivity(new Intent(LaunchScreenActivity.this, MainActivity.class));
                         }
@@ -60,6 +62,11 @@ public class LaunchScreenActivity extends AppCompatActivity {
                 finish();
             }
         }, LAUNCH_SCREEN_TIME_OUT);
+    }
+
+    private void subscribeToTopics() {
+        FirebaseMessaging.getInstance().subscribeToTopic(Constant.EARTHQUAKES_FEED_TOPIC);
+        FirebaseMessaging.getInstance().subscribeToTopic(Constant.SETTINGS_UPDATE_TOPIC);
     }
 
     @Override

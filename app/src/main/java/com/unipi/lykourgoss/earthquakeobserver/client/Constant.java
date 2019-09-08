@@ -16,15 +16,22 @@ public class Constant {
     // Notification channel ids
     public static final String OBSERVER_SERVICE_CHANNEL_ID = "ObserverServiceChannel";
     public static final String EARTHQUAKES_FEED_CHANNEL_ID = "EarthquakeFeedChannel";
+    public static final String UPDATE_CHANNEL_ID = "UpdateChannel";
 
     // Topic of FCM for Earthquake Updates
     public static final String EARTHQUAKES_FEED_TOPIC = "earthquakes-feed";
+    public static final String SETTINGS_UPDATE_TOPIC = "settings-update";
 
-    public static final int OBSERVER_SERVICE_ID = 1;
+    /*// shows if device is updated
+    public static final String IS_UPDATED = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.IS_UPDATED";*/
+
+    // Notification ids
+    public static final int OBSERVER_SERVICE_ID = 4;
+    public static final int UPDATE_SERVICE_ID = 3;
 
     // used for scheduling jobs
-    public static final int START_OBSERVER_SERVICE_JOB_ID = 2;
-    public static final int START_UPDATE_SERVICE_JOB_ID = 3;
+    public static final int START_OBSERVER_SERVICE_JOB_ID = 1;
+    public static final int START_UPDATE_SERVICE_JOB_ID = 2;
     public static final String EXTRA_SETTINGS = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.EXTRA_SETTINGS";
 
     // for Debugging purposes: custom action broadcasts

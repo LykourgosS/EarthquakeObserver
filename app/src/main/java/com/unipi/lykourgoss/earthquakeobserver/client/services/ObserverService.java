@@ -1,6 +1,5 @@
 package com.unipi.lykourgoss.earthquakeobserver.client.services;
 
-import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -9,6 +8,8 @@ import android.location.Location;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+
+import androidx.core.app.NotificationCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.EarthquakeEvent;
@@ -115,12 +116,12 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
 
         // todo only use foreground service on Oreo an higher -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
         if (true) { // if API is v.26 and higher start a foreground service
-            Notification notification = NotificationHelper.getObserverServiceNotification(this);
+            NotificationCompat.Builder notification = NotificationHelper.getObserverNotification(this);
 
             // when service started with:
             // 1. startService() -> without the following line system will kill the service after 1 min
             // 2. startForegroundService() -> if not called in 5 seconds max system will kill the service (on API v.26)
-            startForeground(Constant.OBSERVER_SERVICE_ID, notification); // id must be greater than 0
+            startForeground(Constant.OBSERVER_SERVICE_ID, notification.build()); // id must be greater than 0
         }
 
         // todo do heavy work on a background thread

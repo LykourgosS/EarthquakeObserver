@@ -69,6 +69,20 @@ public class ConfigDeviceActivity extends BaseActivity implements View.OnClickLi
                 boolean result = sharedPrefManager.write(Constant.SENSOR_BALANCE_VALUE, meanValue);
                 Log.d(TAG, "onSensorChanged: finish mean = " + meanValue + ", write: " + result);
                 addDeviceToFirebase(meanValue);
+                // TODO functionality to update balance sensor value (remove)
+                /*if (sharedPrefManager.read(Constant.IS_UPDATED, true)) {
+                    // if it is the first time that device is being configured IS_UPDATED will not
+                    // exist in Shared Preferences so it will add the device to firebase
+                    addDeviceToFirebase(meanValue);
+                } else {
+                    // if it's not the first time that device is being configured (so it has been
+                    // already added to firebase) only the balanceSensorValue will be updated for
+                    // the device in firebase (it won't add again the whole device)
+                    DeviceHandler.updateBalanceSensorValue(Util.getUniqueId(this), meanValue);
+                    Toast.makeText(this, "Device configuration completed successfully", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(this, MainActivity.class));
+                    finish();
+                }*/
             }
         } else {
             Log.d(TAG, "onSensorChanged: value out of range = " + normValue);

@@ -13,7 +13,6 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".activities.EarthquakeActivity" />
-        <activity android:name=".notifications.NotificationActivity" />
         <activity
             android:name=".activities.LaunchScreenActivity"
             android:theme="@style/AppTheme.LaunchTheme">
@@ -68,9 +67,13 @@
         <service
             android:name=".services.StartObserverJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name=".services.StartUpdateJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
         <service android:name=".services.ObserverService" />
         <service android:name=".services.UpdateService" />
-        <service android:name=".location.LocationService" /> <!-- todo what should become exported="false" ??? -->
+        <service android:name=".location.LocationService" />
+        <!-- todo what should become exported="false" ??? -->
         <service
             android:name=".notifications.FCMService"
             android:exported="false">

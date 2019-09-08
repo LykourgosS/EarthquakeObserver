@@ -50,6 +50,7 @@ public class MainActivity extends BaseActivity {
         IntentFilter filter = new IntentFilter(Constant.FAKE_BOOT);
         registerReceiver(receiver, filter);
 
+        checkLocationPermission();
         /*if (todo checkLocationPermission()) {
             Intent service = new Intent(this, ObserverService.class);
             ContextCompat.startForegroundService(this, service);
@@ -139,11 +140,11 @@ public class MainActivity extends BaseActivity {
         findViewById(R.id.button_log_location).setVisibility(visibility);
         findViewById(R.id.button_graph_only_norm).setVisibility(visibility);
         findViewById(R.id.button_graph_all).setVisibility(visibility);
-        findViewById(R.id.button_boot).setVisibility(visibility);
+        findViewById(R.id.button_boot).setVisibility(View.VISIBLE);
         findViewById(R.id.button_disconnect_power).setVisibility(visibility);
         findViewById(R.id.button_clear_event).setVisibility(visibility);
         findViewById(R.id.button_sign_in).setVisibility(visibility);
-        findViewById(R.id.button_start_service).setVisibility(visibility);
+        findViewById(R.id.button_start_service).setVisibility(View.VISIBLE);
         findViewById(R.id.button_stop_service).setVisibility(visibility);
         findViewById(R.id.text_view_battery_status).setVisibility(visibility);
     }

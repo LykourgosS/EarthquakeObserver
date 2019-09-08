@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver.client.notifications;
+package com.unipi.lykourgoss.earthquakeobserver.client.filestoremove;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;

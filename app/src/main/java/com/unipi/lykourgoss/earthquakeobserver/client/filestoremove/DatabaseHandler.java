@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver.client.tools.dbhandlers;
+package com.unipi.lykourgoss.earthquakeobserver.client.filestoremove;
 
 import android.util.Log;
 

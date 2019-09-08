@@ -2,6 +2,8 @@ package com.unipi.lykourgoss.earthquakeobserver.client.tools.dbhandlers;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,35 +26,54 @@ public class SettingsHandler {
 
     private static DatabaseReference settingsRef = databaseReference.child(SETTINGS_REF);
 
-    private OnUpdateSettingsListener listener;
+    private OnSettingsListener listener;
 
-    public SettingsHandler(OnUpdateSettingsListener onUpdateSettingsListener) {
-        this.listener = onUpdateSettingsListener;
+    public SettingsHandler(OnSettingsListener onSettingsListener) {
+        this.listener = onSettingsListener;
     }
 
-    public void getSettings() {
+    public void fetchSettings() {
         settingsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     Settings settings = dataSnapshot.getValue(Settings.class);
-                    listener.onSettingsUpdate(settings);
+                    listener.onSettingsFetched(settings);
+                } else {
+                    listener.onSettingsFetched(null);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                listener.onSettingsFetched(null);
             }
         });
     }
 
-    public interface OnUpdateSettingsListener {
+    public void updateSettings(Settings settings) {
+        settingsRef.setValue(settings).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                listener.onSettingsUpdated(task.isSuccessful());
+            }
+        });
+    }
+
+    public interface OnSettingsListener {
+
         /**
-         * Triggered when the {@link #getSettings()} is completed.
+         * Triggered when the {@link #fetchSettings()} is completed.
          *
          * @param settings Settings object fetched from Firebase.
          */
-        void onSettingsUpdate(Settings settings);
+        void onSettingsFetched(Settings settings);
+
+        /**
+         * Triggered when the {@link #updateSettings(Settings)} is completed.
+         *
+         * @param successfullyUpdated shows if settings updated successfully.
+         */
+        void onSettingsUpdated(boolean successfullyUpdated);
     }
 }

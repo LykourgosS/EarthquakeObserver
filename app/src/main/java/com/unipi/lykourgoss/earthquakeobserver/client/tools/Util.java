@@ -11,6 +11,8 @@ import android.widget.Toast;
 import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.Settings;
 import com.unipi.lykourgoss.earthquakeobserver.client.services.StartObserverJobService;
+import com.unipi.lykourgoss.earthquakeobserver.client.services.StartUpdateJobService;
+import com.unipi.lykourgoss.earthquakeobserver.client.services.UpdateService;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -65,7 +67,7 @@ public class Util {
     }
 
     public static void scheduleUpdateService(Context context) {
-        ComponentName serviceComponent = new ComponentName(context, StartObserverJobService.class);
+        ComponentName serviceComponent = new ComponentName(context, StartUpdateJobService.class);
         // JobId must be unique, otherwise it will replace the previous scheduled job, by our
         // application, with the same jobId
         JobInfo jobInfo = new JobInfo.Builder(Constant.START_UPDATE_SERVICE_JOB_ID, serviceComponent)
@@ -77,12 +79,13 @@ public class Util {
 
         int resultCode = jobScheduler.schedule(jobInfo);
 
+        // TODO: 09/08/2019 remove following
         if (resultCode == JobScheduler.RESULT_SUCCESS) {
             Log.d(TAG, "UpdateService scheduled");
-            Toast.makeText(context, "UpdateService scheduled", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "UpdateService scheduled", Toast.LENGTH_SHORT).show();
         } else {
             Log.d(TAG, "UpdateService scheduling failed");
-            Toast.makeText(context, "UpdateService scheduling failed", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "UpdateService scheduling failed", Toast.LENGTH_SHORT).show();
         }
 
         // log all pending and started jobs
