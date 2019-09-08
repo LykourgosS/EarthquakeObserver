@@ -25,7 +25,7 @@ public class Constant {
     // used for scheduling jobs
     public static final int START_OBSERVER_SERVICE_JOB_ID = 2;
     public static final int START_UPDATE_SERVICE_JOB_ID = 3;
-    public static final String EXTRA_CLIENT_SETTINGS = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.EXTRA_CLIENT_SETTINGS";
+    public static final String EXTRA_SETTINGS = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.EXTRA_SETTINGS";
 
     // for Debugging purposes: custom action broadcasts
     public static final String FAKE_BOOT = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.FAKE_BOOT";

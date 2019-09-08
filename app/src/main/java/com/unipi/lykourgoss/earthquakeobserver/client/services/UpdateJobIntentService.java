@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.JobIntentService;
 
 import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
-import com.unipi.lykourgoss.earthquakeobserver.client.models.ClientSettings;
+import com.unipi.lykourgoss.earthquakeobserver.client.models.Settings;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
 
 /**
@@ -35,7 +35,7 @@ public class UpdateJobIntentService extends JobIntentService {
     protected void onHandleWork(@NonNull Intent intent) {
         Log.d(TAG, "onHandleWork");
 
-        ClientSettings settings = (ClientSettings) intent.getSerializableExtra(Constant.EXTRA_CLIENT_SETTINGS);
+        Settings settings = (Settings) intent.getSerializableExtra(Constant.EXTRA_SETTINGS);
         Util.updateSettings(this, settings);
     }
 

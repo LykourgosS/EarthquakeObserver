@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver.client.tools;
+package com.unipi.lykourgoss.earthquakeobserver.client.tools.dbhandlers;
 
 import android.util.Log;
 
@@ -13,11 +13,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
-import com.unipi.lykourgoss.earthquakeobserver.client.models.ClientSettings;
+import com.unipi.lykourgoss.earthquakeobserver.client.models.Settings;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.Device;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.Earthquake;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.User;
+import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,7 +47,7 @@ public class DatabaseHandler {
 
     private static final String ADMINS_REF = "admins";
 
-    private static final String CLIENT_SETTINGS_REF = "client-settings";
+    private static final String SETTINGS_REF = "settings";
 
     private static DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
@@ -62,7 +63,7 @@ public class DatabaseHandler {
 
     private DatabaseReference adminsRef;
 
-    private DatabaseReference clientSettingsRef;
+    private DatabaseReference settingsRef;
 
     private OnUserAddListener onUserAddListener;
     private OnDeviceAddListener onDeviceAddListener;
@@ -80,7 +81,7 @@ public class DatabaseHandler {
         devicesRef = databaseReference.child(DEVICES_REF);
         usersRef = databaseReference.child(USERS_REF);
         adminsRef = databaseReference.child(ADMINS_REF);
-        clientSettingsRef = databaseReference.child(CLIENT_SETTINGS_REF);
+        settingsRef = databaseReference.child(SETTINGS_REF);
     }
 
     public void addOnUserAddListener(OnUserAddListener onUserAddListener) {
@@ -229,7 +230,7 @@ public class DatabaseHandler {
         });
     }
 
-    // TODO: 09/06/2019 remove comments from previous methods states
+     // TODO: 09/06/2019 remove comments from previous methods states
 
     public void addUser(final User user) {
 
@@ -363,11 +364,11 @@ public class DatabaseHandler {
     }
 
     public void getSettings() {
-        clientSettingsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        settingsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    ClientSettings settings = dataSnapshot.getValue(ClientSettings.class);
+                    Settings settings = dataSnapshot.getValue(Settings.class);
                     onUpdateSettingsListener.onSettingsUpdate(settings);
                 }
             }
@@ -417,8 +418,8 @@ public class DatabaseHandler {
         /**
          * Triggered when the {@link #getSettings()} is completed.
          *
-         * @param settings ClientSettings object fetched from Firebase.
+         * @param settings Settings object fetched from Firebase.
          */
-        void onSettingsUpdate(ClientSettings settings);
+        void onSettingsUpdate(Settings settings);
     }
 }

@@ -1,7 +1,6 @@
 package com.unipi.lykourgoss.earthquakeobserver.client.notifications;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -9,10 +8,9 @@ import androidx.annotation.NonNull;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
-import com.unipi.lykourgoss.earthquakeobserver.client.models.ClientSettings;
+import com.unipi.lykourgoss.earthquakeobserver.client.models.Settings;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.Earthquake;
 import com.unipi.lykourgoss.earthquakeobserver.client.services.UpdateJobIntentService;
-import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
 
 import java.util.Map;
 
@@ -55,7 +53,7 @@ public class FCMService extends FirebaseMessagingService {
                 Map<String, String> bundle = remoteMessage.getData();
 
                 Intent intent = new Intent(this, UpdateJobIntentService.class);
-                intent.putExtra(Constant.EXTRA_CLIENT_SETTINGS, new ClientSettings());
+                intent.putExtra(Constant.EXTRA_SETTINGS, new Settings());
                 UpdateJobIntentService.enqueueWork(this, intent);
             }
 

@@ -8,7 +8,7 @@ import java.util.Map;
  * on 06,September,2019.
  */
 
-public class ClientSettings implements Serializable {
+public class Settings implements Serializable {
 
     public static final String SAMPLING_PERIOD = "samplingPeriod";
     public static final String SAMPLES_BATCH_COUNT = "samplesBatchCount";
@@ -77,10 +77,10 @@ public class ClientSettings implements Serializable {
      * */
     private long lastUpdateTimestamp;
 
-    public ClientSettings() {
+    public Settings() {
     }
 
-    public ClientSettings(int samplingPeriod, int samplesBatchCount, long minEventDuration, float defaultBalanceSensorValue, float sensorValueThreshold, float configDeviceRejectSampleThreshold, long lastUpdateTimestamp) {
+    public Settings(int samplingPeriod, int samplesBatchCount, long minEventDuration, float defaultBalanceSensorValue, float sensorValueThreshold, float configDeviceRejectSampleThreshold, long lastUpdateTimestamp) {
         this.samplingPeriod = samplingPeriod;
         this.samplesBatchCount = samplesBatchCount;
         this.minEventDuration = minEventDuration;
@@ -90,7 +90,7 @@ public class ClientSettings implements Serializable {
         this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 
-    public ClientSettings(Map<String, String> settings) {
+    public Settings(Map<String, String> settings) {
     }
 
     public int getSamplingPeriod() {

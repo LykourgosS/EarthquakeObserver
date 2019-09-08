@@ -7,12 +7,12 @@ import android.widget.Toast;
 import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.client.R;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.Earthquake;
-import com.unipi.lykourgoss.earthquakeobserver.client.tools.DatabaseHandler;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
+import com.unipi.lykourgoss.earthquakeobserver.client.tools.dbhandlers.EarthquakeHandler;
 
-public class EarthquakeActivity extends BaseActivity implements DatabaseHandler.OnEarthquakeFetchListener {
+public class EarthquakeActivity extends BaseActivity implements EarthquakeHandler.OnEarthquakeFetchListener {
 
-    private DatabaseHandler databaseHandler;
+    private EarthquakeHandler earthquakeHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,9 +22,8 @@ public class EarthquakeActivity extends BaseActivity implements DatabaseHandler.
         String earthquakeId = getIntent().getStringExtra(Constant.EXTRA_EARTHQUAKE_ID);
         if (earthquakeId != null) {
             showProgressDialog();
-            databaseHandler = new DatabaseHandler(Util.getUniqueId(this));
-            databaseHandler.addOnEarthquakeFetchListener(this);
-            databaseHandler.getEarthquake(earthquakeId);
+            earthquakeHandler = new EarthquakeHandler(this);
+            earthquakeHandler.getEarthquake(earthquakeId);
         } else {
             Toast.makeText(this, "Error loading earthquake info", Toast.LENGTH_SHORT).show();
             finish();

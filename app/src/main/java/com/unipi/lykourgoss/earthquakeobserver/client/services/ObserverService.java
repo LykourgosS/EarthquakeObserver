@@ -1,7 +1,6 @@
 package com.unipi.lykourgoss.earthquakeobserver.client.services;
 
 import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -11,18 +10,15 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import androidx.core.app.NotificationCompat;
-
 import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
-import com.unipi.lykourgoss.earthquakeobserver.client.R;
-import com.unipi.lykourgoss.earthquakeobserver.client.activities.MainActivity;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.MinimalEarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.client.notifications.NotificationHelper;
-import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
-import com.unipi.lykourgoss.earthquakeobserver.client.tools.DatabaseHandler;
 import com.unipi.lykourgoss.earthquakeobserver.client.receivers.PowerDisconnectedReceiver;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.SharedPrefManager;
+import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
+import com.unipi.lykourgoss.earthquakeobserver.client.tools.dbhandlers.DeviceHandler;
+import com.unipi.lykourgoss.earthquakeobserver.client.tools.dbhandlers.EventHandler;
 
 import java.util.List;
 
@@ -49,7 +45,7 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
     private Locator locator;
     private Location lastLocation;
 
-    private DatabaseHandler databaseHandler;
+    private EventHandler eventHandler;
 
     private String deviceId;
 
@@ -87,8 +83,8 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
 
         // following are used for observing events and if needed save them to Firebase Database
         deviceId = Util.getUniqueId(this);
-        databaseHandler = new DatabaseHandler(deviceId);
-        databaseHandler.updateDeviceStatus(deviceId, true);
+        eventHandler = new EventHandler(deviceId);
+        DeviceHandler.updateDeviceStatus(deviceId, true);
     }
 
     public void initLocator() {
@@ -130,8 +126,8 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         // todo do heavy work on a background thread
         /*// following are used for observing events and if needed save them to Firebase Database
         deviceId = Util.getUniqueId(this);
-        databaseHandler = new DatabaseHandler(deviceId);
-        databaseHandler.updateDeviceStatus(deviceId, true);*/
+        eventHandler = new DatabaseHandler(deviceId);
+        eventHandler.updateDeviceStatus(deviceId, true);*/
 
         // to stop service from here (it will trigger onDestroy())
         //stopSelf();
@@ -150,7 +146,7 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         //Util.scheduleObserverService(this); // todo (is it needed) if user stop our service schedule to re-start it
         unregisterReceiver(receiver);
         if (isStarted) {
-            databaseHandler.updateDeviceStatus(deviceId, false);
+            DeviceHandler.updateDeviceStatus(deviceId, false);
         }
         earthquakeManager.unregisterListener();
         locator.removeUpdates();
@@ -195,21 +191,21 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
                 .setLatitude(0/*todo use lastLocation.getLatitude()*/)
                 .setLongitude(0/*todo use lastLocation.getLongitude()*/)
                 .build();
-        databaseHandler.addEventToMinors(earthquakeEvent);
+        eventHandler.addEventToMinors(earthquakeEvent);
     }
 
     @Override
     public void addMajorEvent() {
-        databaseHandler.addEventToMajors();
+        eventHandler.addEventToMajors();
     }
 
     @Override
     public void updateEvent(boolean isMajor, int valueIndex, float sensorValue, long endTime) {
-        databaseHandler.updateEvent(isMajor, valueIndex, sensorValue, endTime);
+        eventHandler.updateEvent(isMajor, valueIndex, sensorValue, endTime);
     }
 
     @Override
     public void terminateEvent(boolean isMajor) {
-        databaseHandler.terminateEvent(isMajor);
+        eventHandler.terminateEvent(isMajor);
     }
 }

@@ -23,7 +23,7 @@
 //import com.unipi.lykourgoss.earthquakeobserver.client.services.Locator;
 //import com.unipi.lykourgoss.earthquakeobserver.client.tools.SharedPrefManager;
 //import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
-//import com.unipi.lykourgoss.earthquakeobserver.client.tools.DatabaseHandler;
+//import com.unipi.lykourgoss.earthquakeobserver.client.tools.dbhandlers.DatabaseHandler;
 //
 //import java.util.ArrayList;
 //import java.util.List;

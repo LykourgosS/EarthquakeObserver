@@ -27,9 +27,9 @@ import com.unipi.lykourgoss.earthquakeobserver.client.R;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.User;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.SharedPrefManager;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
-import com.unipi.lykourgoss.earthquakeobserver.client.tools.DatabaseHandler;
+import com.unipi.lykourgoss.earthquakeobserver.client.tools.dbhandlers.UserHandler;
 
-public class SignInActivity extends BaseActivity implements View.OnClickListener, DatabaseHandler.OnUserAddListener {
+public class SignInActivity extends BaseActivity implements View.OnClickListener, UserHandler.OnUserAddListener {
 
     private static final String TAG = "SignInActivity";
 
@@ -40,7 +40,7 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
 
     private GoogleSignInClient googleSignInClient;
 
-    private DatabaseHandler databaseHandler;
+    private UserHandler userHandler;
 
     /**
      * On the sign in button clicked methods called accordingly:
@@ -67,8 +67,7 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
 
         firebaseAuth = FirebaseAuth.getInstance();
 
-        databaseHandler = new DatabaseHandler(Util.getUniqueId(this));
-        databaseHandler.addOnUserAddListener(this);
+        userHandler = new UserHandler(this);
     }
 
     @Override
@@ -131,7 +130,7 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
                     Log.d(TAG, "signInWithCredential:success");
                     // add user to Firebase Database
                     FirebaseUser user = task.getResult().getUser();
-                    databaseHandler.addUser(new User(user.getUid(), user.getEmail()));
+                    userHandler.addUser(new User(user.getUid(), user.getEmail()));
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.d(TAG, "signInWithCredential:failure", task.getException());
@@ -175,7 +174,7 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
     @Override
     public void onUserAdded(boolean userAddedSuccessfully) {
         if (userAddedSuccessfully) {
-            databaseHandler.checkIfUserIsAdmin(firebaseAuth.getCurrentUser().getEmail());
+            userHandler.checkIfUserIsAdmin(firebaseAuth.getCurrentUser().getEmail());
         } else {
             hideProgressDialog();
             // Sign In or Saving User object to Firebase Database got wrong, request signing in again

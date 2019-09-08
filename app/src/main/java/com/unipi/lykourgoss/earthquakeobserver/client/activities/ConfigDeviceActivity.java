@@ -20,9 +20,9 @@ import com.unipi.lykourgoss.earthquakeobserver.client.models.MinimalEarthquakeEv
 import com.unipi.lykourgoss.earthquakeobserver.client.models.SensorInfo;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.SharedPrefManager;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
-import com.unipi.lykourgoss.earthquakeobserver.client.tools.DatabaseHandler;
+import com.unipi.lykourgoss.earthquakeobserver.client.tools.dbhandlers.DeviceHandler;
 
-public class ConfigDeviceActivity extends BaseActivity implements View.OnClickListener, SensorEventListener, DatabaseHandler.OnDeviceAddListener {
+public class ConfigDeviceActivity extends BaseActivity implements View.OnClickListener, SensorEventListener, DeviceHandler.OnDeviceAddListener {
 
     private static final String TAG = ConfigDeviceActivity.class.getSimpleName();
 
@@ -34,7 +34,7 @@ public class ConfigDeviceActivity extends BaseActivity implements View.OnClickLi
     private float valueCount;
     private float valueSum;
 
-    private DatabaseHandler databaseHandler;
+    private DeviceHandler deviceHandler;
 
     private Button buttonConfigDevice;
     private ProgressBar progressBarConfig;
@@ -54,8 +54,7 @@ public class ConfigDeviceActivity extends BaseActivity implements View.OnClickLi
 
         sharedPrefManager = SharedPrefManager.getInstance(this);
 
-        databaseHandler = new DatabaseHandler(Util.getUniqueId(this));
-        databaseHandler.addOnDeviceAddListener(this);
+        deviceHandler = new DeviceHandler(this);
     }
 
     @Override
@@ -88,7 +87,7 @@ public class ConfigDeviceActivity extends BaseActivity implements View.OnClickLi
                 .setFirebaseAuthUid(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .setSensorInfo(sensorInfo)
                 .build();
-        databaseHandler.addDevice(device);
+        deviceHandler.addDevice(device);
     }
 
     @Override

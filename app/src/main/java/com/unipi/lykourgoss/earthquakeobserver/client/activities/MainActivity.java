@@ -23,7 +23,7 @@ import com.unipi.lykourgoss.earthquakeobserver.client.receivers.BootCompletedRec
 import com.unipi.lykourgoss.earthquakeobserver.client.services.ObserverService;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.SharedPrefManager;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
-import com.unipi.lykourgoss.earthquakeobserver.client.tools.DatabaseHandler;
+import com.unipi.lykourgoss.earthquakeobserver.client.tools.dbhandlers.EventHandler;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -114,8 +114,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public void clearEvents(View v) {
-        String deviceId = Util.getUniqueId(this);
-        DatabaseHandler handler = new DatabaseHandler(deviceId);
+        EventHandler handler = new EventHandler(Util.getUniqueId(this));
         handler.deleteSavedEvents();
     }
 
@@ -125,10 +124,6 @@ public class MainActivity extends BaseActivity {
 
     public void startService(View view) {
         Intent intentService = new Intent(this, ObserverService.class);
-
-        // to start the service while app is on the background call
-        // startForegroundService(intentService), but after 5 seconds max should call
-        // startForeground(...) within Service onStartCommand()!!!
         ContextCompat.startForegroundService(this, intentService);
     }
 

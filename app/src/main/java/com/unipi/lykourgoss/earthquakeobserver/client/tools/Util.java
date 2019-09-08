@@ -9,7 +9,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
-import com.unipi.lykourgoss.earthquakeobserver.client.models.ClientSettings;
+import com.unipi.lykourgoss.earthquakeobserver.client.models.Settings;
 import com.unipi.lykourgoss.earthquakeobserver.client.services.StartObserverJobService;
 
 import java.text.SimpleDateFormat;
@@ -17,13 +17,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static com.unipi.lykourgoss.earthquakeobserver.client.models.ClientSettings.CONFIG_DEVICE_REJECT_SAMPLE_THRESHOLD;
-import static com.unipi.lykourgoss.earthquakeobserver.client.models.ClientSettings.DEFAULT_BALANCE_SENSOR_VALUE;
-import static com.unipi.lykourgoss.earthquakeobserver.client.models.ClientSettings.LAST_UPDATE_TIMESTAMP;
-import static com.unipi.lykourgoss.earthquakeobserver.client.models.ClientSettings.MIN_EVENT_DURATION;
-import static com.unipi.lykourgoss.earthquakeobserver.client.models.ClientSettings.SAMPLES_BATCH_COUNT;
-import static com.unipi.lykourgoss.earthquakeobserver.client.models.ClientSettings.SAMPLING_PERIOD;
-import static com.unipi.lykourgoss.earthquakeobserver.client.models.ClientSettings.SENSOR_VALUE_THRESHOLD;
+import static com.unipi.lykourgoss.earthquakeobserver.client.models.Settings.CONFIG_DEVICE_REJECT_SAMPLE_THRESHOLD;
+import static com.unipi.lykourgoss.earthquakeobserver.client.models.Settings.DEFAULT_BALANCE_SENSOR_VALUE;
+import static com.unipi.lykourgoss.earthquakeobserver.client.models.Settings.LAST_UPDATE_TIMESTAMP;
+import static com.unipi.lykourgoss.earthquakeobserver.client.models.Settings.MIN_EVENT_DURATION;
+import static com.unipi.lykourgoss.earthquakeobserver.client.models.Settings.SAMPLES_BATCH_COUNT;
+import static com.unipi.lykourgoss.earthquakeobserver.client.models.Settings.SAMPLING_PERIOD;
+import static com.unipi.lykourgoss.earthquakeobserver.client.models.Settings.SENSOR_VALUE_THRESHOLD;
 
 /**
  * Created by LykourgosS <lpsarantidis@gmail.com>
@@ -117,7 +117,7 @@ public class Util {
         return uniqueId;
     }
 
-    public static void updateSettings(Context context, ClientSettings settings) {
+    public static void updateSettings(Context context, Settings settings) {
         SharedPrefManager manager = SharedPrefManager.getInstance(context);
         manager.write(SAMPLING_PERIOD, settings.getSamplingPeriod());
         manager.write(SAMPLES_BATCH_COUNT, settings.getSamplesBatchCount());
