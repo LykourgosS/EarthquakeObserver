@@ -42,6 +42,7 @@ public class Util {
         // application, with the same jobId
         JobInfo jobInfo = new JobInfo.Builder(Constant.START_OBSERVER_SERVICE_JOB_ID, serviceComponent)
                 .setRequiresCharging(true)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 //.setRequiresDeviceIdle(true)
                 //.setOverrideDeadline(1000) // The job will be run by this deadline even if other requirements are not met
                 //.setPersisted(true)

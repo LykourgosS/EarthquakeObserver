@@ -37,7 +37,6 @@ public class Locator implements LocationListener {
     public Locator(Context context) {
         this.context = context;
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-//        locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, UPDATES_PERIOD, 10, this);
         /**
          * updates every ~20 seconds
          * locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, UPDATES_PERIOD, 0, this);
@@ -45,8 +44,8 @@ public class Locator implements LocationListener {
          * updates every ~10 seconds
          * locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, UPDATES_PERIOD, 0, this);
          * */
-//        LocationProvider provider = locationManager.getProvider(locationManager.getBestProvider(createCriteria(), true));
-        locationManager.requestLocationUpdates(provider, Constant.LOCATION_REQUEST_INTERVAL, 0, this);
+        //LocationProvider provider = locationManager.getProvider(locationManager.getBestProvider(createCriteria(), true));
+        locationManager.requestLocationUpdates(provider, Constant.LOCATION_REQUEST_INTERVAL, MAX_DISTANCE_CONNECTED__TO_AC, this);
         lastLocation = locationManager.getLastKnownLocation(provider);
         lastUpdateTime = SystemClock.elapsedRealtime();
         Log.d(TAG, "Locator: " + lastLocation);
@@ -78,18 +77,18 @@ public class Locator implements LocationListener {
         return isMoving;
     }
 
-    // todo remove isFixed
+    /*// todo remove isFixed
     private boolean isFixed = false;
 
     private boolean isFixed() {
         return isFixed;
-    }
+    }*/
 
     @Override
     public void onLocationChanged(Location location) {
-        // when the onLocationChanged triggered the first time means provider is fixed and only the
+        /*// when the onLocationChanged triggered the first time means provider is fixed and only the
         // first time isFixed will become true
-        if (!isFixed) isFixed = true;
+        if (!isFixed) isFixed = true;*/
 
         long timeNow = SystemClock.elapsedRealtime();
         Log.d(TAG, "onLocationChangedPeriod: " + ((timeNow - lastUpdateTime) / 1000.0));
