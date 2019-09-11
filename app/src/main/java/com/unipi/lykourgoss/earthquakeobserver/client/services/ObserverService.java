@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.SensorEvent;
 import android.location.Location;
+import android.net.ConnectivityManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -15,7 +16,7 @@ import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.EarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.client.models.MinimalEarthquakeEvent;
 import com.unipi.lykourgoss.earthquakeobserver.client.notifications.NotificationHelper;
-import com.unipi.lykourgoss.earthquakeobserver.client.receivers.PowerDisconnectedReceiver;
+import com.unipi.lykourgoss.earthquakeobserver.client.receivers.StopObserverReceiver;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.SharedPrefManager;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.dbhandlers.DeviceHandler;
@@ -28,11 +29,9 @@ import java.util.List;
  * on 10,July,2019.
  */
 
-public class ObserverService extends Service implements EarthquakeManager.OnEarthquakeListener {
+public class ObserverService extends Service implements EarthquakeManager.OnEarthquakeListener, Locator.LocatorUpdatesListener {
 
     public static final String TAG = "ObserverService";
-
-    private boolean isStarted = false;
 
     // Binder given to clients
     private final IBinder binder = new ObserverBinder();
@@ -50,7 +49,7 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
 
     private String deviceId;
 
-    private PowerDisconnectedReceiver receiver = new PowerDisconnectedReceiver();
+    private StopObserverReceiver receiver = new StopObserverReceiver();
 
     /**
      * Class used for the client Binder.  Because we know this service always
@@ -68,19 +67,24 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         Log.d(TAG, "ObserverService: Constructor");
     }
 
+    private void registerReceivers() {
+        IntentFilter filter = new IntentFilter(Intent.ACTION_POWER_DISCONNECTED);
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        filter.addAction(Constant.FAKE_POWER_DISCONNECTED);
+        filter.addAction(Constant.DEVICE_IS_MOVING);
+        registerReceiver(receiver, filter);
+    }
+
     @Override
     public void onCreate() { // triggered only once in the lifetime of the service
         super.onCreate();
         Log.d(TAG, "onCreate");
 
-        // register receiver for actions:
-        IntentFilter filter = new IntentFilter(Intent.ACTION_POWER_DISCONNECTED);
-        filter.addAction(Constant.FAKE_POWER_DISCONNECTED);
-        filter.addAction(Constant.DEVICE_IS_MOVING);
-        registerReceiver(receiver, filter);
+        registerReceivers();
 
-        initSensor();
-        initLocator();
+        float balanceValue = SharedPrefManager.getInstance(this).read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_BALANCE_SENSOR_VALUE);
+        earthquakeManager = new EarthquakeManager(this, balanceValue);
+        locator = new Locator(this, this);
 
         // following are used for observing events and if needed save them to Firebase Database
         deviceId = Util.getUniqueId(this);
@@ -88,47 +92,26 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         DeviceHandler.updateDeviceStatus(deviceId, true);
     }
 
-    public void initLocator() {
-        if (true/*!isLocatorInitialized*/) {
-            locator = new Locator(this) {
-                @Override
-                public void onLocationChanged(Location location) {
-                    super.onLocationChanged(location);
-                    lastLocation = location;
-                }
-            };
-            lastLocation = locator.getLastLocation();
-            // todo important line (the following!!!)
-            //isLocatorInitialized = true;
+    @Override
+    public void onLocatorStatusChanged(boolean isFixed) {
+        Log.d(TAG, "onLocatorStatusChanged: isFixed = " + isFixed);
+        if (isFixed) {
+            earthquakeManager.registerListener(this);
+        } else {
+            earthquakeManager.unregisterListener();
         }
-    }
-
-    public void initSensor() {
-        float balanceValue = SharedPrefManager.getInstance(this).read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_BALANCE_SENSOR_VALUE);
-        earthquakeManager = new EarthquakeManager(this, balanceValue);
-        earthquakeManager.registerListener(this);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) { // triggered every time we call startService()
         Log.d(TAG, "onStartCommand");
-        isStarted = true;
 
-        // todo only use foreground service on Oreo an higher -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-        if (true) { // if API is v.26 and higher start a foreground service
-            NotificationCompat.Builder notification = NotificationHelper.getObserverNotification(this);
+        NotificationCompat.Builder notification = NotificationHelper.getObserverNotification(this);
 
-            // when service started with:
-            // 1. startService() -> without the following line system will kill the service after 1 min
-            // 2. startForegroundService() -> if not called in 5 seconds max system will kill the service (on API v.26)
-            startForeground(Constant.OBSERVER_SERVICE_ID, notification.build()); // id must be greater than 0
-        }
-
-        // todo do heavy work on a background thread
-        /*// following are used for observing events and if needed save them to Firebase Database
-        deviceId = Util.getUniqueId(this);
-        eventHandler = new DatabaseHandler(deviceId);
-        eventHandler.updateDeviceStatus(deviceId, true);*/
+        // when service started with:
+        // 1. startService() -> without the following line system will kill the service after 1 min
+        // 2. startForegroundService() -> if not called in 5 seconds max system will kill the service (on API v.26)
+        startForeground(Constant.OBSERVER_SERVICE_ID, notification.build()); // id must be greater than 0
 
         // to stop service from here (it will trigger onDestroy())
         //stopSelf();
@@ -136,7 +119,7 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         // START_NOT_STICKY = when the system kills the service it won't be recreated again
         // START_STICKY = when the system kills the service it will be recreated with a null intent
         // START_REDELIVER_INTENT = when the system kills the service it will be recreated with the last intent
-        return START_STICKY; // TODO is it ok to use START_STICKY ?
+        return START_STICKY;
     }
 
     @Override
@@ -144,15 +127,14 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         super.onDestroy();
         Log.d(TAG, "onDestroy");
 
-        //Util.scheduleObserverService(this); // todo (is it needed) if user stop our service schedule to re-start it
         unregisterReceiver(receiver);
-        if (isStarted) {
-            DeviceHandler.updateDeviceStatus(deviceId, false);
-        }
+
+        DeviceHandler.updateDeviceStatus(deviceId, false);
+
         earthquakeManager.unregisterListener();
         locator.removeUpdates();
-        // todo not sure if needed!
-        //isStarted = false;
+
+        Util.scheduleObserverService(this);
     }
 
     @Override
@@ -189,8 +171,8 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         EarthquakeEvent earthquakeEvent = new EarthquakeEvent.Builder(eventList)
                 .setDeviceId(deviceId)
                 .addSensorValue(sensorValue)
-                .setLatitude(0/*todo use lastLocation.getLatitude()*/)
-                .setLongitude(0/*todo use lastLocation.getLongitude()*/)
+                .setLatitude(locator.getLastLocation().getLatitude())
+                .setLongitude(locator.getLastLocation().getLongitude())
                 .build();
         eventHandler.addEventToMinors(earthquakeEvent);
     }

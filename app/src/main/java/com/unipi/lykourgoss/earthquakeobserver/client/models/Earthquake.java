@@ -16,7 +16,7 @@ public class Earthquake {
 
     private String id;
 
-    private Map<String, Boolean> devices;
+    private Map<String, MinimalDevice> devices;
 
     private boolean isActive;
 
@@ -35,7 +35,7 @@ public class Earthquake {
     public Earthquake() {
     }
 
-    public Earthquake(Map<String, Boolean> devices, boolean isActive, long startTime) {
+    public Earthquake(Map<String, MinimalDevice> devices, boolean isActive, long startTime) {
         this.devices = devices;
         this.isActive = isActive;
         this.startTime = startTime;
@@ -49,7 +49,7 @@ public class Earthquake {
         this.id = id;
     }
 
-    public Map<String, Boolean> getDevices() {
+    public Map<String, MinimalDevice> getDevices() {
         return devices;
     }
 
