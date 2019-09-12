@@ -1,5 +1,7 @@
 package com.unipi.lykourgoss.earthquakeobserver.client.services;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -89,24 +91,31 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         // following are used for observing events and if needed save them to Firebase Database
         deviceId = Util.getUniqueId(this);
         eventHandler = new EventHandler(deviceId);
-        DeviceHandler.updateDeviceStatus(deviceId, true);
+
     }
 
     @Override
     public void onLocatorStatusChanged(boolean isFixed) {
-        Log.d(TAG, "onLocatorStatusChanged: isFixed = " + isFixed);
+        Log.d(TAG, "onLocatorStatusChanged: " + locator.getLastLocation());
+        String text;
         if (isFixed) {
             earthquakeManager.registerListener(this);
+            text = "Observing...";
         } else {
             earthquakeManager.unregisterListener();
+            text = "No location or device is moving.";
         }
+        DeviceHandler.updateDeviceStatus(deviceId, isFixed);
+        NotificationCompat.Builder notification = NotificationHelper.getObserverNotification(this, text);
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        manager.notify(Constant.OBSERVER_SERVICE_ID, notification.build());
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) { // triggered every time we call startService()
         Log.d(TAG, "onStartCommand");
 
-        NotificationCompat.Builder notification = NotificationHelper.getObserverNotification(this);
+        NotificationCompat.Builder notification = NotificationHelper.getObserverNotification(this, "Initializing...");
 
         // when service started with:
         // 1. startService() -> without the following line system will kill the service after 1 min
@@ -168,13 +177,15 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
 
     @Override
     public void addMinorEvent(List<MinimalEarthquakeEvent> eventList, float sensorValue) {
-        EarthquakeEvent earthquakeEvent = new EarthquakeEvent.Builder(eventList)
-                .setDeviceId(deviceId)
-                .addSensorValue(sensorValue)
-                .setLatitude(locator.getLastLocation().getLatitude())
-                .setLongitude(locator.getLastLocation().getLongitude())
-                .build();
-        eventHandler.addEventToMinors(earthquakeEvent);
+        //if (locator.getLastLocation() != null) {
+            EarthquakeEvent earthquakeEvent = new EarthquakeEvent.Builder(eventList)
+                    .setDeviceId(deviceId)
+                    .addSensorValue(sensorValue)
+                    .setLatitude(locator.getLastLocation().getLatitude())
+                    .setLongitude(locator.getLastLocation().getLongitude())
+                    .build();
+            eventHandler.addEventToMinors(earthquakeEvent);
+        //}
     }
 
     @Override

@@ -31,7 +31,7 @@ public class LaunchScreenActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate");
 
-        subscribeToTopics();
+        //subscribeToTopics();
 
         sharedPrefManager = SharedPrefManager.getInstance(this);
 
@@ -64,10 +64,11 @@ public class LaunchScreenActivity extends AppCompatActivity {
         }, LAUNCH_SCREEN_TIME_OUT);
     }
 
-    private void subscribeToTopics() {
+    // TODO: 09/12/2019 move to App
+    /*private void subscribeToTopics() {
         FirebaseMessaging.getInstance().subscribeToTopic(Constant.EARTHQUAKES_FEED_TOPIC);
         FirebaseMessaging.getInstance().subscribeToTopic(Constant.SETTINGS_UPDATE_TOPIC);
-    }
+    }*/
 
     @Override
     protected void onDestroy() {

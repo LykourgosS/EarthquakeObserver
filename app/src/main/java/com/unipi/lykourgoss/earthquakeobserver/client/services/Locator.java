@@ -33,7 +33,7 @@ public class Locator implements LocationListener {
     public Locator(Context context, LocatorUpdatesListener listener) {
         this.listener = listener;
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(PROVIDER, Constant.LOCATION_REQUEST_INTERVAL, MAX_DISTANCE_CONNECTED__TO_AC, this);
+        locationManager.requestLocationUpdates(PROVIDER, Constant.LOCATION_REQUEST_INTERVAL, 0, this);
         //lastLocation = locationManager.getLastKnownLocation(PROVIDER);
         //Log.d(TAG, "Locator: " + lastLocation);
         //listener.onLocatorInit(locationManager.isProviderEnabled(PROVIDER));
@@ -49,12 +49,18 @@ public class Locator implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(TAG, "onLocationChanged: " + location);
         if (lastLocation == null) {
+            Log.d(TAG, "onLocationChanged: first location = " + location);
             lastLocation = location;
             listener.onLocatorStatusChanged(true);
         } else if (location.distanceTo(lastLocation) > MAX_DISTANCE_CONNECTED__TO_AC) {
+            Log.d(TAG, "onLocationChanged: max distance exceeded, distance = " + location.distanceTo(lastLocation));
             listener.onLocatorStatusChanged(false);
+        } else {
+            // could be removed last assignment, because distance is not greater from
+            // MAX_DISTANCE_CONNECTED__TO_AC (used mainly for debugging to see the location updates)
+            Log.d(TAG, "onLocationChanged: distance = " + location.distanceTo(lastLocation));
+            lastLocation = location;
         }
     }
 
@@ -69,7 +75,6 @@ public class Locator implements LocationListener {
     public void onProviderEnabled(String provider) {
         Log.d(TAG, "onProviderEnabled: " + locationManager.getLastKnownLocation(provider));
         lastLocation = null;
-        listener.onLocatorStatusChanged(true);
     }
 
     @SuppressLint("MissingPermission")
@@ -80,6 +85,7 @@ public class Locator implements LocationListener {
 //        context.startActivity(intent);
         Log.d(TAG, "onProviderDisabled: " + locationManager.getLastKnownLocation(provider));
         listener.onLocatorStatusChanged(false);
+        lastLocation = null;
     }
 
     public interface LocatorUpdatesListener {

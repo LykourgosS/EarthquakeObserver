@@ -12,6 +12,7 @@ import androidx.core.app.NotificationManagerCompat;
 import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.client.R;
 import com.unipi.lykourgoss.earthquakeobserver.client.activities.EarthquakeActivity;
+import com.unipi.lykourgoss.earthquakeobserver.client.activities.LaunchScreenActivity;
 import com.unipi.lykourgoss.earthquakeobserver.client.activities.MainActivity;
 
 /**
@@ -74,18 +75,17 @@ public class NotificationHelper {
         return notification;
     }
 
-    // TODO: 09/06/2019 add showServiceNotification
-    public static NotificationCompat.Builder getObserverNotification(Context context) {
-        Intent intentNotification = new Intent(context, MainActivity.class);
+    public static NotificationCompat.Builder getObserverNotification(Context context, String text) {
+        Intent intentNotification = new Intent(context, LaunchScreenActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intentNotification, 0);
 
         NotificationCompat.Builder notification = new NotificationCompat.Builder(context, Constant.OBSERVER_SERVICE_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_track_changes_white_24dp)
                 .setColor(context.getResources().getColor(R.color.colorAccent))
-                .setContentTitle("Example Service")
-                .setContentText("Observing...")
+                .setContentTitle("Observing for earthquakes")
+                .setContentText(text)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setOnlyAlertOnce(true) // todo used when the pauser is added (incoming calls etc.)
+                .setOnlyAlertOnce(true) // todo used when the pauser class is added (incoming calls etc.)
                 .setContentIntent(pendingIntent);
         return notification;
     }

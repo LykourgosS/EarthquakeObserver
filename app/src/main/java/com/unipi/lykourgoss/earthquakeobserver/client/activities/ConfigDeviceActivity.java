@@ -88,6 +88,7 @@ public class ConfigDeviceActivity extends BaseActivity implements View.OnClickLi
             Log.d(TAG, "onSensorChanged: value out of range = " + normValue);
             valueSum = 0;
             valueCount = 0;
+            Toast.makeText(this, "Do not move your device.", Toast.LENGTH_LONG).show();
         }
         progressBarConfig.setProgress((int) valueCount);
     }

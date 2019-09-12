@@ -24,6 +24,12 @@ public class App extends Application {
         // every time the app is launched onCreate is triggered, but once a channel is already
         // created trying to created again does nothing...
         createNotificationChannels();
+        subscribeToTopics();
+    }
+
+    private void subscribeToTopics() {
+        FirebaseMessaging.getInstance().subscribeToTopic(Constant.EARTHQUAKES_FEED_TOPIC);
+        FirebaseMessaging.getInstance().subscribeToTopic(Constant.SETTINGS_UPDATE_TOPIC);
     }
 
     private void createNotificationChannels() {
