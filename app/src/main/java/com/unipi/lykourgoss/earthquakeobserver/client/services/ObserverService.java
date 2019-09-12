@@ -1,6 +1,5 @@
 package com.unipi.lykourgoss.earthquakeobserver.client.services;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
@@ -45,7 +44,6 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
     private EarthquakeManager earthquakeManager;
 
     private Locator locator;
-    private Location lastLocation;
 
     private EventHandler eventHandler;
 
@@ -86,11 +84,8 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
 
         float balanceValue = SharedPrefManager.getInstance(this).read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_BALANCE_SENSOR_VALUE);
         earthquakeManager = new EarthquakeManager(this, balanceValue);
-        locator = new Locator(this, this);
+        //todo only onStart locator = new Locator(this, this);
 
-        // following are used for observing events and if needed save them to Firebase Database
-        deviceId = Util.getUniqueId(this);
-        eventHandler = new EventHandler(deviceId);
 
     }
 
@@ -125,6 +120,11 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         // to stop service from here (it will trigger onDestroy())
         //stopSelf();
 
+        // following are used for observing events and if needed save them to Firebase Database
+        locator = new Locator(this, this);
+        deviceId = Util.getUniqueId(this);
+        eventHandler = new EventHandler(deviceId);
+
         // START_NOT_STICKY = when the system kills the service it won't be recreated again
         // START_STICKY = when the system kills the service it will be recreated with a null intent
         // START_REDELIVER_INTENT = when the system kills the service it will be recreated with the last intent
@@ -137,18 +137,20 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         Log.d(TAG, "onDestroy");
 
         unregisterReceiver(receiver);
-
-        DeviceHandler.updateDeviceStatus(deviceId, false);
-
         earthquakeManager.unregisterListener();
-        locator.removeUpdates();
 
-        Util.scheduleObserverService(this);
+        if (locator != null) { // means the service has been started
+            locator.removeUpdates();
+            DeviceHandler.updateDeviceStatus(deviceId, false);
+        }
+
+        //todo ? Util.scheduleObserverService(this);
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         Log.d(TAG, "onBind");
+        earthquakeManager.registerListener(this);
         return binder;
     }
 
@@ -165,7 +167,7 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
     }
 
     public Location getLastLocation() {
-        return lastLocation;
+        return locator.getLastLocation();
     }
 
     @Override
@@ -177,7 +179,7 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
 
     @Override
     public void addMinorEvent(List<MinimalEarthquakeEvent> eventList, float sensorValue) {
-        //if (locator.getLastLocation() != null) {
+        if (locator != null) { // means the service is started
             EarthquakeEvent earthquakeEvent = new EarthquakeEvent.Builder(eventList)
                     .setDeviceId(deviceId)
                     .addSensorValue(sensorValue)
@@ -185,21 +187,27 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
                     .setLongitude(locator.getLastLocation().getLongitude())
                     .build();
             eventHandler.addEventToMinors(earthquakeEvent);
-        //}
+        }
     }
 
     @Override
     public void addMajorEvent() {
-        eventHandler.addEventToMajors();
+        if (locator != null) { // means the service is started
+            eventHandler.addEventToMajors();
+        }
     }
 
     @Override
     public void updateEvent(boolean isMajor, int valueIndex, float sensorValue, long endTime) {
-        eventHandler.updateEvent(isMajor, valueIndex, sensorValue, endTime);
+        if (locator != null) { // means the service is started
+            eventHandler.updateEvent(isMajor, valueIndex, sensorValue, endTime);
+        }
     }
 
     @Override
     public void terminateEvent(boolean isMajor) {
-        eventHandler.terminateEvent(isMajor);
+        if (locator != null) { // means the service is started
+            eventHandler.terminateEvent(isMajor);
+        }
     }
 }

@@ -59,9 +59,17 @@ public class EarthquakeManager implements SensorEventListener {
 
     private boolean listenerIsRegistered = false;
 
-    public void registerListener(OnEarthquakeListener listener) {
+    /**
+     * if true means the service is started and we want to upload events, else the service is just
+     * bound and we don't want to upload events
+     * */
+    //private boolean uploadEvents;
+
+    public void registerListener(OnEarthquakeListener listener/*, boolean uploadEvents*/) {
         if (!listenerIsRegistered) {
+            Log.d(TAG, "registerListener");
             this.listener = listener;
+            //this.uploadEvents = uploadEvents;
             sensorManager.registerListener(this, accelerometer, Constant.SAMPLING_PERIOD);
             listenerIsRegistered = true;
         }
@@ -69,10 +77,13 @@ public class EarthquakeManager implements SensorEventListener {
 
     public void unregisterListener() {
         if (listenerIsRegistered) {
+            Log.d(TAG, "unregisterListener");
             sensorManager.unregisterListener(this);
             if (isQuaking) {
                 Log.d(TAG, "unregisterListener: Terminate last event");
-                listener.terminateEvent(isMajor);
+                //if (uploadEvents) {
+                    listener.terminateEvent(isMajor);
+                //}
                 isQuaking = false;
             }
             listenerIsRegistered = false;
@@ -124,15 +135,16 @@ public class EarthquakeManager implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         long nowMillis = SystemClock.elapsedRealtime();
-        Log.d(TAG, "onSensorChanged: diff = " + (nowMillis - millis));
+        //Log.d(TAG, "onSensorChanged: diff = " + (nowMillis - millis));
         millis = nowMillis;
         performLowPassFilter(sensorEvent);
         // todo use one of the 2 following ways !!!
         // todo probably remove performLowPassFilter(...) abnormal behavior, not following the automato
         // MinimalEarthquakeEvent minimalEarthquakeEvent = performLowPassFilter(event);
         MinimalEarthquakeEvent minimalEarthquakeEvent = new MinimalEarthquakeEvent(sensorEvent, balanceValue);
+        listener.onSensorChanged(sensorEvent, minimalEarthquakeEvent, acceleration);
         eventList.add(minimalEarthquakeEvent);
-        if (eventList.size() == Constant.SAMPLES_BATCH_COUNT) {
+        if (eventList.size() == Constant.SAMPLES_BATCH_COUNT/* && uploadEvents*/) {
             float meanValue = MinimalEarthquakeEvent.getMeanValue(eventList);
             // Log.d(TAG, "onSensorChanged: diff = " + (nowMillis - millis) + ", meanValue = " + String.format("%.4f", meanValue));
             boolean possibleEarthquake = MinimalEarthquakeEvent.getIfPossibleEarthquake(eventList);
@@ -168,7 +180,7 @@ public class EarthquakeManager implements SensorEventListener {
             }
             eventList.clear();
         }
-        listener.onSensorChanged(sensorEvent, minimalEarthquakeEvent, acceleration);
+        //listener.onSensorChanged(sensorEvent, minimalEarthquakeEvent, acceleration);
     }
 
     @Override

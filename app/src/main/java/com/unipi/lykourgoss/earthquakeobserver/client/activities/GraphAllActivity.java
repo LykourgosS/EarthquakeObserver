@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.hardware.SensorEvent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
@@ -155,8 +156,8 @@ public class GraphAllActivity extends AppCompatActivity implements ServiceConnec
 
         data.notifyDataChanged();
 
-        lineChart.getAxisLeft().setSpaceTop(data.getYMax());
-        lineChart.getAxisLeft().setSpaceBottom(data.getYMax());
+        //lineChart.getAxisLeft().setSpaceTop(data.getYMax());
+        //lineChart.getAxisLeft().setSpaceBottom(data.getYMax());
 
         // let the chart know it's data has changed
         lineChart.notifyDataSetChanged();
@@ -188,7 +189,8 @@ public class GraphAllActivity extends AppCompatActivity implements ServiceConnec
                     });
                 }
             }
-        }, 0, Constant.SAMPLING_PERIOD + 10); // period = 110, because accelerometer sampling period is 100 millis
+        }, 0, Constant.SAMPLING_PERIOD / 1000 + 10); // period = 110, because accelerometer sampling period is 100 millis
+
     }
 
     public void stopStartGraph(View v) {
