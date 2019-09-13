@@ -26,59 +26,35 @@ public class EventHandler {
 
     private static final String TAG = "EventHandler";
 
-    private static final String MINOR_ACTIVE_EVENTS_REF = "minor-active-events";
-    private static final String MAJOR_ACTIVE_EVENTS_REF = "major-active-events";
+    private static final String ACTIVE_EVENTS_REF = "major-active-events"; // todo remove major keyword
 
     private static final String SAVED_EVENTS_REF = "saved-events";
 
     private static DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
-    private DatabaseReference minorActiveEventRef;
-    private DatabaseReference majorActiveEventRef;
+    private DatabaseReference activeEventRef;
 
     private DatabaseReference savedEventsRef;
 
     public EventHandler(String deviceId) {
-        minorActiveEventRef = databaseReference.child(MINOR_ACTIVE_EVENTS_REF).child(deviceId);
-        majorActiveEventRef = databaseReference.child(MAJOR_ACTIVE_EVENTS_REF).child(deviceId);
+        activeEventRef = databaseReference.child(ACTIVE_EVENTS_REF).child(deviceId);
         savedEventsRef = databaseReference.child(SAVED_EVENTS_REF).child(deviceId);
     }
 
-    public void addEventToMinors(EarthquakeEvent newEvent) {
-        Log.d(TAG, "addEvent: minor");
-        String eventId = minorActiveEventRef.push().getKey();
-        newEvent.setEventId(eventId);
-        // todo remove listener
-        minorActiveEventRef.setValue(newEvent).addOnCompleteListener(new OnCompleteListener<Void>() {
+    public void addEvent(EarthquakeEvent event) {
+        Log.d(TAG, "addEvent");
+        String eventId = activeEventRef.push().getKey();
+        event.setEventId(eventId);
+        activeEventRef.setValue(event).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                Log.d(TAG, "Completed = " + task.isSuccessful());
+                Log.d(TAG, "addEvent completed = " + task.isSuccessful());
             }
         });
     }
 
-    public void addEventToMajors() {
-        Log.d(TAG, "addEventToMajors: event is now major");
-        minorActiveEventRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    EarthquakeEvent event = dataSnapshot.getValue(EarthquakeEvent.class);
-                    // add the event from minor-events to major-events
-                    majorActiveEventRef.setValue(event);
-                    // delete the event that moved from minor-events to major-events
-                    minorActiveEventRef.setValue(null);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
-    }
-
-    public void updateEvent(boolean isMajor, int valueIndex, float sensorValue, long endTime) {
-        Log.d(TAG, "updateEvent: isMajor = " + isMajor);
+    public void updateEvent(int valueIndex, float sensorValue, long endTime) {
+        Log.d(TAG, "updateEvent");
         Map<String, Object> eventUpdates = new HashMap<>();
 
         String valuePath = EarthquakeEvent.SENSOR_VALUES + "/" + valueIndex;
@@ -88,34 +64,32 @@ public class EventHandler {
 
         eventUpdates.put(EarthquakeEvent.END_DATE_TIME, Util.millisToDateTime(endTime));
 
-        if (isMajor) {
-            majorActiveEventRef.updateChildren(eventUpdates);
-        } else {
-            minorActiveEventRef.updateChildren(eventUpdates);
-        }
+        activeEventRef.updateChildren(eventUpdates);
     }
 
-    public void terminateEvent(boolean isMajor) {
-        Log.d(TAG, "terminateEvent: isMajor = " + isMajor);
-        if (isMajor) {
-            majorActiveEventRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        EarthquakeEvent event = dataSnapshot.getValue(EarthquakeEvent.class);
-                        Log.d(TAG, "terminateEvent: onDataChange: event saved");
+    public void terminateEvent() {
+        Log.d(TAG, "terminateEvent");
+        activeEventRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    EarthquakeEvent event = dataSnapshot.getValue(EarthquakeEvent.class);
+                    Log.d(TAG, "terminateEvent completed");
+                    if (event.getEventId() != null) {
+                        // if sampling period is too small or network's connection is slow,
+                        // checking that the event has been saved successfully for the first time
+                        // (and not just updated, which means will have only endTime, endDatetime,
+                        // and a sensor value) in active-events
                         savedEventsRef.child(event.getEventId()).setValue(event);
-                        majorActiveEventRef.setValue(null);
                     }
+                    activeEventRef.setValue(null);
                 }
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                }
-            });
-        } else {
-            minorActiveEventRef.setValue(null);
-        }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
     }
 
     public void deleteSavedEvents() {

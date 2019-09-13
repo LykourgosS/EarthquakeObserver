@@ -114,7 +114,7 @@ public class DatabaseHandler {
     }
 
     public void addEventToMajors() {
-        Log.d(TAG, "addEventToMajors: event is now major");
+        Log.d(TAG, "addEvent: event is now major");
         minorActiveEventRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

@@ -28,6 +28,7 @@ public class App extends Application {
     }
 
     private void subscribeToTopics() {
+        Log.d(TAG, "subscribeToTopics");
         FirebaseMessaging.getInstance().subscribeToTopic(Constant.EARTHQUAKES_FEED_TOPIC);
         FirebaseMessaging.getInstance().subscribeToTopic(Constant.SETTINGS_UPDATE_TOPIC);
     }

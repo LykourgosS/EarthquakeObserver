@@ -82,7 +82,7 @@ public class EarthquakeManager implements SensorEventListener {
             if (isQuaking) {
                 Log.d(TAG, "unregisterListener: Terminate last event");
                 //if (uploadEvents) {
-                    listener.terminateEvent(isMajor);
+                    listener.terminateEvent();
                 //}
                 isQuaking = false;
             }
@@ -127,61 +127,92 @@ public class EarthquakeManager implements SensorEventListener {
 
     private int valueCount;
 
-    private long startTime;
+    //private long startTime;
+
+    private long lastTimestamp;
     private boolean isMajor = false;
 
-
+    private EarthquakeEvent lastEarthquakeEvent;
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        long nowMillis = SystemClock.elapsedRealtime();
-        //Log.d(TAG, "onSensorChanged: diff = " + (nowMillis - millis));
-        millis = nowMillis;
-        performLowPassFilter(sensorEvent);
-        // todo use one of the 2 following ways !!!
-        // todo probably remove performLowPassFilter(...) abnormal behavior, not following the automato
-        // MinimalEarthquakeEvent minimalEarthquakeEvent = performLowPassFilter(event);
-        MinimalEarthquakeEvent minimalEarthquakeEvent = new MinimalEarthquakeEvent(sensorEvent, balanceValue);
-        listener.onSensorChanged(sensorEvent, minimalEarthquakeEvent, acceleration);
-        eventList.add(minimalEarthquakeEvent);
-        if (eventList.size() == Constant.SAMPLES_BATCH_COUNT/* && uploadEvents*/) {
-            float meanValue = MinimalEarthquakeEvent.getMeanValue(eventList);
-            // Log.d(TAG, "onSensorChanged: diff = " + (nowMillis - millis) + ", meanValue = " + String.format("%.4f", meanValue));
-            boolean possibleEarthquake = MinimalEarthquakeEvent.getIfPossibleEarthquake(eventList);
-            if (meanValue > Constant.SENSOR_THRESHOLD /* todo && possibleEarthquake*/) {
-                if (!isQuaking) {
-                    // add event
-                    valueCount = 0;
-                    startTime = eventList.get(0).getTimeInMillis();
-                    // todo add all measurements from MinimalEarthquakeEvent objects instead of only meanValue
-                    listener.addMinorEvent(eventList, meanValue);
-                    isQuaking = true;
-                } else {
-                    // update event
-                    valueCount++;
-                    long endTime = eventList.get(eventList.size() - 1).getTimeInMillis();
-                    listener.updateEvent(isMajor,valueCount, meanValue, endTime);
-                    if (!isMajor) {
-                        long duration = EarthquakeEvent.getDuration(startTime, endTime);
-                        if (duration >= Constant.MIN_EVENT_DURATION) {
-                            // event is the first time to become major, will be added in major-active-events
-                            isMajor = true;
-                            listener.addMajorEvent();
+        // to ensure we have constant sampling period -> check timestamp between new and last
+        // timestamp (SAMPLING_PERIOD is in microseconds and timestamp is in nanoseconds)
+        if (sensorEvent.timestamp - lastTimestamp >= Constant.SAMPLING_PERIOD * 1000) {
+            // do work every SAMPLING_PERIOD
+            //[START_OF_WORK]
+            performLowPassFilter(sensorEvent);
+            // todo use one of the 2 following ways !!!
+            // todo probably remove performLowPassFilter(...) abnormal behavior, not following the automato
+            // MinimalEarthquakeEvent minimalEarthquakeEvent = performLowPassFilter(event);
+            MinimalEarthquakeEvent minimalEarthquakeEvent = new MinimalEarthquakeEvent(sensorEvent, balanceValue);
+            listener.onSensorChanged(sensorEvent, minimalEarthquakeEvent, acceleration);
+            eventList.add(minimalEarthquakeEvent);
+            if (eventList.size() == Constant.SAMPLES_BATCH_COUNT/* && uploadEvents*/) {
+                float meanValue = MinimalEarthquakeEvent.getMeanValue(eventList);
+                boolean possibleEarthquake = MinimalEarthquakeEvent.getIfPossibleEarthquake(eventList);
+                if (meanValue > Constant.SENSOR_THRESHOLD /* todo && possibleEarthquake*/) {
+                    if (!isQuaking) {
+                        // add event
+                        valueCount = 0;
+                        // todo remove startTime = eventList.get(0).getTimeInMillis();
+                        // todo add all measurements from MinimalEarthquakeEvent objects instead of only meanValue
+                        Log.d(TAG, "onSensorChanged: new local event");
+                        lastEarthquakeEvent = listener.createMinorEvent(eventList, meanValue);
+                        isQuaking = true;
+                    } else {
+                        // update event
+                        valueCount++;
+                        long endTime = eventList.get(eventList.size() - 1).getTimeInMillis();
+                        // updating the local minor active event
+                        if (lastEarthquakeEvent != null) {
+                            lastEarthquakeEvent.addSensorValue(meanValue);
+                            lastEarthquakeEvent.setEndTime(endTime);
+                        }
+                        if (lastEarthquakeEvent != null && lastEarthquakeEvent.getDuration() >= Constant.MIN_EVENT_DURATION) {
+                            if (!isMajor) {
+                                // event is the first time to become major, will be added in major-active-events
+                                listener.addEvent(lastEarthquakeEvent);
+                                isMajor = true;
+                            } else {
+                                // updating the existing major event in firebase (in major-active-events)
+                                listener.updateEvent(valueCount, meanValue, endTime);
+                            }
+                        } else {
+                            Log.d(TAG, "onSensorChanged: updating event locally");
                         }
                     }
+                } else {
+                    if (isQuaking) {
+                        // terminate event
+                        if (isMajor) {
+                            listener.terminateEvent();
+                            isMajor = false;
+                        } else {
+                            Log.d(TAG, "onSensorChanged: terminating local event");
+                        }
+                        isQuaking = false;
+                        lastEarthquakeEvent = null;
+                    }
                 }
-            } else {
-                if (isQuaking) {
-                    // terminate event
-                    listener.terminateEvent(isMajor);
-                    isQuaking = false;
-                    isMajor = false;
-                }
+                eventList.clear();
             }
-            eventList.clear();
+            //[END_OF_WORK]
+            lastTimestamp = sensorEvent.timestamp;
         }
+
         //listener.onSensorChanged(sensorEvent, minimalEarthquakeEvent, acceleration);
     }
+
+    /*private void getNewEarthquakeEvent() {
+        EarthquakeEvent earthquakeEvent = new EarthquakeEvent.Builder(eventList)
+                .setDeviceId(deviceId)
+                .addSensorValue(sensorValue)
+                .setLatitude(locator.getLastLocation().getLatitude())
+                .setLongitude(locator.getLastLocation().getLongitude())
+                .build();
+        eventHandler.addEventToMinors(earthquakeEvent);
+    }*/
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -191,12 +222,12 @@ public class EarthquakeManager implements SensorEventListener {
     public interface OnEarthquakeListener {
         void onSensorChanged(SensorEvent sensorEvent, MinimalEarthquakeEvent minimalEarthquakeEvent, float acceleration);
 
-        void addMinorEvent(List<MinimalEarthquakeEvent> eventList, float sensorValue);
+        EarthquakeEvent createMinorEvent(List<MinimalEarthquakeEvent> eventList, float sensorValue);
 
-        void addMajorEvent();
+        void addEvent(EarthquakeEvent earthquakeEvent);
 
-        void updateEvent(boolean isMajor, int valueIndex, float sensorValue, long endTime);
+        void updateEvent(int valueIndex, float sensorValue, long endTime);
 
-        void terminateEvent(boolean isMajor);
+        void terminateEvent();
     }
 }

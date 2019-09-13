@@ -178,36 +178,36 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
     }
 
     @Override
-    public void addMinorEvent(List<MinimalEarthquakeEvent> eventList, float sensorValue) {
+    public EarthquakeEvent createMinorEvent(List<MinimalEarthquakeEvent> eventList, float sensorValue) {
         if (locator != null) { // means the service is started
-            EarthquakeEvent earthquakeEvent = new EarthquakeEvent.Builder(eventList)
+            return new EarthquakeEvent.Builder(eventList)
                     .setDeviceId(deviceId)
                     .addSensorValue(sensorValue)
                     .setLatitude(locator.getLastLocation().getLatitude())
                     .setLongitude(locator.getLastLocation().getLongitude())
                     .build();
-            eventHandler.addEventToMinors(earthquakeEvent);
+        }
+        return null;
+    }
+
+    @Override
+    public void addEvent(EarthquakeEvent earthquakeEvent) {
+        if (locator != null) { // means the service is started
+            eventHandler.addEvent(earthquakeEvent);
         }
     }
 
     @Override
-    public void addMajorEvent() {
+    public void updateEvent(int valueIndex, float sensorValue, long endTime) {
         if (locator != null) { // means the service is started
-            eventHandler.addEventToMajors();
+            eventHandler.updateEvent(valueIndex, sensorValue, endTime);
         }
     }
 
     @Override
-    public void updateEvent(boolean isMajor, int valueIndex, float sensorValue, long endTime) {
+    public void terminateEvent() {
         if (locator != null) { // means the service is started
-            eventHandler.updateEvent(isMajor, valueIndex, sensorValue, endTime);
-        }
-    }
-
-    @Override
-    public void terminateEvent(boolean isMajor) {
-        if (locator != null) { // means the service is started
-            eventHandler.terminateEvent(isMajor);
+            eventHandler.terminateEvent();
         }
     }
 }
