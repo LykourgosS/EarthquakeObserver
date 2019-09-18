@@ -76,7 +76,7 @@ public class NotificationHelper {
     }
 
     public static NotificationCompat.Builder getObserverNotification(Context context, String text) {
-        Intent intentNotification = new Intent(context, LaunchScreenActivity.class);
+        Intent intentNotification = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intentNotification, 0);
 
         NotificationCompat.Builder notification = new NotificationCompat.Builder(context, Constant.OBSERVER_SERVICE_CHANNEL_ID)

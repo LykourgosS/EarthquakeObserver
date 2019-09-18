@@ -21,7 +21,7 @@
 //import com.unipi.lykourgoss.earthquakeobserver.client.services.EarthquakeManager;
 //import com.unipi.lykourgoss.earthquakeobserver.client.models.EarthquakeEvent;
 //import com.unipi.lykourgoss.earthquakeobserver.client.models.MinimalEarthquakeEvent;
-//import com.unipi.lykourgoss.earthquakeobserver.client.receivers.PowerDisconnectedReceiver;
+//import com.unipi.lykourgoss.earthquakeobserver.client.filestoremove.PowerDisconnectedReceiver;
 //import com.unipi.lykourgoss.earthquakeobserver.client.services.Locator;
 //import com.unipi.lykourgoss.earthquakeobserver.client.tools.SharedPrefManager;
 //import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;

@@ -1,4 +1,4 @@
-package com.unipi.lykourgoss.earthquakeobserver.client.receivers;
+package com.unipi.lykourgoss.earthquakeobserver.client.filestoremove;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

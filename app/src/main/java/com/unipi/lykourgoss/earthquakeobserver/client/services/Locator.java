@@ -19,7 +19,7 @@ public class Locator implements LocationListener {
 
     private static final String TAG = "Locator";
 
-    private static final float MAX_DISTANCE_CONNECTED__TO_AC = 10; // 10 meters
+    private static final float MAX_DISTANCE_CONNECTED__TO_AC = 100; // in meters
 
     private Location lastLocation;
 

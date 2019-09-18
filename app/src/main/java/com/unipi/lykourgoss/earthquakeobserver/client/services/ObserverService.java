@@ -68,12 +68,14 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
     }
 
     private void registerReceivers() {
-        IntentFilter filter = new IntentFilter(Intent.ACTION_POWER_DISCONNECTED);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        filter.addAction(Constant.FAKE_POWER_DISCONNECTED);
-        filter.addAction(Constant.DEVICE_IS_MOVING);
+        filter.addAction(Constant.FAKE_POWER_DISCONNECTED); // TODO: 09/18/2019 remove
         registerReceiver(receiver, filter);
     }
+
+
 
     @Override
     public void onCreate() { // triggered only once in the lifetime of the service
@@ -85,8 +87,6 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         float balanceValue = SharedPrefManager.getInstance(this).read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_BALANCE_SENSOR_VALUE);
         earthquakeManager = new EarthquakeManager(this, balanceValue);
         //todo only onStart locator = new Locator(this, this);
-
-
     }
 
     @Override
@@ -117,6 +117,7 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         // 2. startForegroundService() -> if not called in 5 seconds max system will kill the service (on API v.26)
         startForeground(Constant.OBSERVER_SERVICE_ID, notification.build()); // id must be greater than 0
 
+        // registerReceivers();
         // to stop service from here (it will trigger onDestroy())
         //stopSelf();
 
@@ -140,11 +141,12 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         earthquakeManager.unregisterListener();
 
         if (locator != null) { // means the service has been started
+            // cancel the notification that has been notified (when No location or device is moving)
+            NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            manager.cancel(Constant.OBSERVER_SERVICE_ID);
             locator.removeUpdates();
             DeviceHandler.updateDeviceStatus(deviceId, false);
         }
-
-        //todo ? Util.scheduleObserverService(this);
     }
 
     @Override

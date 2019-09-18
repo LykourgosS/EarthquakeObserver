@@ -34,7 +34,7 @@ public class MainActivity extends BaseActivity {
 
     private static final int LOCATION_PERMISSION_CODE = 1;
 
-    private TextView textViewBatteryStatus;
+    //private TextView textViewBatteryStatus;
 
     private BootCompletedReceiver receiver = new BootCompletedReceiver();
 
@@ -46,17 +46,15 @@ public class MainActivity extends BaseActivity {
 
         updateUiForAdmin(SharedPrefManager.getInstance(this).read(Constant.USER_IS_ADMIN, false));
 
-        // register receiver for
+        // register receiver for todo remove
         IntentFilter filter = new IntentFilter(Constant.FAKE_BOOT);
         registerReceiver(receiver, filter);
 
-        checkLocationPermission();
-        /*if (todo checkLocationPermission()) {
-            Intent service = new Intent(this, ObserverService.class);
-            ContextCompat.startForegroundService(this, service);
-        }*/
+        if (checkLocationPermission()) {
+            Util.scheduleObserverService(this);
+        }
 
-        textViewBatteryStatus = findViewById(R.id.text_view_battery_status);
+        /*textViewBatteryStatus = findViewById(R.id.text_view_battery_status);
         final IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 
         // todo remove Timer
@@ -81,7 +79,7 @@ public class MainActivity extends BaseActivity {
                     }
                 });
             }
-        }, 0, 500);
+        }, 0, 500);*/
     }
 
     @Override
@@ -135,18 +133,21 @@ public class MainActivity extends BaseActivity {
 
     private void updateUiForAdmin(boolean isAdmin) {
         int visibility = View.VISIBLE;
+        // regular user features
+        findViewById(R.id.button_boot).setVisibility(visibility);
+        findViewById(R.id.button_start_service).setVisibility(visibility);
+        findViewById(R.id.button_stop_service).setVisibility(visibility);
         if (!isAdmin) visibility = View.GONE;
+        // admin user features
         findViewById(R.id.button_sensor_configuration).setVisibility(visibility);
         findViewById(R.id.button_log_location).setVisibility(visibility);
         findViewById(R.id.button_graph_only_norm).setVisibility(visibility);
         findViewById(R.id.button_graph_all).setVisibility(visibility);
-        findViewById(R.id.button_boot).setVisibility(View.VISIBLE);
         findViewById(R.id.button_disconnect_power).setVisibility(visibility);
         findViewById(R.id.button_clear_event).setVisibility(visibility);
         findViewById(R.id.button_sign_in).setVisibility(visibility);
-        findViewById(R.id.button_start_service).setVisibility(View.VISIBLE);
-        findViewById(R.id.button_stop_service).setVisibility(visibility);
-        findViewById(R.id.text_view_battery_status).setVisibility(visibility);
+        // todo remove
+        //  findViewById(R.id.text_view_battery_status).setVisibility(visibility);
     }
     
     private boolean checkLocationPermission() {

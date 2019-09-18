@@ -57,10 +57,6 @@
         <receiver android:name=".receivers.BootCompletedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.hardware.usb.action.USB_ACCESSORY_DETACHED" />
-                <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED" />
-                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
-                <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED" />
             </intent-filter>
         </receiver>
 
@@ -70,7 +66,8 @@
         <service
             android:name=".services.StartUpdateJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service android:name=".services.ObserverService" />
+        <service android:name=".services.ObserverService"
+            android:exported="false"/>
         <service android:name=".services.UpdateService" />
         <service android:name=".location.LocationService" />
         <!-- todo what should become exported="false" ??? -->
