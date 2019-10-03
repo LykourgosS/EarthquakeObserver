@@ -1,6 +1,9 @@
 package com.unipi.lykourgoss.earthquakeobserver.client.activities;
 
 import android.Manifest;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -34,10 +37,6 @@ public class MainActivity extends BaseActivity {
 
     private static final int LOCATION_PERMISSION_CODE = 1;
 
-    //private TextView textViewBatteryStatus;
-
-    private BootCompletedReceiver receiver = new BootCompletedReceiver();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,78 +45,33 @@ public class MainActivity extends BaseActivity {
 
         updateUiForAdmin(SharedPrefManager.getInstance(this).read(Constant.USER_IS_ADMIN, false));
 
-        // register receiver for todo remove
-        IntentFilter filter = new IntentFilter(Constant.FAKE_BOOT);
-        registerReceiver(receiver, filter);
-
         if (checkLocationPermission()) {
             Util.scheduleObserverService(this);
         }
-
-        /*textViewBatteryStatus = findViewById(R.id.text_view_battery_status);
-        final IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-
-        // todo remove Timer
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Intent batteryStatus = registerReceiver(null, intentFilter);
-                // Are we charging / charged?
-                int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-                boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL;
-
-                // How are we charging?
-                int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-                boolean usbCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_USB;
-                boolean acCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_AC;
-
-                final String batteryStatusString = String.format("isCharging = %s\nusbCharge = %s\nacCharge = %s", isCharging, usbCharge, acCharge);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        textViewBatteryStatus.setText(batteryStatusString);
-                    }
-                });
-            }
-        }, 0, 500);*/
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(receiver);
-    }
-
-    public void sensorConfiguration(View v) {
+    public void sensorConfiguration(View view) {
         startActivity(new Intent(this, ConfigDeviceActivity.class));
     }
 
-    public void logLocation(View v) {
+    public void logLocation(View view) {
         startActivity(new Intent(this, LogLocationActivity.class));
     }
 
-    public void graphOnlyNorm(View v) {
+    public void graphOnlyNorm(View view) {
         startActivity(new Intent(this, GraphOnlyNormActivity.class));
     }
 
-    public void graphAll(View v) {
+    public void graphAll(View view) {
         startActivity(new Intent(this, GraphAllActivity.class));
     }
 
-    public void fakeBoot(View v) {
-        sendBroadcast(new Intent(Constant.FAKE_BOOT));
-    }
-
-    public void fakePowerDisconnected(View v) {
-        sendBroadcast(new Intent(Constant.FAKE_POWER_DISCONNECTED));
-    }
-
-    public void clearEvents(View v) {
+    public void clearEvents(View view) {
         EventHandler handler = new EventHandler(Util.getUniqueId(this));
         handler.deleteSavedEvents();
     }
 
-    public void signIn(View v) {
+    public void signIn(View view) {
         startActivity(new Intent(this, SignInActivity.class));
     }
 
@@ -131,10 +85,16 @@ public class MainActivity extends BaseActivity {
         stopService(new Intent(this, ObserverService.class));
     }
 
+    public void share(View view) {
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("EarthquakeObserver's link", "www.google.com");
+        clipboard.setPrimaryClip(clip);
+        Toast.makeText(this, "EarthquakeObserver's link copied to clipboard", Toast.LENGTH_SHORT).show();
+    }
+
     private void updateUiForAdmin(boolean isAdmin) {
         int visibility = View.VISIBLE;
         // regular user features
-        findViewById(R.id.button_boot).setVisibility(visibility);
         findViewById(R.id.button_start_service).setVisibility(visibility);
         findViewById(R.id.button_stop_service).setVisibility(visibility);
         if (!isAdmin) visibility = View.GONE;
@@ -143,11 +103,8 @@ public class MainActivity extends BaseActivity {
         findViewById(R.id.button_log_location).setVisibility(visibility);
         findViewById(R.id.button_graph_only_norm).setVisibility(visibility);
         findViewById(R.id.button_graph_all).setVisibility(visibility);
-        findViewById(R.id.button_disconnect_power).setVisibility(visibility);
         findViewById(R.id.button_clear_event).setVisibility(visibility);
         findViewById(R.id.button_sign_in).setVisibility(visibility);
-        // todo remove
-        //  findViewById(R.id.text_view_battery_status).setVisibility(visibility);
     }
     
     private boolean checkLocationPermission() {

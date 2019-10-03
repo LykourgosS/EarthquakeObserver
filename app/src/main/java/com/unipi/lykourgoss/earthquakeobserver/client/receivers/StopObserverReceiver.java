@@ -24,10 +24,8 @@ public class StopObserverReceiver extends BroadcastReceiver { // to take action 
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(TAG, "onReceive " + intent.getAction());
-        // TODO: 09/11/2019 remove custom action (added for debugging purposes)
         // getAction() might be null thus we don't use it to call equals()
-        if (Intent.ACTION_POWER_DISCONNECTED.equals(intent.getAction()) ||
-                Constant.FAKE_POWER_DISCONNECTED.equals(intent.getAction())) { // Check if power disconnected
+        if (Intent.ACTION_POWER_DISCONNECTED.equals(intent.getAction())) { // Check if power disconnected
 
             Log.d(TAG, "onReceive: Power Disconnected");
 

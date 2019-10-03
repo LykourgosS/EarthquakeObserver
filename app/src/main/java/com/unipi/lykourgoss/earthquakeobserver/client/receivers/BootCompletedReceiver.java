@@ -20,9 +20,7 @@ public class BootCompletedReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // todo remove custom action (added for debugging purposes)
-        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())
-                || Constant.FAKE_BOOT.equals(intent.getAction())) {
+        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
             Log.d(TAG, "onReceive");
             Toast.makeText(context, TAG, Toast.LENGTH_SHORT).show();
             Util.scheduleObserverService(context);

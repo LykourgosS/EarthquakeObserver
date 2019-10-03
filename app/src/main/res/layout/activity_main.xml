@@ -41,20 +41,6 @@
             android:text="Graph all" />
 
         <Button
-            android:id="@+id/button_boot"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="fakeBoot"
-            android:text="Boot" />
-
-        <Button
-            android:id="@+id/button_disconnect_power"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="fakePowerDisconnected"
-            android:text="Disconnect power" />
-
-        <Button
             android:id="@+id/button_clear_event"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -82,11 +68,12 @@
             android:onClick="stopService"
             android:text="Stop Service" />
 
-        <TextView
-            android:id="@+id/text_view_battery_status"
+        <Button
+            android:id="@+id/button_share"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+            android:onClick="share"
+            android:text="Share" />
 
     </LinearLayout>
 

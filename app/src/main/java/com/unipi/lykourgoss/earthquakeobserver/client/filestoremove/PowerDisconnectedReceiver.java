@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.client.services.ObserverService;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
 
@@ -21,9 +20,8 @@ public class PowerDisconnectedReceiver extends BroadcastReceiver { // to take ac
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // todo remove custom action (added for debugging purposes)
-        if (Intent.ACTION_POWER_DISCONNECTED.equals(intent.getAction())
-                || Constant.FAKE_POWER_DISCONNECTED.equals(intent.getAction())) { // getAction() might be null thus we don't use it to call equals()
+        // getAction() might be null thus we don't use it to call equals()
+        if (Intent.ACTION_POWER_DISCONNECTED.equals(intent.getAction())) {
             Log.d(TAG, "onReceive");
             Toast.makeText(context, "Power Disconnected", Toast.LENGTH_SHORT).show();
 

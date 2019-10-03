@@ -71,7 +71,6 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        filter.addAction(Constant.FAKE_POWER_DISCONNECTED); // TODO: 09/18/2019 remove
         registerReceiver(receiver, filter);
     }
 

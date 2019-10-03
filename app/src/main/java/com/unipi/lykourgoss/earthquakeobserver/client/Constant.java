@@ -34,11 +34,6 @@ public class Constant {
     public static final int START_UPDATE_SERVICE_JOB_ID = 2;
     public static final String EXTRA_SETTINGS = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.EXTRA_SETTINGS";
 
-    // for Debugging purposes: custom action broadcasts
-    public static final String FAKE_BOOT = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.FAKE_BOOT";
-    public static final String FAKE_POWER_DISCONNECTED = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.FAKE_POWER_DISCONNECTED";
-    public static final String DEVICE_IS_MOVING = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.DEVICE_IS_MOVING";
-
     // 10 samples/s => 1 sample in 0.1 s = 100 ms = 100000 μs
     public static final int SAMPLING_PERIOD = 100 * 1000;
 
@@ -46,21 +41,7 @@ public class Constant {
      * minimum duration in milliseconds for an earthquakeobserver event used to check while the event is terminated, to
      * know if event should be saved to Firebase Database (from active-events to saved-events)
      * */
-    public static final long MIN_EVENT_DURATION = 5 * 1000;
-
-    /* todo remove
-    // Client Settings
-    public static final String SAMPLING_PERIOD_PREF = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.SAMPLING_PERIOD_PREF";
-    public static final String _PREF = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.SAMPLES_BATCH_COUNT_PREF";
-    public static final String _PREF = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.MIN_EVENT_DURATION_PREF";
-    public static final String _PREF = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.DEFAULT_BALANCE_SENSOR_VALUE_PREF";
-    public static final String SENSOR_VALUE_THRESHOLD_PREF = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.SENSOR_VALUE_THRESHOLD_PREF";
-    public static final String CONFIG_DEVICE_REJECT_SAMPLE_THRESHOLD_PREF = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.SENSOR_VALUE_THRESHOLD_PREF";*/
-
-    // todo remove
-    // used for passing info about sensor from ConfigDeviceActivity back to SignInActivity
-    // to add device to firebase
-    public static final String EXTRA_SENSOR_INFO = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.EXTRA_SENSOR_INFO";
+    public static final long MIN_EVENT_DURATION = 2 * 1000;
 
     // according to documentation, might defer from the real one
     // (ex. instead of 9.8 to be 9.87 or 9.9)
@@ -105,8 +86,4 @@ public class Constant {
     // used for setting up location Requests
     public static final int LOCATION_REQUEST_INTERVAL = 1000 * 30; // 30 seconds
     public static final int LOCATION_REQUEST_FAST_INTERVAL = 1000 * 10; // 10 seconds
-
-    // todo remove
-    // used for logging locations in LogLocationActivity and ObserverService
-    public static final String EXTRA_LOCATION_LOG = "com.unipi.lykourgoss.earthquakeobserver.client.Constant.EXTRA_LOCATION_LOG";
 }
