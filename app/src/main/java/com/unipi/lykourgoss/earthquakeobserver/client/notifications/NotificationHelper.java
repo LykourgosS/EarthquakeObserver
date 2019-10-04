@@ -25,7 +25,7 @@ public class NotificationHelper {
     // notification id must be different from the id when you call
     // startForeground(int id, Notification notification)
     private static final int EARTHQUAKE_NOTIFICATION_ID = 2;
-    private static final int UPDATE_NOTIFICATION_ID = 2;
+    private static final int UPDATE_NOTIFICATION_ID = 3;
 
     public static void sendEarthquakeNotification(Context context, String title, String body, String id) {
         Intent intent = new Intent(context, EarthquakeActivity.class);

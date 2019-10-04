@@ -1,5 +1,7 @@
 package com.unipi.lykourgoss.earthquakeobserver.client.models;
 
+import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
+
 import java.util.Map;
 
 /**
@@ -71,8 +73,8 @@ public class Earthquake {
                 "id='" + id + '\'' +
                 ", devices=" + devices.size() +
                 ", isActive=" + isActive +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
+                ", startTime=" + Util.millisToDateTime(startTime) +
+                ", endTime=" + Util.millisToDateTime(endTime) +
                 '}';
     }
 }

@@ -87,9 +87,9 @@ public class MainActivity extends BaseActivity {
 
     public void share(View view) {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("EarthquakeObserver's link", "www.google.com");
+        ClipData clip = ClipData.newPlainText("EarthquakeObserver's link", "https://drive.google.com/open?id=1pL5CPYEZNBhLe7TtMiOabMaiOPQeTMol");
         clipboard.setPrimaryClip(clip);
-        Toast.makeText(this, "EarthquakeObserver's link copied to clipboard", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "EarthquakeObserver's link copied", Toast.LENGTH_SHORT).show();
     }
 
     private void updateUiForAdmin(boolean isAdmin) {
