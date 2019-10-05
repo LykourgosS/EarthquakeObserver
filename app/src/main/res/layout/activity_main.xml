@@ -16,63 +16,54 @@
             android:id="@+id/button_sensor_configuration"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="sensorConfiguration"
             android:text="Sensor configuration" />
 
         <Button
             android:id="@+id/button_log_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="logLocation"
             android:text="Log Location" />
 
         <Button
             android:id="@+id/button_graph_only_norm"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="graphOnlyNorm"
             android:text="Graph only norm" />
 
         <Button
             android:id="@+id/button_graph_all"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="graphAll"
             android:text="Graph all" />
 
         <Button
-            android:id="@+id/button_clear_event"
+            android:id="@+id/button_clear_events"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="clearEvents"
             android:text="Clear events" />
 
         <Button
             android:id="@+id/button_sign_in"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="signIn"
             android:text="Sign in" />
 
         <Button
             android:id="@+id/button_start_service"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="startService"
             android:text="Start Service" />
 
         <Button
             android:id="@+id/button_stop_service"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="stopService"
             android:text="Stop Service" />
 
         <Button
             android:id="@+id/button_share"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="share"
             android:text="Share" />
 
     </LinearLayout>

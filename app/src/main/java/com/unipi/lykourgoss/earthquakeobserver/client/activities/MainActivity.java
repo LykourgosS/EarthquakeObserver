@@ -6,13 +6,10 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.os.BatteryManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,16 +19,12 @@ import androidx.core.content.ContextCompat;
 
 import com.unipi.lykourgoss.earthquakeobserver.client.Constant;
 import com.unipi.lykourgoss.earthquakeobserver.client.R;
-import com.unipi.lykourgoss.earthquakeobserver.client.receivers.BootCompletedReceiver;
 import com.unipi.lykourgoss.earthquakeobserver.client.services.ObserverService;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.SharedPrefManager;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.Util;
 import com.unipi.lykourgoss.earthquakeobserver.client.tools.dbhandlers.EventHandler;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = "MainActivity";
 
@@ -43,6 +36,16 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate");
 
+        findViewById(R.id.button_sensor_configuration).setOnClickListener(this);
+        findViewById(R.id.button_log_location).setOnClickListener(this);
+        findViewById(R.id.button_graph_only_norm).setOnClickListener(this);
+        findViewById(R.id.button_graph_all).setOnClickListener(this);
+        findViewById(R.id.button_clear_events).setOnClickListener(this);
+        findViewById(R.id.button_sign_in).setOnClickListener(this);
+        findViewById(R.id.button_start_service).setOnClickListener(this);
+        findViewById(R.id.button_stop_service).setOnClickListener(this);
+        findViewById(R.id.button_share).setOnClickListener(this);
+
         updateUiForAdmin(SharedPrefManager.getInstance(this).read(Constant.USER_IS_ADMIN, false));
 
         if (checkLocationPermission()) {
@@ -50,42 +53,41 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    public void sensorConfiguration(View view) {
+    private void sensorConfiguration() {
         startActivity(new Intent(this, ConfigDeviceActivity.class));
     }
 
-    public void logLocation(View view) {
+    private void logLocation() {
         startActivity(new Intent(this, LogLocationActivity.class));
     }
 
-    public void graphOnlyNorm(View view) {
+    private void graphOnlyNorm() {
         startActivity(new Intent(this, GraphOnlyNormActivity.class));
     }
 
-    public void graphAll(View view) {
+    private void graphAll() {
         startActivity(new Intent(this, GraphAllActivity.class));
     }
 
-    public void clearEvents(View view) {
+    private void clearEvents() {
         EventHandler handler = new EventHandler(Util.getUniqueId(this));
         handler.deleteSavedEvents();
     }
 
-    public void signIn(View view) {
+    private void signIn() {
         startActivity(new Intent(this, SignInActivity.class));
     }
 
-    public void startService(View view) {
+    private void startService() {
         Intent intentService = new Intent(this, ObserverService.class);
         ContextCompat.startForegroundService(this, intentService);
     }
 
-    // todo remove onClick from XML files and make them private
-    public void stopService(View view) {
+    private void stopService() {
         stopService(new Intent(this, ObserverService.class));
     }
 
-    public void share(View view) {
+    private void share() {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("EarthquakeObserver's link", "https://drive.google.com/open?id=1pL5CPYEZNBhLe7TtMiOabMaiOPQeTMol");
         clipboard.setPrimaryClip(clip);
@@ -103,7 +105,7 @@ public class MainActivity extends BaseActivity {
         findViewById(R.id.button_log_location).setVisibility(visibility);
         findViewById(R.id.button_graph_only_norm).setVisibility(visibility);
         findViewById(R.id.button_graph_all).setVisibility(visibility);
-        findViewById(R.id.button_clear_event).setVisibility(visibility);
+        findViewById(R.id.button_clear_events).setVisibility(visibility);
         findViewById(R.id.button_sign_in).setVisibility(visibility);
     }
     
@@ -147,6 +149,39 @@ public class MainActivity extends BaseActivity {
             } else {
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.button_sensor_configuration:
+                sensorConfiguration();
+                break;
+            case R.id.button_log_location:
+                logLocation();
+                break;
+            case R.id.button_graph_only_norm:
+                graphOnlyNorm();
+                break;
+            case R.id.button_graph_all:
+                graphAll();
+                break;
+            case R.id.button_clear_events:
+                clearEvents();
+                break;
+            case R.id.button_sign_in:
+                signIn();
+                break;
+            case R.id.button_start_service:
+                startService();
+                break;
+            case R.id.button_stop_service:
+                stopService();
+                break;
+            case R.id.button_share:
+                share();
+                break;
         }
     }
 }
