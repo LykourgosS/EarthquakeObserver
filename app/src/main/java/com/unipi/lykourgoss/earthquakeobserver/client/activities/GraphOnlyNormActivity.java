@@ -48,6 +48,8 @@ public class GraphOnlyNormActivity extends AppCompatActivity implements ServiceC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graph);
 
+        setTitle("Graph Only Norm");
+
         initializeChart();
     }
 

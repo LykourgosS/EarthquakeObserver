@@ -62,19 +62,12 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
         }
     }
 
-    // todo remove (used for debugging)
-    public ObserverService() {
-        Log.d(TAG, "ObserverService: Constructor");
-    }
-
     private void registerReceivers() {
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(receiver, filter);
     }
-
-
 
     @Override
     public void onCreate() { // triggered only once in the lifetime of the service
@@ -85,7 +78,8 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
 
         float balanceValue = SharedPrefManager.getInstance(this).read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_BALANCE_SENSOR_VALUE);
         earthquakeManager = new EarthquakeManager(this, balanceValue);
-        //todo only onStart locator = new Locator(this, this);
+        deviceId = Util.getUniqueId(this);
+        eventHandler = new EventHandler(deviceId);
     }
 
     @Override
@@ -122,8 +116,7 @@ public class ObserverService extends Service implements EarthquakeManager.OnEart
 
         // following are used for observing events and if needed save them to Firebase Database
         locator = new Locator(this, this);
-        deviceId = Util.getUniqueId(this);
-        eventHandler = new EventHandler(deviceId);
+
 
         // START_NOT_STICKY = when the system kills the service it won't be recreated again
         // START_STICKY = when the system kills the service it will be recreated with a null intent

@@ -49,6 +49,8 @@ public class GraphAllActivity extends AppCompatActivity implements ServiceConnec
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graph);
 
+        setTitle("Graph All");
+
         initializeChart();
         balanceValue = SharedPrefManager.getInstance(this).read(Constant.SENSOR_BALANCE_VALUE, Constant.DEFAULT_BALANCE_SENSOR_VALUE);
     }
@@ -88,9 +90,9 @@ public class GraphAllActivity extends AppCompatActivity implements ServiceConnec
         LineDataSet normXYZDataSet = createSet("√(x²+y²+z²)", 3f, Color.MAGENTA);
         data.addDataSet(normXYZDataSet);
 
-        // Acceleration using LPF DataSet
-        LineDataSet accelerationLPFDataSet = createSet("Acceleration using LPF", 1f, Color.YELLOW);
-        data.addDataSet(accelerationLPFDataSet);
+        // Acceleration using HPF DataSet
+        LineDataSet accelerationHPFDataSet = createSet("Acceleration using HPF", 1f, Color.YELLOW);
+        data.addDataSet(accelerationHPFDataSet);
 
         lineChart.setData(data);
 
@@ -149,10 +151,10 @@ public class GraphAllActivity extends AppCompatActivity implements ServiceConnec
         ILineDataSet normXYZDataSet = data.getDataSetByIndex(3);
         data.addEntry(new Entry(normXYZDataSet.getEntryCount(), normXYZ), 3);
 
-        // Acceleration using LPF DataSet
+        // Acceleration using HPF DataSet
         float acceleration = observerService.getAcceleration();
-        ILineDataSet accelerationLPFDataSet = data.getDataSetByIndex(4);
-        data.addEntry(new Entry(accelerationLPFDataSet.getEntryCount(), acceleration), 4);
+        ILineDataSet accelerationHPFDataSet = data.getDataSetByIndex(4);
+        data.addEntry(new Entry(accelerationHPFDataSet.getEntryCount(), acceleration), 4);
 
         data.notifyDataChanged();
 
@@ -189,7 +191,7 @@ public class GraphAllActivity extends AppCompatActivity implements ServiceConnec
                     });
                 }
             }
-        }, 0, Constant.SAMPLING_PERIOD / 1000 + 10); // period = 110, because accelerometer sampling period is 100 millis
+        }, 0, Constant.SAMPLING_PERIOD / 1000 /*+ 10*/); // period = 110, because accelerometer sampling period is 100 millis
 
     }
 

@@ -58,6 +58,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void logLocation() {
+        Intent intentService = new Intent(this, ObserverService.class);
+        ContextCompat.startForegroundService(this, intentService);
         startActivity(new Intent(this, LogLocationActivity.class));
     }
 
@@ -99,6 +101,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         // regular user features
         findViewById(R.id.button_start_service).setVisibility(visibility);
         findViewById(R.id.button_stop_service).setVisibility(visibility);
+        findViewById(R.id.button_share).setVisibility(visibility);
         if (!isAdmin) visibility = View.GONE;
         // admin user features
         findViewById(R.id.button_sensor_configuration).setVisibility(visibility);
@@ -107,6 +110,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         findViewById(R.id.button_graph_all).setVisibility(visibility);
         findViewById(R.id.button_clear_events).setVisibility(visibility);
         findViewById(R.id.button_sign_in).setVisibility(visibility);
+        //findViewById(R.id.button_start_service).setVisibility(visibility);
     }
     
     private boolean checkLocationPermission() {

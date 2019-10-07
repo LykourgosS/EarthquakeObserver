@@ -44,8 +44,7 @@ public class LaunchScreenActivity extends AppCompatActivity {
                     startActivity(new Intent(LaunchScreenActivity.this, SignInActivity.class));
                 } else {
                     if (sharedPrefManager.read(Constant.DEVICE_ADDED_TO_FIREBASE, false)) {
-                        Bundle bundle = getIntent().getExtras();
-                        if (bundle != null) {
+                        if (getIntent().hasExtra(Earthquake.ID)) {
                             String earthquakeId = (String) getIntent().getExtras().get(Earthquake.ID);
                             if (earthquakeId != null) { // when user clicked notification about new earthquake
                                 Intent intent = new Intent(LaunchScreenActivity.this, EarthquakeActivity.class);

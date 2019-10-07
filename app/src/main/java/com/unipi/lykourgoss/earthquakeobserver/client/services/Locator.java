@@ -34,9 +34,6 @@ public class Locator implements LocationListener {
         this.listener = listener;
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(PROVIDER, Constant.LOCATION_REQUEST_INTERVAL, 0, this);
-        //lastLocation = locationManager.getLastKnownLocation(PROVIDER);
-        //Log.d(TAG, "Locator: " + lastLocation);
-        //listener.onLocatorInit(locationManager.isProviderEnabled(PROVIDER));
     }
 
     public void removeUpdates() {
